@@ -1,0 +1,111 @@
+@model WebAppEF.Entities.Cliente
+
+@{
+    ViewData["Title"] = "Aggiungi Nuovo Cliente";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-white p-3 rounded bg-gradient" style="background: linear-gradient(45deg, #007bff, #66b3ff);">
+        @ViewData["Title"]
+    </h2>
+
+    <div>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <div class="card shadow-lg p-4 mt-4 border-0 rounded-3">
+        <form id="customerForm" asp-action="Create" method="post">
+            <div class="row">
+                <!-- Nome -->
+                <div class="col-md-6 mb-4">
+                    <label asp-for="Nome" class="form-label fw-bold text-secondary">Nome</label>
+                    <input asp-for="Nome" class="form-control form-control-lg border-primary shadow-sm" required />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <!-- Cognome -->
+                <div class="col-md-6 mb-4">
+                    <label asp-for="Cognome" class="form-label fw-bold text-secondary">Cognome</label>
+                    <input asp-for="Cognome" class="form-control form-control-lg border-primary shadow-sm" required />
+                    <span asp-validation-for="Cognome" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label asp-for="Email" class="form-label fw-bold text-secondary">Email</label>
+                <input asp-for="Email" class="form-control form-control-lg border-primary shadow-sm" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+                <small id="emailError" class="text-danger d-none"></small>
+            </div>
+
+            <!-- Data di Nascita -->
+            <div class="mb-4">
+                <label asp-for="DataIscrizione" class="form-label fw-bold text-secondary">Data di Iscrizione</label>
+                <input asp-for="DataIscrizione" type="date" class="form-control form-control-lg border-primary shadow-sm" required />
+                <span asp-validation-for="DataIscrizione" class="text-danger"></span>
+            </div>
+
+            <!-- Pulsanti -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg shadow-lg px-4 py-2 rounded-pill">
+                    <i class="fas fa-save"></i> Salva Cliente
+                </button>
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg shadow-lg px-4 py-2 rounded-pill">
+                    <i class="fas fa-arrow-left"></i> Torna alla Lista
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let emailInput = document.getElementById("Email");
+            let emailError = document.getElementById("emailError");
+            let form = document.getElementById("customerForm");
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Blocca l'invio del form
+
+                // Reset messaggi di errore
+                emailError.classList.add("d-none");
+                emailInput.classList.remove("is-invalid");
+
+                let email = emailInput.value;
+
+                // Chiamata AJAX al controller per la validazione
+                fetch('@Url.Action("CheckEmailExists", "Customer")?email=' + encodeURIComponent(email))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.valid) {
+                            emailError.textContent = data.message;
+                            emailError.classList.remove("d-none");
+                            emailInput.classList.add("is-invalid");
+                        } else {
+                            form.submit(); // Se tutto è OK, invia il form
+                        }
+                    })
+                    .catch(error => console.error("Errore AJAX:", error));
+            });
+        });
+    </script>
+}

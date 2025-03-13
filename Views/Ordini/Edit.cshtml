@@ -1,0 +1,108 @@
+@model WebAppEF.ViewModels.OrdineViewModel
+@using WebAppEF.ViewModels
+@{
+    ViewData["Title"] = "Modifica Ordine";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-white p-3 rounded shadow-lg" style="background: linear-gradient(45deg, #007bff, #00d4ff);">
+            <i class="fas fa-edit"></i> Modifica Ordine
+        </h2>
+    </div>
+
+    <div>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header" style="background: #343a40; color: white;">
+                    <h5 class="mb-0">Dettagli dell'Ordine</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="IdOrdine" />
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="IdCliente" class="form-label">Cliente</label>
+                            <select asp-for="IdCliente" asp-items="ViewBag.Clienti" class="form-control">
+                                <option value="">-- Seleziona Cliente --</option>
+                            </select>
+                            <span asp-validation-for="IdCliente" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="TotaleOrdine" class="form-label">Totale Ordine</label>
+                            <input asp-for="TotaleOrdine" class="form-control" />
+                            <span asp-validation-for="TotaleOrdine" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Stato" class="form-label">Stato</label>
+                            <select asp-for="Stato" class="form-control">
+                                @foreach (var stato in Enum.GetValues(typeof(WebAppEF.Entities.StatoOrdine)).Cast<WebAppEF.Entities.StatoOrdine>())
+                                {
+                                    <option value="@stato">@stato</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Stato" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="DataOrdine" class="form-label">Data Ordine</label>
+                            <input asp-for="DataOrdine" class="form-control" type="date" />
+                            <span asp-validation-for="DataOrdine" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3 text-center">
+                            <button type="submit" class="btn btn-success btn-lg shadow">
+                                <i class="fas fa-save"></i> Salva Modifiche
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg shadow ms-3">
+                                <i class="fas fa-arrow-left"></i> Torna alla lista
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('form').on('submit', function (e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('was-validated');
+            }
+        });
+    });
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

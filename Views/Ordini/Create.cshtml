@@ -1,0 +1,95 @@
+@model WebAppEF.ViewModels.OrdineViewModel
+
+@{
+    ViewData["Title"] = "Crea Ordine";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-white p-3 rounded bg-gradient" style="background: linear-gradient(45deg, #007bff, #66b3ff);">
+        @ViewData["Title"]
+    </h2>
+
+    <!-- Messaggi di notifica -->
+    <div>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <!-- Card principale -->
+    <div class="card shadow-lg p-4 mt-4 border-0 rounded-3">
+        <form asp-action="Create" method="post" id="orderForm">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.IdOrdine)
+
+            <!-- Seleziona Cliente -->
+            <div class="mb-4">
+                <label asp-for="IdCliente" class="form-label fw-bold text-secondary">Seleziona Cliente *</label>
+                <select asp-for="IdCliente" class="form-select form-control-lg border-primary shadow-sm" required>
+                    <option value="">-- Seleziona un cliente --</option>
+                    @if (Model.Clienti != null && Model.Clienti.Count > 0)
+                    {
+                        foreach (var cliente in Model.Clienti)
+                        {
+                            <option value="@cliente.IdCliente">@cliente.Nome @cliente.Cognome</option>
+                        }
+                    }
+                    else
+                    {
+                        <option disabled>Nessun cliente disponibile</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Totale Ordine -->
+            <div class="mb-4">
+                <label asp-for="TotaleOrdine" class="form-label fw-bold text-secondary">Totale Ordine *</label>
+                <div class="input-group">
+                    <span class="input-group-text">€</span>
+                    <input asp-for="TotaleOrdine" class="form-control form-control-lg border-primary shadow-sm" required min="0.01" step="0.01" />
+                </div>
+            </div>
+
+            <!-- Stato Ordine -->
+            <div class="mb-4">
+                <label asp-for="Stato" class="form-label fw-bold text-secondary">Stato Ordine *</label>
+                <select asp-for="Stato" class="form-select form-control-lg border-primary shadow-sm" required>
+                    <option value="Confermato">Confermato</option>
+                    <option value="Spedito">Spedito</option>
+                    <option value="Annullato">Annullato</option>
+                </select>
+            </div>
+
+            <!-- Data Ordine -->
+            <div class="mb-4">
+                <label asp-for="DataOrdine" class="form-label fw-bold text-secondary">Data Ordine *</label>
+                <input asp-for="DataOrdine" class="form-control form-control-lg border-primary shadow-sm" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <!-- Pulsanti -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg shadow-lg px-4 py-2 rounded-pill">
+                    <i class="fas fa-save"></i> Salva Ordine
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg shadow-lg px-4 py-2 rounded-pill">
+                    <i class="fas fa-arrow-left"></i> Torna alla Lista
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+}

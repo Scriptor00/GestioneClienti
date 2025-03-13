@@ -1,0 +1,111 @@
+@model WebAppEF.ViewModel.RisultatiRicercaViewModel
+
+@{
+    ViewData["Title"] = "Risultati Ricerca";
+}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center text-primary">Risultati della Ricerca</h1>
+        
+        <a href="@Url.Action("Filtri", "Filtri")" class="btn btn-secondary mb-3">Nuova Ricerca</a>
+
+        @if (Model.Clienti != null && Model.Clienti.Count > 0)
+        {
+            <h3>Clienti Trovati</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Email</th>
+                        <th>Ordini</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in Model.Clienti)
+                    {
+                        <tr>
+                            <td>@cliente.Nome</td>
+                            <td>@cliente.Cognome</td>
+                            <td>@cliente.Email</td>
+                            <td>
+                                @if (cliente.Ordini != null && cliente.Ordini.Any())
+                                {
+                                    <ul>
+                                        @foreach (var ordine in cliente.Ordini)
+                                        {
+                                            <li>
+                                                Ordine #@ordine.IdOrdine 
+                                                - @ordine.DataOrdine.ToShortDateString() 
+                                                - @ordine.TotaleOrdine.ToString("C")
+                                                - Stato: @ordine.Stato
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span>Nessun ordine</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Model.Ordini != null && Model.Ordini.Count > 0)
+        {
+            <h3>Ordine Trovato</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID Ordine</th>
+                        <th>Data Ordine</th>
+                        <th>Totale</th>
+                        <th>Stato</th>
+                        <th>Cliente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ordine in Model.Ordini)
+                    {
+                        <tr>
+                            <td>@ordine.IdOrdine</td>
+                            <td>@ordine.DataOrdine.ToShortDateString()</td>
+                            <td>@ordine.TotaleOrdine.ToString("C")</td>
+                            <td>@ordine.Stato</td>
+                            <td>
+                                @if (ordine.Cliente != null)
+                                {
+                                    @ordine.Cliente.Nome @(" ") @ordine.Cliente.Cognome
+                                }
+                                else
+                                {
+                                    <span>Cliente non trovato</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if ((Model.Clienti == null || Model.Clienti.Count == 0) && (Model.Ordini == null || Model.Ordini.Count == 0))
+        {
+            <div class="alert alert-info text-center">
+                Nessun risultato trovato per la ricerca.
+            </div>
+        }
+    </div>
+</body>
+</html>

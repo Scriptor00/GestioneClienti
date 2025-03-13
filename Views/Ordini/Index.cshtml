@@ -1,0 +1,242 @@
+@model WebAppEF.ViewModel.PagOrdiniViewModel<WebAppEF.ViewModels.OrdineViewModel>
+
+@{
+    ViewData["Title"] = "Gestione Ordini";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg shadow">
+            <i class="fas fa-home"></i> Torna alla Home
+        </a>
+
+        <h2 class="text-center text-white p-3 rounded shadow-lg flex-grow-1" style="background: linear-gradient(45deg, #007bff, #00d4ff);">
+            <i class="fas fa-boxes"></i> @ViewData["Title"]
+        </h2>
+    </div>
+
+    <!-- Notifica di successo -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>@TempData["SuccessMessage"]</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-end mb-3">
+        <a href="@Url.Action("Create")" class="btn btn-success btn-lg shadow">
+            <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Ordine
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered shadow-lg text-center">
+            <thead class="text-white" style="background: linear-gradient(45deg, #343a40, #555);">
+                <tr>
+                    <th>Id Ordine</th>
+                    <th>Cliente</th>
+                    <th>Totale Ordine</th>
+                    <th>Stato</th>
+                    <th>Data Ordine</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ordine in Model.Ordini)
+                {
+                    <tr>
+                        <td>@ordine.IdOrdine</td>
+                        <td>
+                            @if (ordine.Cliente != null)
+                            {
+                                @ordine.Cliente.Nome @ordine.Cliente.Cognome
+                            }
+                            else
+                            {
+                                <span>Cliente non disponibile</span>
+                            }
+                        </td> 
+                        <td>@ordine.TotaleOrdine</td>
+                        <td>@ordine.Stato</td>
+                        <td>@ordine.DataOrdine.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a href="@Url.Action("Edit", new { id = ordine.IdOrdine })" class="btn btn-warning btn-sm shadow">
+                                <i class="fas fa-edit"></i> Modifica
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = ordine.IdOrdine })"
+                               class="btn btn-danger btn-sm shadow"
+                               onclick="return confirm('Sei sicuro di voler eliminare questo ordine?')">
+                                <i class="fas fa-trash-alt"></i> Elimina
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginazione -->
+    <div class="pagination-container d-flex justify-content-center align-items-center mt-4">
+        <!-- Frecce di navigazione -->
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn btn-secondary">
+                <i class="fas fa-angle-double-left"></i> Prima
+            </a>
+        }
+
+        @if (Model.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn btn-secondary">
+                <i class="fas fa-chevron-left"></i> Precedente
+            </a>
+        }
+
+        <!-- Pagine numeriche -->
+        <div class="page-numbers d-flex">
+            @if (Model.CurrentPage > 3)
+            {
+                <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
+                    1
+                </a>
+                <span class="pagination-btn">...</span>
+            }
+
+            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+            {
+                <a href="@Url.Action("Index", new { page = i })" class="pagination-btn @((i == Model.CurrentPage) ? "active" : "")">
+                    @i
+                </a>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPages - 2)
+            {
+                <span class="pagination-btn">...</span>
+                <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
+                    @Model.TotalPages
+                </a>
+            }
+        </div>
+
+        <!-- Saltare a una pagina -->
+        <div class="input-group mx-3">
+            <input type="number" id="pageInput" class="form-control input-page" placeholder="P" min="1" max="@Model.TotalPages" />
+            <div class="input-group-append">
+                <button class="btn btn-primary" id="goToPageButton">Vai</button>
+            </div>
+        </div>
+
+        <!-- Frecce di navigazione -->
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn btn-secondary">
+                Successiva <i class="fas fa-chevron-right"></i>
+            </a>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn btn-secondary">
+                Ultima <i class="fas fa-angle-double-right"></i>
+            </a>
+        }
+    </div>
+</div>
+
+
+<style>
+    body {
+        background-color: #f8f9fa !important;
+    }
+
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: #343a40;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn {
+        border-radius: 8px;
+    }
+
+    .btn-lg {
+        padding: 12px 20px;
+        font-size: 1.1rem;
+    }
+
+    .pagination-btn {
+        margin: 0 5px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+    }
+
+    .pagination-btn.active {
+        background-color: #0056b3;
+    }
+
+    .pagination-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .input-page {
+        width: 40px;
+        text-align: center;
+        padding: 5px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    document.getElementById('goToPageButton').addEventListener('click', function () {
+        var pageInput = document.getElementById('pageInput').value;
+        var totalPages = @Model.TotalPages;
+        
+        // Controllo se il numero della pagina è valido
+        if (pageInput >= 1 && pageInput <= totalPages) {
+            window.location.href = '@Url.Action("Index", new { page = "__page__" })'.replace('__page__', pageInput);
+        } else {
+            alert('Numero di pagina non valido');
+        }
+    });
+</script>
+
+<script>
+    var successMessage = document.querySelector('.alert-success');
+    var titleContainer = document.querySelector('.d-flex.justify-content-between.align-items-center.mb-3'); // Selettore per il contenitore del titolo
+
+    if (successMessage) {
+        // Rimuovi il margine quando la notifica è visibile
+        titleContainer.classList.add('mt-0');
+        
+        // Nascondi la notifica dopo 5 secondi
+        setTimeout(function () {
+            successMessage.classList.add('fade');
+            successMessage.classList.remove('show');
+
+            // Aggiorna la pagina dopo 5 secondi per ripristinare la distanza
+            setTimeout(function () {
+                window.location.reload();
+            }, 500); // Il tempo deve essere maggiore del fade-out della notifica
+        }, 5000); // 5000 ms = 5 secondi
+    }
+</script>
+
+
+
