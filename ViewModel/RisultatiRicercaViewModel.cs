@@ -12,5 +12,8 @@ namespace WebAppEF.ViewModel
         public List<Ordine> Ordini { get; set; } = new List<Ordine>();
         public string NomeCliente { get; set; }
         public int? IdOrdine { get; set; }
+
+        public int PaginaCorrente { get; set; }
+        public int TotalePagine { get; set; }
     }
 }

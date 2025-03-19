@@ -4,35 +4,264 @@
     ViewData["Title"] = "Gestione Ordini";
 }
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg shadow">
-            <i class="fas fa-home"></i> Torna alla Home
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e2b37;
+            --secondary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --text-color: #333;
+            --light-text: #ecf0f1;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-custom .navbar-brand {
+            color: var(--light-text);
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .navbar-custom .nav-link {
+            color: var(--light-text);
+            font-weight: 500;
+            margin: 0 10px;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-custom .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            font-weight: 600;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .table td {
+            padding: 0.75rem;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #16202a;
+            border-color: #16202a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+            border-color: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-warning {
+            background-color: #e67e22;
+            border-color: #e67e22;
+        }
+
+        .btn-warning:hover {
+            background-color: #d35400;
+            border-color: #d35400;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            margin: 0 5px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--accent-color);
+        }
+
+        .pagination-btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-page {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .input-group-append .btn {
+            border-radius: 0 5px 5px 0;
+        }
+
+        .text-white {
+            color: var(--light-text) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .rounded {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="@Url.Action("Dashboard", "Home")">
+            <i class="fas fa-boxes"></i> OrdiNinja
         </a>
-
-        <h2 class="text-center text-white p-3 rounded shadow-lg flex-grow-1" style="background: linear-gradient(45deg, #007bff, #00d4ff);">
-            <i class="fas fa-boxes"></i> @ViewData["Title"]
-        </h2>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link " href="@Url.Action("Index", "Customer")">
+                        <i class="fas fa-users"></i> Gestione Clienti
+                    </a>
+                <li class="nav-item">
+                    <a class="nav-link active" href="@Url.Action("Index", "Ordini")">
+                        <i class="fas fa-list"></i> Gestione Ordini
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Dashboard", "Home")">
+                        <i class="fas fa-home"></i> Torna alla Home
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
+</nav>
 
+<div class="container mt-4">
     <!-- Notifica di successo -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>@TempData["SuccessMessage"]</strong>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="text-end mb-3">
+    <div class="text-end mb-4">
         <a href="@Url.Action("Create")" class="btn btn-success btn-lg shadow">
             <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Ordine
         </a>
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover table-bordered shadow-lg text-center">
-            <thead class="text-white" style="background: linear-gradient(45deg, #343a40, #555);">
+        <table class="table table-hover table-bordered shadow-lg">
+            <thead>
                 <tr>
                     <th>Id Ordine</th>
                     <th>Cliente</th>
@@ -50,13 +279,13 @@
                         <td>
                             @if (ordine.Cliente != null)
                             {
-                                @ordine.Cliente.Nome @ordine.Cliente.Cognome
+                                @ordine.Cliente.Nome @(" ") @ordine.Cliente.Cognome
                             }
                             else
                             {
                                 <span>Cliente non disponibile</span>
                             }
-                        </td> 
+                        </td>
                         <td>@ordine.TotaleOrdine</td>
                         <td>@ordine.Stato</td>
                         <td>@ordine.DataOrdine.ToString("dd/MM/yyyy")</td>
@@ -77,23 +306,21 @@
     </div>
 
     <!-- Paginazione -->
-    <div class="pagination-container d-flex justify-content-center align-items-center mt-4">
-        <!-- Frecce di navigazione -->
+    <div class="pagination-container">
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn btn-secondary">
+            <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
                 <i class="fas fa-angle-double-left"></i> Prima
             </a>
         }
 
         @if (Model.CurrentPage > 1)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn btn-secondary">
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn">
                 <i class="fas fa-chevron-left"></i> Precedente
             </a>
         }
 
-        <!-- Pagine numeriche -->
         <div class="page-numbers d-flex">
             @if (Model.CurrentPage > 3)
             {
@@ -119,7 +346,6 @@
             }
         </div>
 
-        <!-- Saltare a una pagina -->
         <div class="input-group mx-3">
             <input type="number" id="pageInput" class="form-control input-page" placeholder="P" min="1" max="@Model.TotalPages" />
             <div class="input-group-append">
@@ -127,88 +353,27 @@
             </div>
         </div>
 
-        <!-- Frecce di navigazione -->
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn btn-secondary">
+            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn">
                 Successiva <i class="fas fa-chevron-right"></i>
             </a>
         }
 
         @if (Model.CurrentPage < Model.TotalPages)
         {
-            <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn btn-secondary">
+            <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
                 Ultima <i class="fas fa-angle-double-right"></i>
             </a>
         }
     </div>
 </div>
 
-
-<style>
-    body {
-        background-color: #f8f9fa !important;
-    }
-
-    .table-responsive {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .table th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background-color: #343a40;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .btn {
-        border-radius: 8px;
-    }
-
-    .btn-lg {
-        padding: 12px 20px;
-        font-size: 1.1rem;
-    }
-
-    .pagination-btn {
-        margin: 0 5px;
-        padding: 8px 12px;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-    }
-
-    .pagination-btn.active {
-        background-color: #0056b3;
-    }
-
-    .pagination-btn:hover {
-        background-color: #0056b3;
-    }
-
-    .input-page {
-        width: 40px;
-        text-align: center;
-        padding: 5px;
-    }
-</style>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <script>
     document.getElementById('goToPageButton').addEventListener('click', function () {
         var pageInput = document.getElementById('pageInput').value;
         var totalPages = @Model.TotalPages;
-        
-        // Controllo se il numero della pagina è valido
+
         if (pageInput >= 1 && pageInput <= totalPages) {
             window.location.href = '@Url.Action("Index", new { page = "__page__" })'.replace('__page__', pageInput);
         } else {
@@ -218,25 +383,21 @@
 </script>
 
 <script>
-    var successMessage = document.querySelector('.alert-success');
-    var titleContainer = document.querySelector('.d-flex.justify-content-between.align-items-center.mb-3'); // Selettore per il contenitore del titolo
-
-    if (successMessage) {
-        // Rimuovi il margine quando la notifica è visibile
-        titleContainer.classList.add('mt-0');
-        
-        // Nascondi la notifica dopo 5 secondi
+    document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {
-            successMessage.classList.add('fade');
-            successMessage.classList.remove('show');
-
-            // Aggiorna la pagina dopo 5 secondi per ripristinare la distanza
-            setTimeout(function () {
-                window.location.reload();
-            }, 500); // Il tempo deve essere maggiore del fade-out della notifica
-        }, 5000); // 5000 ms = 5 secondi
-    }
+            let alertBox = document.getElementById("successMessage");
+            if (alertBox) {
+                alertBox.style.transition = "opacity 0.5s";
+                alertBox.style.opacity = "0";
+                setTimeout(() => {
+                    alertBox.remove();
+                    location.reload(); // Ricarica la pagina
+                }, 500); 
+            }
+        }, 3000); // 3 secondi
+    });
 </script>
 
 
-
+</body>
+</html>

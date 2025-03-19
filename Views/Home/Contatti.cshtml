@@ -1,0 +1,147 @@
+@{
+    ViewData["Title"] = "Contatti";
+}
+
+<!-- Navbar -->
+<nav style="background-color: #343a40; padding: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <a href="@Url.Action("Index", "Home")" style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">OrdiNinja</a>
+        <div style="display: flex; gap: 1rem;">
+            <a href="@Url.Action("Dashboard", "Home")" style="color: white; padding: 0.5rem 1rem; text-decoration: none; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#495057'" onmouseout="this.style.backgroundColor='transparent'">Dashboard</a>
+            <a href="@Url.Action("Contatti", "Home")" style="color: white; padding: 0.5rem 1rem; text-decoration: none; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#495057'" onmouseout="this.style.backgroundColor='transparent'">Contatti</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid p-4" style="max-width: 1200px; margin: 0 auto;">
+    <div class="text-center mb-5">
+        <h1 class="display-4" style="font-weight: bold; color: #343a40;">Contatti</h1>
+        <p class="lead" style="color: #6c757d;">Siamo qui per aiutarti. Contattaci per qualsiasi domanda, richiesta o supporto.</p>
+    </div>
+
+    <!-- Mappa e Informazioni di Contatto -->
+    <div class="row mb-5" style="display: flex; gap: 2rem; justify-content: center;">
+        <!-- Mappa -->
+        <div class="col-md-6" style="flex: 1; min-width: 300px;">
+            <div class="card shadow-sm h-100" style="border: none; border-radius: 10px; overflow: hidden;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3018.113123634814!2d16.27931531541002!3d41.31989497928948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13381d8e1f9b7d1f%3A0x9f0a7d7b8b8b8b8b!2sVia%20Roma%2C%2076111%20Barletta%20BT%2C%20Italia!5e0!3m2!1sit!2sit!4v1622549400000!5m2!1sit!2sit" 
+                        width="100%" 
+                        height="400" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                </iframe>
+            </div>
+        </div>
+
+        <!-- Informazioni di Contatto -->
+        <div class="col-md-6" style="flex: 1; min-width: 300px;">
+            <div class="card shadow-sm h-100" style="border: none; border-radius: 10px;">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #343a40;">Informazioni di Contatto</h3>
+                    <div class="mb-4">
+                        <h5 style="color: #007bff;">📍 Indirizzo</h5>
+                        <p class="text-muted">Via Roma, 123<br>76121 Barletta (BT), Italia</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5 style="color: #28a745;">📞 Telefono</h5>
+                        <p class="text-muted">+39 06 1234 5678<br>Lun-Ven, 9:00 - 18:00</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5 style="color: #dc3545;">✉️ Email</h5>
+                        <p class="text-muted">supporto@ordininja.it<br>risposta entro 24 ore</p>
+                    </div>
+                    <!-- Pulsante "Contattaci" -->
+                    <button id="showFormButton" class="btn btn-primary" style="background-color: #007bff; border: none; padding: 0.75rem 2rem; border-radius: 8px;">Contattaci</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form di Contatto (nascosto inizialmente) -->
+    <div class="row" style="display: flex; justify-content: center;">
+        <div class="col-md-8" id="contactForm" style="flex: 1; min-width: 300px; display: none;">
+            <div class="card shadow-sm" style="border: none; border-radius: 10px;">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4" style="color: #343a40;">Scrivici un Messaggio</h3>
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nome" style="color: #343a40;">Nome</label>
+                                    <input type="text" class="form-control" id="nome" placeholder="Inserisci il tuo nome" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cognome" style="color: #343a40;">Cognome</label>
+                                    <input type="text" class="form-control" id="cognome" placeholder="Inserisci il tuo cognome" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email" style="color: #343a40;">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Inserisci la tua email" style="border-radius: 8px;">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="messaggio" style="color: #343a40;">Messaggio</label>
+                            <textarea class="form-control" id="messaggio" rows="5" placeholder="Scrivi il tuo messaggio" style="border-radius: 8px;"></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary" style="background-color: #007bff; border: none; padding: 0.75rem 2rem; border-radius: 8px;">Invia Messaggio</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script per gestire la visibilità del form -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const showFormButton = document.getElementById('showFormButton');
+        const contactForm = document.getElementById('contactForm');
+
+        showFormButton.addEventListener('click', function() {
+            contactForm.style.display = 'block';
+            window.scrollTo({ top: contactForm.offsetTop, behavior: 'smooth' });
+        });
+    });
+</script>
+
+<!-- Footer -->
+<footer style="background-color: #343a40; padding: 2rem; margin-top: 4rem;">
+    <div class="text-center" style="color: white;">
+        <p style="margin: 0;">© 2025 OrdiNinja. Tutti i diritti riservati.</p>
+    </div>
+</footer>
+
+<style>
+    .card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-control {
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-primary {
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+</style>

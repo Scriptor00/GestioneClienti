@@ -17,7 +17,7 @@ namespace WebAppEF.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -165,12 +165,17 @@ namespace WebAppEF.Migrations
             modelBuilder.Entity("WebAppEF.Entities.Ordine", b =>
                 {
                     b.HasOne("WebAppEF.Entities.Cliente", "Cliente")
-                        .WithMany()
+                        .WithMany("Ordini")
                         .HasForeignKey("IdCliente")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("WebAppEF.Entities.Cliente", b =>
+                {
+                    b.Navigation("Ordini");
                 });
 #pragma warning restore 612, 618
         }

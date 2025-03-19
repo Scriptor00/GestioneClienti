@@ -25,5 +25,8 @@ namespace WebAppEF.Entities
         public int Giacenza { get; set; }
 
         public DateTime DataInserimento { get; set; } = DateTime.Now;
+
+         [StringLength(200)] // Lunghezza massima per l'URL dell'immagine
+    public string? ImmagineUrl { get; set; }
     }
 }

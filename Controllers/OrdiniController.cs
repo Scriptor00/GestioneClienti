@@ -84,59 +84,76 @@ namespace WebAppEF.Controllers
             return View(viewModel);
         }
 
-       [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Create([Bind("IdOrdine,IdCliente,TotaleOrdine,Stato,DataOrdine")] OrdineViewModel ordineViewModel)
-{
-    if (ModelState.ContainsKey("Cliente"))
-    {
-        ModelState.Remove("Cliente");
-    }
-
-    // Ripopola la lista dei clienti
-    ordineViewModel.Clienti = await _context.Clienti
-        .Select(c => new ClienteViewModel
+        [HttpGet]
+        public async Task<IActionResult> GetClientiSuggestions(string term)
         {
-            IdCliente = c.IdCliente,
-            Nome = c.Nome,
-            Cognome = c.Cognome
-        }).ToListAsync();
+            if (string.IsNullOrEmpty(term))
+            {
+                return Json(new List<object>()); //returna una lista object vuota
+            }
 
-    // Verifica se il cliente esiste
-    var cliente = await _context.Clienti.FindAsync(ordineViewModel.IdCliente);
-    if (cliente == null)
-    {
-        _logger.LogError($"Cliente con Id {ordineViewModel.IdCliente} non trovato");
-        ModelState.AddModelError("IdCliente", "Cliente non trovato");
-        return View(ordineViewModel);
-    }
+            var clienti = await _context.Clienti
+                .Where(c => c.Nome.Contains(term) || c.Cognome.Contains(term))
+                .Select(c => new { label = $"{c.Nome} {c.Cognome}", value = c.IdCliente })
+                .ToListAsync();
 
-    var ordine = new Ordine
-    {
-        IdCliente = ordineViewModel.IdCliente,
-        TotaleOrdine = ordineViewModel.TotaleOrdine,
-        Stato = ordineViewModel.Stato,
-        DataOrdine = ordineViewModel.DataOrdine
-    };
+            return Json(clienti);
+        }
 
-    try
-    {
-        _context.Ordini.Add(ordine);
-        await _context.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Ordine creato con successo!";
-        _logger.LogInformation($"Ordine creato con successo, ID: {ordine.IdOrdine}");
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("IdOrdine,IdCliente,TotaleOrdine,Stato,DataOrdine")] OrdineViewModel ordineViewModel)
+        {
+            if (ModelState.ContainsKey("Cliente"))
+            {
+                ModelState.Remove("Cliente");
+            }
 
-        
-        return RedirectToAction("Index");
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Errore durante il salvataggio dell'ordine: {ex.Message}");
-        ModelState.AddModelError(string.Empty, "Si è verificato un errore durante il salvataggio dell'ordine.");
-        return View(ordineViewModel);
-    }
-}
+            // Ripopola la lista dei clienti
+            ordineViewModel.Clienti = await _context.Clienti
+                .Select(c => new ClienteViewModel
+                {
+                    IdCliente = c.IdCliente,
+                    Nome = c.Nome,
+                    Cognome = c.Cognome
+                }).ToListAsync();
+
+            // Verifica se il cliente esiste
+            var cliente = await _context.Clienti.FindAsync(ordineViewModel.IdCliente);
+            if (cliente == null)
+            {
+                _logger.LogError($"Cliente con Id {ordineViewModel.IdCliente} non trovato");
+                ModelState.AddModelError("IdCliente", "Cliente non trovato");
+                return View(ordineViewModel);
+            }
+
+            var ordine = new Ordine
+            {
+                IdCliente = ordineViewModel.IdCliente,
+                TotaleOrdine = ordineViewModel.TotaleOrdine,
+                Stato = ordineViewModel.Stato,
+                DataOrdine = ordineViewModel.DataOrdine
+            };
+
+            try
+            {
+                _context.Ordini.Add(ordine);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Ordine creato con successo!";
+                _logger.LogInformation($"Ordine creato con successo, ID: {ordine.IdOrdine}");
+
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Errore durante il salvataggio dell'ordine: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "Si è verificato un errore durante il salvataggio dell'ordine.");
+                return View(ordineViewModel);
+            }
+        }
 
 
 

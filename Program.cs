@@ -1,54 +1,83 @@
-using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using PuppeteerSharp;
-using WebAppEF.Repositories;
-using WebAppEF.Entities;
-using WebAppEF.Models;
-using WebAppEF.ViewModel;
 using Serilog;
+using WebAppEF.Models;
+using WebAppEF.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using WebAppEF.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#pragma warning disable CS0618 // Type or member is obsolete
-await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-builder.Services.AddSingleton(serviceProvider =>
-{
-    return Puppeteer.LaunchAsync(new LaunchOptions
-    {
-        Headless = true,
-        Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
-    }).Result;
-});
-
-// configurazione serilog
+// Configurazione Serilog per logging
 Log.Logger = new LoggerConfiguration()
-.WriteTo.File(@"C:\LogsProgetto\app-log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("C:\\LogsProgetto\\app-log-.txt", rollingInterval: RollingInterval.Day)
     .Enrich.FromLogContext()
-    .MinimumLevel.Warning()
+    .MinimumLevel.Information()
     .CreateLogger();
 
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog();
 
+// Configurazione DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// DI PER LE REPOSITORY
+/*
+// Configurazione Identity 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 1;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+*/
+
+// Configurazione CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWithCredentials", builder =>
+    {
+        builder.WithOrigins("http://localhost:5000")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
+
+// Configurazione autenticazione Cookie (cookie authentication)
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "MioProgettoCookie";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.SlidingExpiration = true;  // Questo fa sì che la scadenza venga rinnovata se l'utente è attivo
+    });
+
+
+// Configurazione autorizzazione
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
+});
+
+// Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
 
-builder.Services.AddSingleton<BrowserFetcher>();
-builder.Services.AddSingleton<IWebScraperService, PuppeteerWebScraperService>();
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
-builder.Services.AddEndpointsApiExplorer();
-
-// PERSONALIZZAZIONE SWAGGER
+// Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -56,19 +85,16 @@ builder.Services.AddSwaggerGen(c =>
         Title = "WebAppEF API",
         Version = "v1",
         Description = "API per la gestione dei clienti e ordini.",
-        Contact = new OpenApiContact
-        {
-            Name = "Carlo",
-            Email = "supporto@webapief.com",
-            Url = new Uri("http://localhost:5000/")
-        },
-        // License = new OpenApiLicense
-        // {
-        //     Name = "Licenza MIT",
-        //     Url = new Uri("https://opensource.org/licenses/MIT")
-        // }
+        Contact = new OpenApiContact { Name = "Carlo", Email = "supporto@webapief.com", Url = new Uri("http://localhost:5000/") }
     });
 });
+
+// Configurazione MVC e Razor Pages
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -78,60 +104,57 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
-
-        // Seeding clienti
-        if (!context.Clienti.Any())
-        {
-            var clientiFittizi = DataSeeder.GeneraClienti(50);
-            context.Clienti.AddRange(clientiFittizi);
-            context.SaveChanges();
-        }
-
-        // Seeding ordini
-        if (!context.Ordini.Any())
-        {
-            var ordiniFaker = new OrdiniFaker();
-            var ordiniFittizi = ordiniFaker.GenerateOrders(100);
-            context.Ordini.AddRange(ordiniFittizi);
-            context.SaveChanges();
-        }
+        DbInitializer.Initialize(context); // Popola il database
     }
     catch (Exception ex)
     {
-        Log.Error($"Errore durante il seeding del database: {ex.Message}");
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Errore durante il seeding del database.");
+    }
+}
+// Seeding database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+        if (!context.Clienti.Any()) context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
+        if (!context.Ordini.Any()) context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
+        context.SaveChanges();
+    }
+    catch (Exception ex)
+    {
+        Log.Error($"Errore seeding database: {ex.Message}");
     }
 }
 
-// Configura la pipeline di gestione delle richieste
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
-// Swagger solo in ambiente di sviluppo
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAppEF API v1");
-        c.RoutePrefix = "swagger"; // Swagger disponibile su /swagger
+        c.RoutePrefix = "swagger";
     });
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
+app.UseCors("AllowWithCredentials");
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
-// Mappa i controller e le Razor Pages
 app.MapControllers();
 app.MapRazorPages();
-
-// Configura la route predefinita per i controller
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

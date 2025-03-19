@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\A573_Apulia\\Desktop\\WebApp\\WebAppEF\\WebAppEF.csproj": {}
+    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {}
   },
   "projects": {
-    "c:\\Users\\A573_Apulia\\Desktop\\WebApp\\WebAppEF\\WebAppEF.csproj": {
+    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\A573_Apulia\\Desktop\\WebApp\\WebAppEF\\WebAppEF.csproj",
+        "projectUniqueName": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "projectName": "WebAppEF",
-        "projectPath": "c:\\Users\\A573_Apulia\\Desktop\\WebApp\\WebAppEF\\WebAppEF.csproj",
+        "projectPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "packagesPath": "C:\\Users\\A573_Apulia\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\A573_Apulia\\Desktop\\WebApp\\WebAppEF\\obj\\",
+        "outputPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -53,17 +53,23 @@
               "target": "Package",
               "version": "[35.6.2, )"
             },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.AspNetCore.StaticFiles": {
               "target": "Package",
               "version": "[2.3.0, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[9.0.3, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[9.0.3, )"
             },
             "PuppeteerSharp": {
               "target": "Package",

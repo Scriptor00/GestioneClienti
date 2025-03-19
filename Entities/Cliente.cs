@@ -29,5 +29,7 @@ namespace WebAppEF.Entities
 
         public ICollection<Ordine>? Ordini { get; set; }
 
+        
+
     }
 }

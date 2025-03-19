@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Filtri di Ricerca";
 }
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -10,22 +11,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
+        .text-primary {
+            color: #0d6efd !important;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row mb-3 p-2 bg-light">
             <div class="col">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                <a asp-controller="Home" asp-action="Dashboard" class="btn btn-outline-primary">
                     <i class="bi bi-house-door-fill me-1"></i>Home
                 </a>
             </div>
         </div>
     </div>
     <div class="container mt-5">
-        <h1 class="text-center text-primary">Filtri di Ricerca</h1>
-        <p class="text-center">Trova rapidamente clienti e ordini correlati.</p>
+        <h1 class="text-center text-primary mb-4">Filtri di Ricerca</h1>
+        <p class="text-center text-muted mb-4">Trova rapidamente clienti e ordini correlati.</p>
         
-        <form asp-action="RicercaRisultati" method="get">
+        <form asp-action="RicercaRisultati" method="get" class="bg-white p-4 rounded shadow-sm">
             <div class="mb-3">
                 <label for="nomeCliente" class="form-label">Nome Cliente</label>
                 <input type="text" class="form-control" id="nomeCliente" name="nomeCliente" placeholder="Inserisci il nome del cliente" />
@@ -34,8 +68,36 @@
                 <label for="idOrdine" class="form-label">ID Ordine</label>
                 <input type="text" class="form-control" id="idOrdine" name="idOrdine" placeholder="Inserisci l'ID dell'ordine">
             </div>
-            <button type="submit" class="btn btn-primary">Cerca</button>
+            <button type="submit" class="btn btn-primary w-100">Cerca</button>
         </form>
     </div>
+
+    <script>
+        $(function() {
+            $("#nomeCliente").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: '@Url.Action("GetClientiSuggestions", "Filtri")',
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function(data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 2, // Numero minimo di caratteri prima di avviare la ricerca
+                focus: function(event, ui) {
+                    $("#nomeCliente").val(ui.item.label);
+                    return false; // Evita che il valore predefinito (value) venga inserito
+                },
+                select: function(event, ui) {
+                    $("#nomeCliente").val(ui.item.label);
+                    return false; 
+                }
+            });
+        });
+    </script>
 </body>
 </html>

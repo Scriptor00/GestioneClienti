@@ -209,5 +209,15 @@ namespace WebAppEF.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public Task<int> CountAsync(Func<IQueryable<Ordine>, IQueryable<Ordine>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Ordine>> GetAllPaged(int page, int pageSize, Func<IQueryable<Ordine>, IQueryable<Ordine>>? filter = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -4,9 +4,160 @@
     ViewData["Title"] = "Crea Ordine";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center text-white p-3 rounded bg-gradient" style="background: linear-gradient(45deg, #007bff, #66b3ff);">
-        @ViewData["Title"]
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+
+        .page-title {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: var(--light-text);
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+        :root {
+            --primary-color: #1e2b37;
+            --secondary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --text-color: #333;
+            --light-text: #ecf0f1;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        @* h2 {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--light-text);
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        } *@
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            padding: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .input-group-text {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+            border-color: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-success {
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+            color: #0f5132;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+
+        .rounded-pill {
+            border-radius: 50px !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h2 class="page-title">
+        <i class="fas fa-plus-circle me-2"></i> @ViewData["Title"]
     </h2>
 
     <!-- Messaggi di notifica -->
@@ -35,26 +186,14 @@
 
             <!-- Seleziona Cliente -->
             <div class="mb-4">
-                <label asp-for="IdCliente" class="form-label fw-bold text-secondary">Seleziona Cliente *</label>
-                <select asp-for="IdCliente" class="form-select form-control-lg border-primary shadow-sm" required>
-                    <option value="">-- Seleziona un cliente --</option>
-                    @if (Model.Clienti != null && Model.Clienti.Count > 0)
-                    {
-                        foreach (var cliente in Model.Clienti)
-                        {
-                            <option value="@cliente.IdCliente">@cliente.Nome @cliente.Cognome</option>
-                        }
-                    }
-                    else
-                    {
-                        <option disabled>Nessun cliente disponibile</option>
-                    }
-                </select>
+                <label for="nomeCliente" class="form-label fw-bold">Seleziona Cliente *</label>
+                <input type="text" id="nomeCliente" class="form-control form-control-lg border-primary shadow-sm" placeholder="Cerca cliente per nome" />
+                <input type="hidden" asp-for="IdCliente" id="idCliente" />
             </div>
 
             <!-- Totale Ordine -->
             <div class="mb-4">
-                <label asp-for="TotaleOrdine" class="form-label fw-bold text-secondary">Totale Ordine *</label>
+                <label asp-for="TotaleOrdine" class="form-label fw-bold">Totale Ordine *</label>
                 <div class="input-group">
                     <span class="input-group-text">€</span>
                     <input asp-for="TotaleOrdine" class="form-control form-control-lg border-primary shadow-sm" required min="0.01" step="0.01" />
@@ -63,7 +202,7 @@
 
             <!-- Stato Ordine -->
             <div class="mb-4">
-                <label asp-for="Stato" class="form-label fw-bold text-secondary">Stato Ordine *</label>
+                <label asp-for="Stato" class="form-label fw-bold">Stato Ordine *</label>
                 <select asp-for="Stato" class="form-select form-control-lg border-primary shadow-sm" required>
                     <option value="Confermato">Confermato</option>
                     <option value="Spedito">Spedito</option>
@@ -73,7 +212,7 @@
 
             <!-- Data Ordine -->
             <div class="mb-4">
-                <label asp-for="DataOrdine" class="form-label fw-bold text-secondary">Data Ordine *</label>
+                <label asp-for="DataOrdine" class="form-label fw-bold">Data Ordine *</label>
                 <input asp-for="DataOrdine" class="form-control form-control-lg border-primary shadow-sm" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
             </div>
 
@@ -88,8 +227,40 @@
             </div>
         </form>
     </div>
-</div>
 
-@section Scripts {
+    <script>
+        $(function() { 
+            $("#nomeCliente").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: '@Url.Action("GetClientiSuggestions", "Ordini")',
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function(data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 2, 
+                focus: function(event, ui) {
+                    $("#nomeCliente").val(ui.item.label);
+                    return false; // Evita che il valore predefinito (value) venga inserito
+                },
+                select: function(event, ui) {
+                    $("#nomeCliente").val(ui.item.label); // Mostra il nome completo nel campo di input
+                    $("#idCliente").val(ui.item.value); // Imposta l'ID del cliente nel campo nascosto
+                    return false; // Evita che il valore predefinito (id) venga inserito
+                }
+            });
+        });
+    </script>
+
+    @section Scripts {
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 }
+
+</body>
+</html>
+

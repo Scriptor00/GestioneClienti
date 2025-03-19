@@ -99,9 +99,7 @@ namespace WebAppEF.Controllers
             return View(cliente);
         }
 
-
-
-        [HttpGet]
+       [HttpGet]
         public async Task<JsonResult> CheckEmailExists(string email)
         {
             if (string.IsNullOrWhiteSpace(email))

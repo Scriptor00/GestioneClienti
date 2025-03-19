@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
 using WebAppEF.Models;
 using WebAppEF.ViewModel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebAppEF.Controllers
 {
@@ -19,7 +22,23 @@ namespace WebAppEF.Controllers
         }
 
         [HttpGet]
-        public IActionResult RicercaRisultati(string nomeCliente, int? idOrdine)
+        public async Task<IActionResult> GetClientiSuggestions(string term)
+        {
+            if (string.IsNullOrEmpty(term))
+            {
+                return Json(new List<object>());
+            }
+
+            var clienti = await _context.Clienti
+                .Where(c => c.Nome.Contains(term) || c.Cognome.Contains(term))
+                .Select(c => new { label = $"{c.Nome} {c.Cognome}", value = c.IdCliente })
+                .ToListAsync();
+
+            return Json(clienti);
+        }
+
+        [HttpGet]
+        public IActionResult RicercaRisultati(string nomeCliente, int? idOrdine, int page = 1)
         {
             _logger.LogInformation("Inizio ricerca: NomeCliente={NomeCliente}, IdOrdine={IdOrdine}", nomeCliente, idOrdine);
 
@@ -39,6 +58,7 @@ namespace WebAppEF.Controllers
                     .Include(o => o.Cliente)
                     .AsQueryable();
 
+                // Filtraggio per nome cliente
                 if (!string.IsNullOrEmpty(nomeCliente))
                 {
                     var nomeClienteLower = nomeCliente.ToLower();
@@ -75,6 +95,7 @@ namespace WebAppEF.Controllers
                     }
                 }
 
+                // Filtraggio per ID Ordine
                 if (idOrdine.HasValue)
                 {
                     _logger.LogInformation("Filtraggio per ID Ordine: {IdOrdine}", idOrdine.Value);
@@ -102,7 +123,28 @@ namespace WebAppEF.Controllers
                     return View("Risultati", viewModel);
                 }
 
-                // Se nessun filtro è stato applicato, restituisce tutti i risultati
+                // Se nessun filtro è stato applicato, paginiamo i clienti
+                if (string.IsNullOrEmpty(nomeCliente) && !idOrdine.HasValue)
+                {
+                    const int pageSize = 1; // Numero di clienti per pagina
+                    var totalClienti = clientiQuery.Count();
+                    var paginatedClienti = clientiQuery
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                    viewModel.Clienti = paginatedClienti;
+                    viewModel.Ordini = new List<Ordine>(); // Nessun ordine se non ci sono filtri
+                    viewModel.PaginaCorrente = page;
+                    viewModel.TotalePagine = (int)Math.Ceiling(totalClienti / (double)pageSize);
+
+                    _logger.LogInformation("Risultati paginati: {NumeroClienti} clienti trovati, pagina {PaginaCorrente} di {TotalePagine}.",
+                        paginatedClienti.Count, page, viewModel.TotalePagine);
+
+                    return View("Risultati", viewModel);
+                }
+
+                // Se ci sono filtri, restituisci tutti i risultati
                 viewModel.Ordini = ordiniQuery.ToList();
                 viewModel.Clienti = clientiQuery.ToList();
 

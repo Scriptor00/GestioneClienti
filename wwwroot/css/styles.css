@@ -1,0 +1,25 @@
+/* Animazione fadeIn */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Classe per applicare l'animazione al messaggio */
+.fade-in {
+    animation: fadeIn 2s ease-in-out;
+    opacity: 0; /* Inizia invisibile */
+    animation-fill-mode: forwards; /* Mantieni visibile dopo l'animazione */
+}
+
+/* Stile per il messaggio di benvenuto */
+#welcomeMessage {
+    display: block;
+    animation: fadeIn 2s ease-in-out;
+    opacity: 0;
+    animation-fill-mode: forwards;
+    animation-delay: 0s; /* Puoi aggiungere un delay se desideri che arrivi più tardi */
+}

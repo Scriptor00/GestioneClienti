@@ -12,7 +12,7 @@ namespace WebAppEF.Utilities
         {
             try
             {
-               var mail = new MailAddress(email);
+                var mail = new MailAddress(email);
                 return Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
             }
             catch (FormatException)
@@ -22,10 +22,10 @@ namespace WebAppEF.Utilities
         }
 
         // caratteri speciali 
-        public static bool HasSpecialCharacters(string input)
-        {
-           
-            return Regex.IsMatch(input, @"[^a-zA-ZàèéìòùÀÈÉÌÒÙ0-9\s\-]");
+         public static bool HasSpecialCharacters(string input)
+       {
+        // sono permesse solo lettere (a-z, A-Z), numeri (0-9), ".", "-", "_" e "@"
+        return Regex.IsMatch(input, @"[^a-zA-Z0-9.\-_@]");
         }
 
         // Lunghezza dell'email
