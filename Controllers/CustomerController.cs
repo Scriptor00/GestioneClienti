@@ -1,7 +1,3 @@
-using System;
-using System.Net.Mail;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
@@ -9,7 +5,6 @@ using WebAppEF.Models;
 using WebAppEF.Repositories;
 using WebAppEF.Utilities;
 using WebAppEF.ViewModel;
-using WebAppEF.ViewModels;
 
 namespace WebAppEF.Controllers
 {
@@ -99,7 +94,7 @@ namespace WebAppEF.Controllers
             return View(cliente);
         }
 
-       [HttpGet]
+        [HttpGet]
         public async Task<JsonResult> CheckEmailExists(string email)
         {
             if (string.IsNullOrWhiteSpace(email))

@@ -1,9 +1,10 @@
+using GestioneClienti.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
 
 namespace WebAppEF.Models
 {
-    public class ApplicationDbContext : DbContext  // Corretta la sintassi della dichiarazione della classe
+    public class ApplicationDbContext : DbContext
     {
         // Costruttore che passa le opzioni di configurazione al DbContext
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -15,6 +16,7 @@ namespace WebAppEF.Models
         public DbSet<Prodotto> Prodotti { get; set; }
         public DbSet<Ordine> Ordini { get; set; }
         public DbSet<DettagliOrdine> DettagliOrdini { get; set; }
+        public DbSet<Utente> Utenti { get; set; } // Aggiunto DbSet per l'entità Utente
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,12 +38,36 @@ namespace WebAppEF.Models
             // Configurazione delle relazioni tra entità
             modelBuilder.Entity<Ordine>()
                 .HasOne(o => o.Cliente)
-                .WithMany(c => c.Ordini)  
+                .WithMany(c => c.Ordini)
                 .HasForeignKey(o => o.IdCliente)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Ordine>()
                 .HasIndex(o => o.IdCliente);
+
+            // Configurazione dell'entità Utente
+            modelBuilder.Entity<Utente>(entity =>
+            {
+                // Imposta la chiave primaria
+                entity.HasKey(u => u.Id);
+
+                // Imposta l'Username come unico
+                entity.HasIndex(u => u.Username)
+                      .IsUnique();
+
+                // Configurazione delle colonne
+                entity.Property(u => u.Username)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(u => u.PasswordHash)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(u => u.Role)
+                      .IsRequired()
+                      .HasMaxLength(50);
+            });
         }
     }
 }

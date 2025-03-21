@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File("C:\\LogsProgetto\\app-log-.txt", rollingInterval: RollingInterval.Day)
     .Enrich.FromLogContext()
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
     .CreateLogger();
 
 builder.Logging.ClearProviders();
@@ -67,11 +67,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 
 // Configurazione autorizzazione
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
-});
+builder.Services.AddAuthorizationBuilder()
+                                    // Configurazione admin
+                                    .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
+                                    // Configurazione user
+                                    .AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 
 // Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();

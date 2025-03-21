@@ -372,3 +372,4 @@ C:\Users\A573_Apulia\Desktop\GestioneClienti\GestioneClienti\bin\Debug\net8.0\zh
 c:\Users\A573_Apulia\Desktop\GestioneClienti\GestioneClienti\bin\Debug\net8.0\WebAppEF.staticwebassets.endpoints.json
 c:\Users\A573_Apulia\Desktop\GestioneClienti\GestioneClienti\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 c:\Users\A573_Apulia\Desktop\GestioneClienti\GestioneClienti\obj\Debug\net8.0\staticwebassets\msbuild.WebAppEF.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+c:\Users\A573_Apulia\Desktop\GestioneClienti\GestioneClienti\bin\Debug\net8.0\BCrypt.Net-Next.dll

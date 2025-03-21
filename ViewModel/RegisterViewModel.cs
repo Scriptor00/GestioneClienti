@@ -7,10 +7,10 @@ namespace GestioneClienti.ViewModel
 {
     public class RegisterViewModel
     {
-        public string Nome { get; set; }
-        public string Cognome { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfermaPassword { get; set; }
+        public required string Nome { get; set; }
+        public required string Cognome { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+        public required string ConfermaPassword { get; set; }
     }
 }

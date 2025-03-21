@@ -38,7 +38,7 @@ namespace WebAppEF.Controllers
         }
 
         [HttpGet]
-        public IActionResult RicercaRisultati(string nomeCliente, int? idOrdine, int page = 1)
+        public IActionResult RicercaRisultati(string nomeCliente, int? idOrdine)
         {
             _logger.LogInformation("Inizio ricerca: NomeCliente={NomeCliente}, IdOrdine={IdOrdine}", nomeCliente, idOrdine);
 
@@ -123,33 +123,24 @@ namespace WebAppEF.Controllers
                     return View("Risultati", viewModel);
                 }
 
-                // Se nessun filtro è stato applicato, paginiamo i clienti
+                // Se nessun filtro è stato applicato, restituisci tutti i clienti e gli ordini
                 if (string.IsNullOrEmpty(nomeCliente) && !idOrdine.HasValue)
                 {
-                    const int pageSize = 1; // Numero di clienti per pagina
-                    var totalClienti = clientiQuery.Count();
-                    var paginatedClienti = clientiQuery
-                        .Skip((page - 1) * pageSize)
-                        .Take(pageSize)
-                        .ToList();
+                    viewModel.Clienti = clientiQuery.ToList();
+                    viewModel.Ordini = ordiniQuery.ToList();
 
-                    viewModel.Clienti = paginatedClienti;
-                    viewModel.Ordini = new List<Ordine>(); // Nessun ordine se non ci sono filtri
-                    viewModel.PaginaCorrente = page;
-                    viewModel.TotalePagine = (int)Math.Ceiling(totalClienti / (double)pageSize);
-
-                    _logger.LogInformation("Risultati paginati: {NumeroClienti} clienti trovati, pagina {PaginaCorrente} di {TotalePagine}.",
-                        paginatedClienti.Count, page, viewModel.TotalePagine);
-
-                    return View("Risultati", viewModel);
+                    _logger.LogInformation("Nessun filtro applicato. Restituiti tutti i clienti e gli ordini: {NumeroClienti} clienti, {NumeroOrdini} ordini.",
+                        viewModel.Clienti.Count, viewModel.Ordini.Count);
                 }
+                else
+                {
+                    // Se ci sono filtri, restituisci i risultati filtrati
+                    viewModel.Ordini = ordiniQuery.ToList();
+                    viewModel.Clienti = clientiQuery.ToList();
 
-                // Se ci sono filtri, restituisci tutti i risultati
-                viewModel.Ordini = ordiniQuery.ToList();
-                viewModel.Clienti = clientiQuery.ToList();
-
-                _logger.LogInformation("Risultati della ricerca: {NumeroClienti} clienti trovati, {NumeroOrdini} ordini trovati.",
-                    viewModel.Clienti.Count, viewModel.Ordini.Count);
+                    _logger.LogInformation("Risultati della ricerca: {NumeroClienti} clienti trovati, {NumeroOrdini} ordini trovati.",
+                        viewModel.Clienti.Count, viewModel.Ordini.Count);
+                }
 
                 return View("Risultati", viewModel);
             }
@@ -158,6 +149,24 @@ namespace WebAppEF.Controllers
                 _logger.LogError(ex, "Errore durante la ricerca NomeCliente={NomeCliente}, IdOrdine={IdOrdine}", nomeCliente, idOrdine);
                 return View("Errore");
             }
+        }
+
+        [HttpGet]
+        public IActionResult GetOrdiniCliente(int idCliente)
+        {
+            // Recupera gli ordini del cliente dal database
+            var ordini = _context.Ordini
+                .Where(o => o.IdCliente == idCliente)
+                .Select(o => new
+                {
+                    o.IdOrdine,
+                    o.DataOrdine,
+                    o.TotaleOrdine,
+                    o.Stato
+                })
+                .ToList();
+
+            return Json(ordini);
         }
     }
 }

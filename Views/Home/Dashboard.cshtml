@@ -248,6 +248,13 @@
                             }
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+       <li>
+    <a class="dropdown-item" href="@Url.Action("Index", "Prodotti")">
+        
+        <i class="fas fa-gamepad me-2"></i>Gaming Store
+    </a>
+</li>
+
                             <li><a class="dropdown-item" href="@Url.Action("Privacy", "Home")"><i class="fas fa-shield-alt me-2"></i>Privacy</a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Contatti", "Home")"><i class="fas fa-envelope me-2"></i>Contatti</a></li>
                             @if (User.Identity?.IsAuthenticated ?? false)

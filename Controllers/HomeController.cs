@@ -12,7 +12,7 @@ namespace WebAppEF.Controllers
         private readonly ILogger<HomeController> _logger = logger;
         private readonly ApplicationDbContext _context = context;
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
 
@@ -20,7 +20,7 @@ namespace WebAppEF.Controllers
         }
 
         // Azione per la home page
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.

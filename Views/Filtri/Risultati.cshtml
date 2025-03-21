@@ -1,3 +1,4 @@
+@using WebAppEF.Entities
 @model WebAppEF.ViewModel.RisultatiRicercaViewModel
 
 @{
@@ -13,8 +14,32 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
-        .pagination .page-link {
-            color: #0d6efd;
+        /* Stili personalizzati per gli stati degli ordini */
+        .badge-annullato {
+            background-color: #dc3545; /* Rosso */
+            color: white;
+        }
+        .badge-confermato {
+            background-color: #28a745; /* Verde */
+            color: white;
+        }
+        .badge-spedito {
+            background-color: #ffc107; /* Giallo */
+            color: black;
+        }
+
+        /* Stile per le intestazioni fisse */
+        .table thead th {
+            position: sticky;
+            top: 0; /* Fissa l'intestazione in cima alla tabella */
+            background-color: #f8f9fa; /* Colore di sfondo per l'intestazione */
+            z-index: 1; /* Assicura che l'intestazione sia sopra le righe della tabella */
+        }
+
+        /* Stile per il contenitore della tabella */
+        .table-container {
+            max-height: 500px; /* Altezza massima del contenitore */
+            overflow-y: auto; /* Abilita lo scrolling verticale */
         }
     </style>
 </head>
@@ -29,74 +54,64 @@
         @if (Model.Clienti != null && Model.Clienti.Count > 0)
         {
             <h3>Clienti Trovati</h3>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Email</th>
-                        <th>Ordini</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var cliente in Model.Clienti)
-                    {
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td>@cliente.Nome</td>
-                            <td>@cliente.Cognome</td>
-                            <td>@cliente.Email</td>
-                            <td>
-                                @if (cliente.Ordini != null && cliente.Ordini.Any())
-                                {
-                                    <ul>
-                                        @foreach (var ordine in cliente.Ordini)
-                                        {
-                                            <li>
-                                                <strong>Ordine #@ordine.IdOrdine</strong> 
-                                                - @ordine.DataOrdine.ToShortDateString() 
-                                                - @ordine.TotaleOrdine.ToString("C")
-                                                - Stato: <span class="badge bg-info">@ordine.Stato</span>
-                                            </li>
-                                        }
-                                    </ul>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Nessun ordine</span>
-                                }
-                            </td>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                            <th>Email</th>
+                            <th>Ordini</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-
-            <!-- Paginazione -->
-            @if (Model.TotalePagine > 1)
-            {
-                <nav aria-label="Paginazione">
-                    <ul class="pagination justify-content-center">
-                        <!-- Freccia Precedente -->
-                        @if (Model.PaginaCorrente > 1)
+                    </thead>
+                    <tbody>
+                        @foreach (var cliente in Model.Clienti)
                         {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("RicercaRisultati", new { nomeCliente = Model.NomeCliente, idOrdine = Model.IdOrdine, page = Model.PaginaCorrente - 1 })">
-                                    <i class="bi bi-chevron-left"></i> Precedente
-                                </a>
-                            </li>
+                            <tr>
+                                <td>@cliente.Nome</td>
+                                <td>@cliente.Cognome</td>
+                                <td>@cliente.Email</td>
+                                <td>
+                                    @if (cliente.Ordini != null && cliente.Ordini.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var ordine in cliente.Ordini)
+                                            {
+                                                <li>
+                                                    <strong>Ordine #@ordine.IdOrdine</strong> 
+                                                    - @ordine.DataOrdine.ToShortDateString() 
+                                                    - @ordine.TotaleOrdine.ToString("C")
+                                                    - Stato: 
+                                                    @if (ordine.Stato == StatoOrdine.Annullato)
+                                                    {
+                                                        <span class="badge badge-annullato">@ordine.Stato</span>
+                                                    }
+                                                    else if (ordine.Stato == StatoOrdine.Confermato)
+                                                    {
+                                                        <span class="badge badge-confermato">@ordine.Stato</span>
+                                                    }
+                                                    else if (ordine.Stato == StatoOrdine.Spedito)
+                                                    {
+                                                        <span class="badge badge-spedito">@ordine.Stato</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">@ordine.Stato</span>
+                                                    }
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Nessun ordine</span>
+                                    }
+                                </td>
+                            </tr>
                         }
-
-                        <!-- Freccia Successiva -->
-                        @if (Model.PaginaCorrente < Model.TotalePagine)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("RicercaRisultati", new { nomeCliente = Model.NomeCliente, idOrdine = Model.IdOrdine, page = Model.PaginaCorrente + 1 })">
-                                    Successivo <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            }
+                    </tbody>
+                </table>
+            </div>
         }
 
         @if (Model.Ordini != null && Model.Ordini.Count > 0)
@@ -120,7 +135,22 @@
                             <td>@ordine.DataOrdine.ToShortDateString()</td>
                             <td>@ordine.TotaleOrdine.ToString("C")</td>
                             <td>
-                                <span class="badge bg-info">@ordine.Stato</span>
+                                @if (ordine.Stato == StatoOrdine.Annullato)
+                                {
+                                    <span class="badge badge-annullato">@ordine.Stato</span>
+                                }
+                                else if (ordine.Stato == StatoOrdine.Confermato)
+                                {
+                                    <span class="badge badge-confermato">@ordine.Stato</span>
+                                }
+                                else if (ordine.Stato == StatoOrdine.Spedito)
+                                {
+                                    <span class="badge badge-spedito">@ordine.Stato</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@ordine.Stato</span>
+                                }
                             </td>
                             <td>
                                 @if (ordine.Cliente != null)

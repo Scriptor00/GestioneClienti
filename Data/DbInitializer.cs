@@ -15,7 +15,6 @@ namespace WebAppEF.Data
                 return; // Il database è già stato popolato
             }
 
-            // Crea una lista di prodotti di gaming
             var prodotti = new Prodotto[]
             {
                 new() {
@@ -24,7 +23,7 @@ namespace WebAppEF.Data
                     Prezzo = 499.99m,
                     Giacenza = 10,
                     DataInserimento = DateTime.Now,
-                    ImmagineUrl = "https://wallpapercave.com/wp/wp6803047.jpg" // Immagine PlayStation 5
+                    ImmagineUrl = "https://wallpapercave.com/wp/wp6803047.jpg" 
                 },
                 new() {
                     NomeProdotto = "Xbox Series X",
@@ -32,7 +31,7 @@ namespace WebAppEF.Data
                     Prezzo = 499.99m,
                     Giacenza = 8,
                     DataInserimento = DateTime.Now,
-                    ImmagineUrl = "https://images.pexels.com/photos/12401185/pexels-photo-12401185.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" // Immagine Xbox Series X
+                    ImmagineUrl = "https://images.pexels.com/photos/12401185/pexels-photo-12401185.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
                 },
                 new() {
                     NomeProdotto = "Nintendo Switch",
@@ -40,7 +39,7 @@ namespace WebAppEF.Data
                     Prezzo = 299.99m,
                     Giacenza = 15,
                     DataInserimento = DateTime.Now,
-                    ImmagineUrl = "https://images.pexels.com/photos/371924/pexels-photo-371924.jpeg?auto=compress&cs=tinysrgb&w=600" // Immagine Nintendo Switch
+                    ImmagineUrl = "https://images.pexels.com/photos/371924/pexels-photo-371924.jpeg?auto=compress&cs=tinysrgb&w=600" 
                 },
                 new() {
                     NomeProdotto = "Logitech G Pro X",
@@ -64,7 +63,7 @@ namespace WebAppEF.Data
                     Prezzo = 59.99m,
                     Giacenza = 50,
                     DataInserimento = DateTime.Now,
-                    ImmagineUrl = "https://s1.1zoom.me/b5050/297/Cyberpunk_2077_Pistols_Men_Jacket_Cyborg_566009_1366x768.jpg" // Immagine Cyberpunk 2077
+                    ImmagineUrl = "https://s1.1zoom.me/b5050/297/Cyberpunk_2077_Pistols_Men_Jacket_Cyborg_566009_1366x768.jpg" 
                 },
                 new() {
                     NomeProdotto = "The Legend of Zelda: Breath of the Wild",
@@ -72,11 +71,10 @@ namespace WebAppEF.Data
                     Prezzo = 49.99m,
                     Giacenza = 30,
                     DataInserimento = DateTime.Now,
-                    ImmagineUrl = "https://th.bing.com/th/id/OIP.HLliURS7N4XlazBHBL_YYQHaDd?w=342&h=163&c=7&r=0&o=5&dpr=1.5&pid=1.7" // Immagine Zelda Breath of the Wild
+                    ImmagineUrl = "https://th.bing.com/th/id/OIP.HLliURS7N4XlazBHBL_YYQHaDd?w=342&h=163&c=7&r=0&o=5&dpr=1.5&pid=1.7" 
                 }
             };
 
-            // Aggiungi i prodotti al database
             context.Prodotti.AddRange(prodotti);
             context.SaveChanges();
         }

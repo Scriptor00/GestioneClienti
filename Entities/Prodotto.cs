@@ -8,7 +8,7 @@ namespace WebAppEF.Entities
 {
     public class Prodotto
     {
-         [Key]
+        [Key]
         public int IdProdotto { get; set; }
 
         [Required]
@@ -26,7 +26,7 @@ namespace WebAppEF.Entities
 
         public DateTime DataInserimento { get; set; } = DateTime.Now;
 
-         [StringLength(200)] // Lunghezza massima per l'URL dell'immagine
-    public string? ImmagineUrl { get; set; }
+        [StringLength(200)] // Lunghezza massima per l'URL dell'immagine
+        public string? ImmagineUrl { get; set; }
     }
 }

@@ -3,66 +3,101 @@ using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using WebAppEF.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestioneClienti.Controllers
 {
-    public class AccountController(ILogger<AccountController> logger) : Controller
+    public class AccountController : Controller
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<AccountController> _logger;
+
+    public AccountController(ApplicationDbContext context, ILogger<AccountController> logger)
     {
-        private readonly ILogger<AccountController> _logger = logger;
+        _context = context;
+        _logger = logger;
+    }
 
         [HttpGet]
         public IActionResult Login()
         {
-            return View(new LoginViewModel());
+            return View(new LoginViewModel
+            {
+                Username = string.Empty,
+                Password = string.Empty,
+                RememberMe = false
+            });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+public async Task<IActionResult> Login(LoginViewModel model)
+{
+    if (!ModelState.IsValid)
+    {
+        _logger.LogWarning("Tentativo di login con dati non validi.");
+        return View(model);
+    }
+
+    // Cerca l'utente nel database
+    var utente = await _context.Utenti
+        .FirstOrDefaultAsync(u => u.Username == model.Username);
+
+    if (utente == null)
+    {
+        _logger.LogWarning($"Tentativo di login fallito per {model.Username}: utente non trovato.");
+        ModelState.AddModelError(string.Empty, "Credenziali errate");
+        return View(model);
+    }
+
+    // Log per debug: stampa la password fornita e l'hash memorizzato
+    _logger.LogDebug($"Password fornita: {model.Password}");
+    _logger.LogDebug($"Hash memorizzato: {utente.PasswordHash}");
+
+    // Verifica la password
+    var passwordValida = VerifyPassword(model.Password, utente.PasswordHash);
+
+    if (!passwordValida)
+    {
+        _logger.LogWarning($"Tentativo di login fallito per {model.Username}: password errata.");
+        ModelState.AddModelError(string.Empty, "Credenziali errate");
+        return View(model);
+    }
+
+    // Creazione dei claim per l'utente
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, utente.Username),
+        new Claim(ClaimTypes.Role, utente.Role)
+    };
+
+    // Creazione dell'identità e del principal
+    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    var principal = new ClaimsPrincipal(identity);
+
+    // Configura le proprietà di autenticazione
+    var authProperties = new AuthenticationProperties
+    {
+        IsPersistent = model.RememberMe, // Mantieni la sessione attiva se l'utente seleziona "ricordami"
+        ExpiresUtc = model.RememberMe
+            ? DateTimeOffset.UtcNow.AddDays(30)
+            : DateTimeOffset.UtcNow.AddMinutes(30)
+    };
+
+    // Firma l'utente
+    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+    _logger.LogInformation($"L'utente {utente.Username} ha effettuato l'accesso con successo.");
+
+    TempData["WelcomeMessage"] = "Benvenuto nella tua Dashboard!";
+
+    return RedirectToAction("Dashboard", "Home");
+}
+
+        private static bool VerifyPassword(string password, string passwordHash)
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Tentativo di login con dati non validi.");
-                return View(model);
-            }
+               return BCrypt.Net.BCrypt.Verify(password, passwordHash);
 
-            // Credenziali hardcoded in fase di test
-            var usernameValido = "carlo00";
-            var passwordValida = "password";
-
-            if (model.Username != usernameValido || model.Password != passwordValida)
-            {
-                _logger.LogWarning($"Tentativo di login fallito per {model.Username}");
-                ModelState.AddModelError(string.Empty, "Credenziali errate");
-                return View(model);
-            }
-
-            // Creazione dei claim per l'utente
-            var claims = new List<Claim>
-        {
-        new Claim(ClaimTypes.Name, model.Username),
-        };
-
-            // Creazione dell'identità e del principal
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            // le proprietà di autenticazione
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = model.RememberMe, // Mantieni la sessione attiva se l'utente seleziona ricordami
-                ExpiresUtc = model.RememberMe
-                    ? DateTimeOffset.UtcNow.AddDays(30)  
-                    : DateTimeOffset.UtcNow.AddMinutes(30)  
-            };
-
-            // Firma l'utente
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
-
-            _logger.LogInformation($"L'utente {model.Username} ha effettuato l'accesso con successo.");
-
-            TempData["WelcomeMessage"] = "Benvenuto nella tua Dashboard!";
-
-            return RedirectToAction("Dashboard", "Home");
         }
 
         [HttpPost]
@@ -76,7 +111,15 @@ namespace GestioneClienti.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View(new RegisterViewModel());
+            return View(new RegisterViewModel
+            {
+                Nome = string.Empty,
+                Cognome = string.Empty,
+                Email = string.Empty,
+                Password = string.Empty,
+                ConfermaPassword = string.Empty
+            });
+
         }
 
         [HttpPost]
@@ -110,3 +153,4 @@ namespace GestioneClienti.Controllers
         }
     }
 }
+

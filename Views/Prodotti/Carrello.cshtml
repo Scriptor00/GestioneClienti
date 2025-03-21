@@ -6,6 +6,7 @@
 
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,46 +17,57 @@
         body {
             background-color: #f8f9fa;
         }
+
         .navbar {
             background-color: #0d6efd;
         }
-        .navbar-brand, .nav-link {
+
+        .navbar-brand,
+        .nav-link {
             color: #fff !important;
         }
+
         .nav-link:hover {
             color: #f8f9fa !important;
             opacity: 0.8;
         }
+
         .card {
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .card-img-top {
             height: 150px;
             object-fit: cover;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
+
         .quantity-input {
             width: 60px;
             text-align: center;
         }
+
         .footer {
             background-color: #0d6efd;
             color: #fff;
             padding: 20px 0;
             margin-top: 40px;
         }
+
         .footer a {
             color: #fff;
             text-decoration: none;
         }
+
         .footer a:hover {
             opacity: 0.8;
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -63,7 +75,8 @@
             <a class="navbar-brand" href="/">
                 <i class="bi bi-controller me-2"></i>Gaming Store
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -99,42 +112,8 @@
 
         <!-- Lista dei Prodotti nel Carrello -->
         <div class="row">
-            <div class="col-md-8">
-                @if (Model != null && Model.Count > 0)
-                {
-                    foreach (var prodotto in Model)
-                    {
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="@prodotto.ImmagineUrl" class="card-img-top" alt="@prodotto.NomeProdotto">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@prodotto.NomeProdotto</h5>
-                                        <p class="card-text text-muted">@prodotto.Categoria</p>
-                                        <p class="card-text">
-                                            <strong>Prezzo:</strong> @prodotto.Prezzo.ToString("C")
-                                        </p>
-                                        <div class="d-flex align-items-center">
-                                            <label for="quantity" class="me-2">Quantità:</label>
-                                            <input type="number" class="form-control quantity-input" value="1" min="1">
-                                            <button class="btn btn-danger ms-3">
-                                                <i class="bi bi-trash"></i> Rimuovi
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="alert alert-info text-center">
-                        <i class="bi bi-info-circle me-2"></i>Il tuo carrello è vuoto.
-                    </div>
-                }
+            <div class="col-md-8" id="cart-items">
+                <!-- I prodotti verranno caricati qui dinamicamente -->
             </div>
 
             <!-- Riepilogo Ordine -->
@@ -144,13 +123,13 @@
                         <h5 class="card-title">Riepilogo Ordine</h5>
                         <hr>
                         <p class="card-text">
-                            <strong>Totale Prodotti:</strong> @Model.Count
+                            <strong>Totale Prodotti:</strong> <span id="total-items">0</span>
                         </p>
                         <p class="card-text">
-                            <strong>Totale:</strong> @Model.Sum(p => p.Prezzo).ToString("C")
+                            <strong>Totale:</strong> <span id="total-price">€0.00</span>
                         </p>
                         <button class="btn btn-primary w-100">
-                            <i class="bi bi-credit-card me-2"></i>Procedi al Checkout
+                            <i class="bi bi-credit-card me-2"></i>Procedi al Pagamento
                         </button>
                         <a href="/Prodotti" class="btn btn-outline-secondary w-100 mt-2">
                             <i class="bi bi-arrow-left me-2"></i>Continua lo Shopping
@@ -166,10 +145,100 @@
         <div class="container">
             <p>&copy; 2025 Gaming Store. Tutti i diritti riservati.</p>
             <p>
-                <a href="/Privacy">Privacy Policy</a> | 
-                <a href="/Termini">Contatti</a>
+                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a> |
+                <a href="@Url.Action("Contatti", "Home")">Contatti</a>
             </p>
         </div>
     </footer>
+
+    <!-- Script per gestire il carrello -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+            const cartContainer = document.getElementById("cart-items");
+            const totalItemsElement = document.getElementById("total-items");
+            const totalPriceElement = document.getElementById("total-price");
+
+            let total = 0;
+            let totalItems = 0;
+
+            // Funzione per aggiornare il riepilogo dell'ordine
+            function updateOrderSummary() {
+                total = 0;
+                totalItems = 0;
+
+                cartItems.forEach(item => {
+                    total += item.prezzo * item.quantita;
+                    totalItems += item.quantita;
+                });
+
+                totalItemsElement.textContent = totalItems;
+                totalPriceElement.textContent = `€${total.toFixed(2)}`;
+            }
+
+            // Funzione per rimuovere un prodotto dal carrello
+            function removeFromCart(productName) {
+                const updatedCart = cartItems.filter(item => item.nomeProdotto !== productName);
+                localStorage.setItem("cart", JSON.stringify(updatedCart));
+                location.reload(); // Ricarica la pagina per aggiornare il carrello
+            }
+
+            // Funzione per aggiornare la quantità di un prodotto
+            function updateQuantity(productName, newQuantity) {
+                const product = cartItems.find(item => item.nomeProdotto === productName);
+                if (product) {
+                    product.quantita = parseInt(newQuantity);
+                    localStorage.setItem("cart", JSON.stringify(cartItems));
+                    updateOrderSummary();
+                }
+            }
+
+            // Mostra i prodotti nel carrello
+            if (cartItems.length === 0) {
+                cartContainer.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>Il tuo carrello è vuoto.
+                    </div>
+                `;
+            } else {
+                cartItems.forEach(item => {
+                    const productTotal = item.prezzo * item.quantita;
+
+                    cartContainer.innerHTML += `
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="${item.immagineUrl}" class="card-img-top" alt="${item.nomeProdotto}">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.nomeProdotto}</h5>
+                                        <p class="card-text text-muted">${item.categoria}</p>
+                                        <p class="card-text">
+                                            <strong>Prezzo:</strong> €${item.prezzo.toFixed(2)}
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <label for="quantity" class="me-2">Quantità:</label>
+                                            <input type="number" class="form-control quantity-input" value="${item.quantita}" min="1" onchange="updateQuantity('${item.nomeProdotto}', this.value)">
+                                            <button class="btn btn-danger ms-3" onclick="removeFromCart('${item.nomeProdotto}')">
+                                                <i class="bi bi-trash"></i> Rimuovi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                updateOrderSummary();
+            }
+
+            // Espone le funzioni al contesto globale
+            window.removeFromCart = removeFromCart;
+            window.updateQuantity = updateQuantity;
+        });
+    </script>
 </body>
+
 </html>
