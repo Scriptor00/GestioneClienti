@@ -1,0 +1,869 @@
+@using System.Web
+@using GestioneClienti.ViewModel
+@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home - Gaming Store";
+}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Orbitron&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" crossorigin="anonymous">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <style>
+    :root {
+        --product-image-height: 180px;
+        --product-card-width: 280px;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #1a1a1a;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar {
+        background-color: #0d6efd;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-brand, .nav-link {
+        color: #fff !important;
+    }
+
+    .nav-link:hover {
+        color: #f8f9fa !important;
+        opacity: 0.8;
+    }
+
+    .hero {
+        text-align: center;
+        background: linear-gradient(to right, #ff416c, #ff4b2b);
+        padding: 60px 20px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://media.gqitalia.it/photos/64800e0d5dd81c9fc9cbdff7/16:9/w_1280,c_limit/100-best-games-hp-b.jpg') center/cover;
+        opacity: 0.3;
+        z-index: 0;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        font-family: 'Orbitron', sans-serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        text-align: center;
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 10px;
+        margin: 60px 0 30px;
+        font-family: 'Orbitron', sans-serif;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: "";
+        display: block;
+        width: 100px;
+        height: 3px;
+        background: #ff4b2b;
+        margin: 10px auto 0;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--product-card-width), 1fr));
+        gap: 30px;
+        margin: 40px 0;
+        justify-items: center;
+    }
+
+    .product-card {
+        background: #2d2d2d;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        width: var(--product-card-width);
+    }
+
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 25px rgba(255, 75, 43, 0.4);
+    }
+
+    /* MODIFICATO: Immagine che riempie tutto il contenitore */
+    .product-image-container {
+        position: relative;
+        height: var(--product-image-height);
+        overflow: hidden;
+        background-color: #1a1a1a;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s;
+        position: relative;
+        z-index: 1;
+    }
+
+    .product-trailer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 2;
+        background: #000;
+    }
+
+    .product-card:hover .product-image {
+        opacity: 0;
+    }
+
+    .product-card:hover .product-trailer {
+        opacity: 1;
+    }
+
+    .youtube-trailer {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .local-trailer {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-info {
+        padding: 20px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        min-height: 60px;
+        flex-grow: 1;
+    }
+
+    .price {
+        font-size: 1.5rem;
+        color: #ff4b2b;
+        font-weight: bold;
+        margin: 15px 0;
+        display: block;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .platform-filter {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 40px 0;
+        flex-wrap: wrap;
+    }
+
+    .platform-btn {
+        background-color: #2d2d2d;
+        color: white;
+        border: 1px solid #0d6efd;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s;
+        font-weight: bold;
+    }
+
+    .platform-btn:hover, .platform-btn.active {
+        background-color: #0d6efd;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .newsletter {
+        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+        padding: 50px;
+        border-radius: 15px;
+        margin: 60px 0;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .newsletter h3 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .newsletter p {
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
+
+    .newsletter .form-control {
+        height: 50px;
+        border-radius: 30px;
+        border: none;
+        padding: 0 20px;
+    }
+
+    .newsletter .btn {
+        border-radius: 30px;
+        height: 50px;
+        padding: 0 30px;
+        font-weight: bold;
+    }
+
+    .testimonials {
+        margin: 60px 0;
+    }
+
+    .testimonial-card {
+        background: #2d2d2d;
+        padding: 30px;
+        border-radius: 15px;
+        height: 100%;
+        transition: transform 0.3s;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .testimonial-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 20px;
+        display: block;
+        border: 3px solid #0d6efd;
+    }
+
+    .testimonial-name {
+        color: #ff4b2b;
+        font-weight: bold;
+        margin-top: 15px;
+        display: block;
+    }
+
+    .rating {
+        color: #ffc107;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+
+    .view-all {
+        margin: 50px 0;
+        text-align: center;
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #0d6efd;
+        color: #0d6efd;
+        padding: 12px 30px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .footer {
+        background-color: #0d6efd;
+        color: #fff;
+        padding: 40px 0;
+        margin-top: 80px;
+    }
+
+    .footer a {
+        color: #fff;
+        text-decoration: none;
+        transition: opacity 0.3s;
+    }
+
+    .footer a:hover {
+        opacity: 0.8;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .social-icons a {
+        font-size: 1.5rem;
+    }
+
+    .copyright {
+        text-align: center;
+        opacity: 0.8;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes slideIn {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .slide-in {
+        animation: slideIn 1s ease-out;
+    }
+
+    /* Fallback per immagini mancanti */
+    .product-image-container::before {
+        content: "Immagine non disponibile";
+        position: absolute;
+        color: #666;
+        font-size: 0.9rem;
+        z-index: 0;
+        text-align: center;
+        width: 100%;
+        padding: 0 20px;
+        display: none;
+    }
+
+    .product-image-container:has(img[src=""])::before,
+    .product-image-container:not(:has(img))::before {
+        display: block;
+    }
+
+    /* Media queries responsive */
+    @@media (max-width: 992px) {
+        :root {
+            --product-image-height: 160px;
+            --product-card-width: 240px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        :root {
+            --product-image-height: 140px;
+            --product-card-width: 220px;
+        }
+        
+        .hero h1 {
+            font-size: 2.2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .platform-filter {
+            gap: 10px;
+        }
+        
+        .platform-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        :root {
+            --product-image-height: 120px;
+            --product-card-width: 100%;
+        }
+        
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-card {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .newsletter {
+            padding: 30px 20px;
+        }
+         .gaming-dropdown {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #0d6efd;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
+            padding: 0;
+            overflow: hidden;
+            min-width: 220px;
+            margin-top: 8px; /* Spazio dal bordo della navbar */
+        }
+        
+        .gaming-dropdown .dropdown-item {
+            color: #e0e0e0;
+            padding: 10px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background: transparent;
+        }
+        
+        .gaming-dropdown .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
+            color: #fff;
+            border-left: 3px solid #0d6efd;
+            transform: translateX(5px);
+        }
+        
+        .gaming-dropdown .dropdown-item i {
+            color: #0d6efd;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .gaming-dropdown .dropdown-divider {
+            border-color: rgba(13, 110, 253, 0.3);
+            margin: 0;
+        }
+        
+        .logout-btn {
+            color: #ff4b2b !important;
+        }
+        
+        .logout-btn:hover {
+            background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
+            border-left: 3px solid #ff4b2b !important;
+        }
+        
+        .dropdown-toggle::after {
+            border-top-color: #fff;
+            transition: transform 0.3s;
+        }
+        
+        /* ANIMAZIONI */
+        @@keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .gaming-dropdown.show {
+            animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        
+        /* FIX PER POSIZIONAMENTO */
+        .navbar-collapse {
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                <i class="bi bi-controller me-2"></i>Gaming Store
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Prodotti">
+                            <i class="bi bi-list-ul me-1"></i>Catalogo
+                        </a>
+                    </li>
+                    
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="/Account">
+                                        <i class="bi bi-person-gear me-2"></i>Profilo
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Carrello", "Prodotti")">
+                                        <i class="bi bi-collection-play me-2"></i>I miei ordini
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item logout-btn">
+                                            <i class="bi bi-power me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">
+                                <i class="bi bi-person-circle me-1"></i>Account
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero fade-in">
+        <div class="hero-content">
+            <h1 class="slide-in">Scopri le ultime novità del mondo gaming!</h1>
+            <p class="slide-in">Trova le console e gli accessori più richiesti sul mercato.</p>
+            <a href="/Prodotti" class="btn btn-primary btn-lg slide-in">Esplora ora</a>
+        </div>
+    </section>
+
+    <div class="container">
+    <!-- Featured Products -->
+    <section class="featured-products">
+        <h2 class="section-title fade-in">🔥 I più venduti</h2>
+        <div class="product-grid">
+            @foreach (var prodotto in Model.ProdottiPiuVenduti.Take(4))
+            {
+                <div class="product-card fade-in">
+                    <div class="product-image-container">
+                        @if (!string.IsNullOrEmpty(prodotto.ImmagineUrl))
+                        {
+                            <img src="@prodotto.ImmagineUrl" alt="@prodotto.NomeProdotto" class="product-image standard-image" onerror="this.style.display='none'">
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(prodotto.TrailerUrl))
+                        {
+                            <div class="product-trailer">
+                                @if (prodotto.TrailerUrl.Contains("youtube.com") || prodotto.TrailerUrl.Contains("youtu.be"))
+                                {
+                                    <!-- Modificato: URL YouTube ottimizzato per embed -->
+                                    <iframe class="youtube-trailer" 
+                                            src="@GetEmbedYoutubeUrl(prodotto.TrailerUrl)" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen
+                                            loading="lazy">
+                                    </iframe>
+                                }
+                                else if (prodotto.TrailerUrl.EndsWith(".mp4") || prodotto.TrailerUrl.EndsWith(".webm"))
+                                {
+                                    <video class="local-trailer" autoplay loop muted playsinline>
+                                        <source src="@prodotto.TrailerUrl" type="video/mp4">
+                                        Il tuo browser non supporta il video.
+                                    </video>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="product-info">
+                        <h3>@prodotto.NomeProdotto</h3>
+                        <span class="price">€@prodotto.Prezzo</span>
+                        <a href="/Prodotti/Dettagli/@prodotto.IdProdotto" class="btn btn-primary">Scopri di più</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- New Arrivals -->
+    <section class="new-arrivals">
+        <h2 class="section-title fade-in">🌟 Novità</h2>
+        <div class="product-grid">
+            @foreach (var prodotto in Model.TuttiProdotti.OrderByDescending(p => p.DataInserimento).Take(4))
+            {
+                <div class="product-card fade-in">
+                    <div class="product-image-container">
+                        @if (!string.IsNullOrEmpty(prodotto.ImmagineUrl))
+                        {
+                            <img src="@prodotto.ImmagineUrl" alt="@prodotto.NomeProdotto" class="product-image standard-image" onerror="this.style.display='none'">
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(prodotto.TrailerUrl))
+                        {
+                            <div class="product-trailer">
+                                @if (prodotto.TrailerUrl.Contains("youtube.com") || prodotto.TrailerUrl.Contains("youtu.be"))
+                                {
+                                    <!-- Modificato: URL YouTube ottimizzato per embed -->
+                                    <iframe class="youtube-trailer" 
+                                            src="@GetEmbedYoutubeUrl(prodotto.TrailerUrl)" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen
+                                            loading="lazy">
+                                    </iframe>
+                                }
+                                else if (prodotto.TrailerUrl.EndsWith(".mp4") || prodotto.TrailerUrl.EndsWith(".webm"))
+                                {
+                                    <video class="local-trailer" autoplay loop muted playsinline>
+                                        <source src="@prodotto.TrailerUrl" type="video/mp4">
+                                        Il tuo browser non supporta il video.
+                                    </video>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="product-info">
+                        <h3>@prodotto.NomeProdotto</h3>
+                        <span class="price">€@prodotto.Prezzo</span>
+                        <a href="/Prodotti/Dettagli/@prodotto.IdProdotto" class="btn btn-primary">Scopri di più</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Platform Filter -->
+    <section class="platform-section">
+        <h2 class="section-title fade-in">🎮 Per Piattaforma</h2>
+        <div class="platform-filter">
+            <button class="platform-btn active">Tutte</button>
+            <button class="platform-btn">PlayStation</button>
+            <button class="platform-btn">Xbox</button>
+            <button class="platform-btn">Nintendo</button>
+            <button class="platform-btn">PC</button>
+            <button class="platform-btn">Accessori</button>
+        </div>
+        
+        <div class="product-grid">
+            @foreach (var prodotto in Model.TuttiProdotti.Take(8))
+            {
+                <div class="product-card fade-in">
+                    <div class="product-image-container">
+                        @if (!string.IsNullOrEmpty(prodotto.ImmagineUrl))
+                        {
+                            <img src="@prodotto.ImmagineUrl" alt="@prodotto.NomeProdotto" class="product-image standard-image" onerror="this.style.display='none'">
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(prodotto.TrailerUrl))
+                        {
+                            <div class="product-trailer">
+                                @if (prodotto.TrailerUrl.Contains("youtube.com") || prodotto.TrailerUrl.Contains("youtu.be"))
+                                {
+                                    <iframe class="youtube-trailer" 
+                                            src="@GetEmbedYoutubeUrl(prodotto.TrailerUrl)" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen
+                                            loading="lazy">
+                                    </iframe>
+                                }
+                                else if (prodotto.TrailerUrl.EndsWith(".mp4") || prodotto.TrailerUrl.EndsWith(".webm"))
+                                {
+                                    <video class="local-trailer" autoplay loop muted playsinline>
+                                        <source src="@prodotto.TrailerUrl" type="video/mp4">
+                                        Il tuo browser non supporta il video.
+                                    </video>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="product-info">
+                        <h3>@prodotto.NomeProdotto</h3>
+                        <span class="price">€@prodotto.Prezzo</span>
+                        <a href="/Prodotti/Dettagli/@prodotto.IdProdotto" class="btn btn-primary">Dettagli</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@functions {
+    public string GetEmbedYoutubeUrl(string youtubeUrl)
+    {
+        string videoId;
+        
+        // Se l'URL è già in formato embed
+        if (youtubeUrl.Contains("embed/"))
+        {
+            videoId = youtubeUrl.Split(new[] { "embed/" }, StringSplitOptions.None).Last().Split('?')[0];
+            return $"https://www.youtube.com/embed/{videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist={videoId}&rel=0&enablejsapi=1";
+        }
+        // Se l'URL è in formato standard
+        else if (youtubeUrl.Contains("v="))
+        {
+            videoId = youtubeUrl.Split(new[] { "v=" }, StringSplitOptions.None).Last().Split('&')[0];
+            return $"https://www.youtube.com/embed/{videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist={videoId}&rel=0&enablejsapi=1";
+        }
+        // Se l'URL è già completo (già con parametri)
+        else
+        {
+            return youtubeUrl.Contains('?') 
+                ? $"{youtubeUrl}&autoplay=1&mute=1" 
+                : $"{youtubeUrl}?autoplay=1&mute=1";
+        }
+    }
+}
+
+        <!-- Newsletter -->
+        <section class="newsletter fade-in">
+            <h3>Iscriviti alla nostra newsletter</h3>
+            <p>Ricevi offerte esclusive e aggiornamenti sui nuovi prodotti!</p>
+            <form class="row g-3 justify-content-center">
+                <div class="col-md-6">
+                    <input type="email" class="form-control" placeholder="La tua email" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Iscriviti</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials">
+            <h2 class="section-title fade-in">💬 Cosa dicono i nostri clienti</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="testimonial-img" alt="Marco R.">
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                        <p>"Servizio eccellente e consegna super veloce. Consigliatissimo!"</p>
+                        <span class="testimonial-name">- Marco R.</span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="testimonial-img" alt="Laura B.">
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                        <p>"Ottima selezione di prodotti e prezzi competitivi."</p>
+                        <span class="testimonial-name">- Laura B.</span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" class="testimonial-img" alt="Andrea T.">
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                        <p>"Assistenza clienti fantastica, mi hanno aiutato a risolvere un problema rapidamente."</p>
+                        <span class="testimonial-name">- Andrea T.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View All Products -->
+        <section class="view-all fade-in">
+            <a href="/Prodotti" class="btn btn-outline-secondary btn-lg">Vedi Tutti i Prodotti</a>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer fade-in">
+        <div class="container">
+            <div class="footer-links">
+                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a>
+                <a href="@Url.Action("Contatti", "Home")">Contatti</a>
+                <a href="#">Termini e condizioni</a>
+                <a href="#">Spedizioni</a>
+                <a href="#">FAQ</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="bi bi-facebook"></i></a>
+                <a href="#"><i class="bi bi-twitter-x"></i></a>
+                <a href="#"><i class="bi bi-instagram"></i></a>
+                <a href="#"><i class="bi bi-youtube"></i></a>
+                <a href="#"><i class="bi bi-discord"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Gaming Store. Tutti i diritti riservati.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

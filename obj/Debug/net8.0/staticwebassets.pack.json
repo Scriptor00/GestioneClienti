@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\images\\HeroImageProgetto.jpg",
+      "PackagePath": "staticwebassets\\images\\HeroImageProgetto.jpg"
+    },
+    {
       "Id": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },
@@ -259,6 +263,14 @@
     {
       "Id": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\lib\\jquery\\dist\\jquery.slim.min.map",
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.slim.min.map"
+    },
+    {
+      "Id": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoNintendo.mp4",
+      "PackagePath": "staticwebassets\\videos\\videoNintendo.mp4"
+    },
+    {
+      "Id": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoPs5.mp4",
+      "PackagePath": "staticwebassets\\videos\\videoPs5.mp4"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.WebAppEF.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",

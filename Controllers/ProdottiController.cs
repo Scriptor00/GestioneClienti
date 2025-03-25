@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebAppEF.Entities;
 using System.Collections.Generic;
 using WebAppEF.Models;
+using GestioneClienti.ViewModel;
 
 namespace WebAppEF.Controllers
 {
@@ -13,6 +14,24 @@ namespace WebAppEF.Controllers
         {
             _context = context;
         }
+
+        public IActionResult Home()
+{
+    var prodotti = _context.Prodotti.ToList();
+
+    // Filtra solo i prodotti più venduti
+    var prodottiPiuVenduti = _context.Prodotti
+        .Where(p => p.NomeProdotto == "PS5" || p.NomeProdotto == "Xbox Series X")
+        .ToList();
+
+    var viewModel = new HomeViewModel
+    {
+        TuttiProdotti = prodotti,
+        ProdottiPiuVenduti = prodottiPiuVenduti
+    };
+
+    return View(viewModel);
+}
 
         public IActionResult Index()
         {

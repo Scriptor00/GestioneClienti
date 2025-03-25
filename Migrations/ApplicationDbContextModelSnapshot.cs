@@ -173,6 +173,9 @@ namespace WebAppEF.Migrations
                     b.Property<decimal>("Prezzo")
                         .HasColumnType("DECIMAL(10,2)");
 
+                    b.Property<string>("TrailerUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("IdProdotto");
 
                     b.ToTable("Prodotti");

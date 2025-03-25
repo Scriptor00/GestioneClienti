@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "FpXrmRPxy3f0/7M6hLxyhjB00F3BMZasRaaQ+3L+Z40=",
+  "Hash": "yRon/N4Nnf9rbz0dIupnxVmmY+GlvbpBzJZjMED9z90=",
   "Source": "WebAppEF",
   "BasePath": "_content/WebAppEF",
   "Mode": "Default",
@@ -120,6 +120,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\images\\HeroImageProgetto.jpg",
+      "SourceId": "WebAppEF",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\",
+      "BasePath": "_content/WebAppEF",
+      "RelativePath": "images/HeroImageProgetto#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "do5hhzy4kq",
+      "Integrity": "A4wWel5IeAbe9wmheiehxKMa2BS86fYJGvUPseEmx6A=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\HeroImageProgetto.jpg"
     },
     {
       "Identity": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\js\\site.js",
@@ -1401,6 +1422,48 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoNintendo.mp4",
+      "SourceId": "WebAppEF",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\",
+      "BasePath": "_content/WebAppEF",
+      "RelativePath": "videos/videoNintendo#[.{fingerprint}]?.mp4",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "7zcqxvr7ia",
+      "Integrity": "zS7xK+ENnI3HvKYsDNu8eWmLNpxCZSXpcsf7VJwSM+s=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\videos\\videoNintendo.mp4"
+    },
+    {
+      "Identity": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoPs5.mp4",
+      "SourceId": "WebAppEF",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\",
+      "BasePath": "_content/WebAppEF",
+      "RelativePath": "videos/videoPs5#[.{fingerprint}]?.mp4",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "h9l8okazwy",
+      "Integrity": "W5psafe3P+mc4Jqiz8YqoIXB5RAypYq40aM4SANMlgk=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\videos\\videoPs5.mp4"
     }
   ],
   "Endpoints": [
@@ -1647,6 +1710,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM="
+        }
+      ]
+    },
+    {
+      "Route": "images/HeroImageProgetto.do5hhzy4kq.jpg",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\images\\HeroImageProgetto.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "693174"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"A4wWel5IeAbe9wmheiehxKMa2BS86fYJGvUPseEmx6A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 10:32:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "do5hhzy4kq"
+        },
+        {
+          "Name": "label",
+          "Value": "images/HeroImageProgetto.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-A4wWel5IeAbe9wmheiehxKMa2BS86fYJGvUPseEmx6A="
+        }
+      ]
+    },
+    {
+      "Route": "images/HeroImageProgetto.jpg",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\images\\HeroImageProgetto.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "693174"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"A4wWel5IeAbe9wmheiehxKMa2BS86fYJGvUPseEmx6A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 10:32:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-A4wWel5IeAbe9wmheiehxKMa2BS86fYJGvUPseEmx6A="
         }
       ]
     },
@@ -6649,6 +6794,170 @@
         {
           "Name": "integrity",
           "Value": "sha256-hjIBkvmgxQXbNXK3B9YQ3t06RwLuQSQzC/dpvuB/lMk="
+        }
+      ]
+    },
+    {
+      "Route": "videos/videoNintendo.7zcqxvr7ia.mp4",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoNintendo.mp4",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1515606"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "video/mp4"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"zS7xK+ENnI3HvKYsDNu8eWmLNpxCZSXpcsf7VJwSM+s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 14:08:18 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "7zcqxvr7ia"
+        },
+        {
+          "Name": "label",
+          "Value": "videos/videoNintendo.mp4"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-zS7xK+ENnI3HvKYsDNu8eWmLNpxCZSXpcsf7VJwSM+s="
+        }
+      ]
+    },
+    {
+      "Route": "videos/videoNintendo.mp4",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoNintendo.mp4",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1515606"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "video/mp4"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"zS7xK+ENnI3HvKYsDNu8eWmLNpxCZSXpcsf7VJwSM+s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 14:08:18 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-zS7xK+ENnI3HvKYsDNu8eWmLNpxCZSXpcsf7VJwSM+s="
+        }
+      ]
+    },
+    {
+      "Route": "videos/videoPs5.h9l8okazwy.mp4",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoPs5.mp4",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "20368574"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "video/mp4"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"W5psafe3P+mc4Jqiz8YqoIXB5RAypYq40aM4SANMlgk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 13:46:59 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "h9l8okazwy"
+        },
+        {
+          "Name": "label",
+          "Value": "videos/videoPs5.mp4"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-W5psafe3P+mc4Jqiz8YqoIXB5RAypYq40aM4SANMlgk="
+        }
+      ]
+    },
+    {
+      "Route": "videos/videoPs5.mp4",
+      "AssetFile": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\wwwroot\\videos\\videoPs5.mp4",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "20368574"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "video/mp4"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"W5psafe3P+mc4Jqiz8YqoIXB5RAypYq40aM4SANMlgk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Mar 2025 13:46:59 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-W5psafe3P+mc4Jqiz8YqoIXB5RAypYq40aM4SANMlgk="
         }
       ]
     },

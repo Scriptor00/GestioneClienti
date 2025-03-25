@@ -28,5 +28,7 @@ namespace WebAppEF.Entities
 
         [StringLength(200)] // Lunghezza massima per l'URL dell'immagine
         public string? ImmagineUrl { get; set; }
+
+        public string? TrailerUrl {get; set;}
     }
 }
