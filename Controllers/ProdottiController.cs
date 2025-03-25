@@ -6,32 +6,27 @@ using GestioneClienti.ViewModel;
 
 namespace WebAppEF.Controllers
 {
-    public class ProdottiController : Controller
+    public class ProdottiController(ApplicationDbContext context) : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProdottiController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public IActionResult Home()
-{
-    var prodotti = _context.Prodotti.ToList();
+        {
+            var prodotti = _context.Prodotti.ToList();
 
-    // Filtra solo i prodotti più venduti
-    var prodottiPiuVenduti = _context.Prodotti
-        .Where(p => p.NomeProdotto == "PS5" || p.NomeProdotto == "Xbox Series X")
-        .ToList();
+            // Filtra solo i prodotti più venduti
+            var prodottiPiuVenduti = _context.Prodotti
+                .Where(p => p.NomeProdotto == "PS5" || p.NomeProdotto == "Xbox Series X")
+                .ToList();
 
-    var viewModel = new HomeViewModel
-    {
-        TuttiProdotti = prodotti,
-        ProdottiPiuVenduti = prodottiPiuVenduti
-    };
+            var viewModel = new HomeViewModel
+            {
+                TuttiProdotti = prodotti,
+                ProdottiPiuVenduti = prodottiPiuVenduti
+            };
 
-    return View(viewModel);
-}
+            return View(viewModel);
+        }
 
         public IActionResult Index()
         {
@@ -46,6 +41,11 @@ namespace WebAppEF.Controllers
         {
             var prodottiNelCarrello = _context.Prodotti.ToList(); // Recupera i prodotti dal carrello
             return View(prodottiNelCarrello);
+        }
+
+        public IActionResult Profilo()
+        {
+            return View();
         }
     }
 }

@@ -15,168 +15,283 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
-        body {
-            background-color: #1a1a1a;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-        }
+       body {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+}
 
-        .navbar {
-            background-color: #0d6efd;
-        }
 
-        .navbar-brand,
-        .nav-link {
-            color: #fff !important;
-        }
+.navbar {
+    background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid #0d6efd;
+    padding: 0.8rem 1rem;
+    position: relative;
+    z-index: 1000;
+}
 
-        .nav-link:hover {
-            color: #f8f9fa !important;
-            opacity: 0.8;
-        }
+.navbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+}
 
-        .card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none;
-            border-radius: 12px;
-            background-color: #2d2d2d;
-        }
+.navbar-brand {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #fff !important;
+    text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+}
 
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
+.navbar-brand:hover {
+    text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+    transform: scale(1.02);
+}
 
-        .card-img-top {
-            height: 150px;
-            object-fit: cover;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
+.navbar-brand i {
+    margin-right: 10px;
+    color: #0d6efd;
+    font-size: 1.5rem;
+    transition: all 0.3s;
+}
 
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-        }
+.navbar-brand:hover i {
+    color: #ff4b2b;
+    transform: rotate(15deg);
+}
 
-        .footer {
-            background-color: #0d6efd;
-            color: #fff;
-            padding: 20px 0;
-            margin-top: 40px;
-            text-align: center;
-        }
+.nav-link {
+    color: #fff !important;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem !important;
+    margin: 0 0.3rem;
+    border-radius: 6px;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-        .footer a {
-            color: #fff;
-            text-decoration: none;
-        }
+.nav-link i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+}
 
-        .footer a:hover {
-            opacity: 0.8;
-        }
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: #ff4b2b;
+    transition: all 0.3s;
+}
 
-        .alert {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #333;
-            color: #fff;
-        }
+.nav-link:hover::before {
+    width: 80%;
+}
 
-        .card-body {
-            padding: 20px;
-        }
+.nav-link:hover {
+    background: rgba(13, 110, 253, 0.2);
+}
 
-        .btn-primary {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
+.nav-link:hover i {
+    color: #ff4b2b;
+    transform: scale(1.2);
+}
 
-        .btn-outline-secondary {
-            border-color: #0d6efd;
-            color: #0d6efd;
-        }
+.navbar-toggler {
+    border: 1px solid #0d6efd;
+    padding: 0.5rem;
+}
 
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    transition: all 0.3s;
+}
 
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #c82333;
-        }
+.navbar-toggler:hover .navbar-toggler-icon {
+    transform: scale(1.1);
+}
 
-        .btn-outline-secondary:hover {
-            background-color: #0d6efd;
-            color: #fff;
-        }
-        .gaming-dropdown {
-        background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 12px;
+    background-color: #2d2d2d;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.card-img-top {
+    height: 150px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+}
+
+.footer {
+    background-color: #0d6efd;
+    color: #fff;
+    padding: 20px 0;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    opacity: 0.8;
+}
+
+.alert {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #333;
+    color: #fff;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-secondary {
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+.gaming-dropdown {
+    background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 1px solid #0d6efd;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
+    padding: 0;
+    overflow: hidden;
+    min-width: 220px;
+}
+
+.gaming-dropdown .dropdown-item {
+    color: #e0e0e0;
+    padding: 10px 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    background: transparent;
+}
+
+.gaming-dropdown .dropdown-item:hover {
+    background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
+    color: #fff;
+    border-left: 3px solid #0d6efd;
+    transform: translateX(5px);
+}
+
+.gaming-dropdown .dropdown-item i {
+    color: #0d6efd;
+    width: 20px;
+    text-align: center;
+}
+
+.gaming-dropdown .dropdown-divider {
+    border-color: rgba(13, 110, 253, 0.3);
+    margin: 0;
+}
+
+.logout-btn {
+    color: #ff4b2b !important;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
+    border-left: 3px solid #ff4b2b !important;
+}
+
+.gaming-user-menu::after {
+    border-top-color: #0d6efd;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Animazione */
+@@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.gaming-dropdown.show {
+    animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+/* Media Query per Mobile */
+@@media (max-width: 768px) {
+    .navbar-collapse {
+        background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
         border: 1px solid #0d6efd;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
-        padding: 0;
-        overflow: hidden;
-        min-width: 220px;
+        border-radius: 0 0 10px 10px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
-
-    .gaming-dropdown .dropdown-item {
-        color: #e0e0e0;
-        padding: 10px 15px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-        background: transparent;
+    
+    .nav-link {
+        margin: 0.3rem 0;
+        padding: 0.8rem 1rem !important;
     }
-
-    .gaming-dropdown .dropdown-item:hover {
-        background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
-        color: #fff;
-        border-left: 3px solid #0d6efd;
-        transform: translateX(5px);
+    
+    .nav-link::before {
+        display: none;
     }
-
-    .gaming-dropdown .dropdown-item i {
-        color: #0d6efd;
-        width: 20px;
-        text-align: center;
-    }
-
-    .gaming-dropdown .dropdown-divider {
-        border-color: rgba(13, 110, 253, 0.3);
-        margin: 0;
-    }
-
-    .logout-btn {
-        color: #ff4b2b !important;
-    }
-
-    .logout-btn:hover {
-        background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
-        border-left: 3px solid #ff4b2b !important;
-    }
-
-    .gaming-user-menu::after {
-        border-top-color: #0d6efd;
-        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    }
-
-    /* Animazione */
-    @@keyframes dropdownFadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px) scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    .gaming-dropdown.show {
-        animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-    }
+}
     </style>
 </head>
 
@@ -209,7 +324,7 @@
                             <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/Account">
+                            <li><a class="dropdown-item" href="@Url.Action("Profilo", "Prodotti")">
                                 <i class="bi bi-person-gear me-2"></i>Profilo
                             </a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Carrello", "Prodotti")">

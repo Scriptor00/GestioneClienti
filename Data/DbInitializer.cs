@@ -1,8 +1,5 @@
 using WebAppEF.Entities;
-using System;
-using System.Linq;
 using WebAppEF.Models;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace WebAppEF.Data
 {

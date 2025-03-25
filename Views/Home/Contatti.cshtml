@@ -2,28 +2,48 @@
     ViewData["Title"] = "Contatti";
 }
 
-<!-- Navbar -->
-<nav style="background-color: #343a40; padding: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+<nav style="background-color: #1a1a2e; padding: 1rem; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1); border-bottom: 1px solid #00ffff;">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-        <a href="@Url.Action("Index", "Home")" style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">OrdiNinja</a>
-        <div style="display: flex; gap: 1rem;">
-            <a href="@Url.Action("Dashboard", "Home")" style="color: white; padding: 0.5rem 1rem; text-decoration: none; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#495057'" onmouseout="this.style.backgroundColor='transparent'">Dashboard</a>
-            <a href="@Url.Action("Contatti", "Home")" style="color: white; padding: 0.5rem 1rem; text-decoration: none; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#495057'" onmouseout="this.style.backgroundColor='transparent'">Contatti</a>
+        <a href="@Url.Action("Home", "Prodotti")" style="color: #00ffff; text-decoration: none; font-size: 1.8rem; font-weight: bold; font-family: 'Agency FB', sans-serif; text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);">GAMING<span style="color: #ff00ff;">STORE</span></a>
+        <div style="display: flex; gap: 1.5rem;">
+            <a href="@Url.Action("Home", "Prodotti")" 
+               style="color: white; padding: 0.5rem 1.5rem; text-decoration: none; 
+                      background: linear-gradient(45deg, #1a1a2e, #16213e); 
+                      border: 1px solid #00ffff; border-radius: 5px;
+                      transition: all 0.3s; font-family: 'Arial', sans-serif;
+                      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);"
+               onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 15px rgba(0, 255, 255, 0.5)'; this.style.backgroundColor='#0f3460'" 
+               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(0, 255, 255, 0.3)'; this.style.backgroundColor='transparent'">
+               Home
+            </a>
+            <a href="@Url.Action("Contatti", "Home")" 
+               style="color: #00ffff; padding: 0.5rem 1.5rem; text-decoration: none; 
+                      background: linear-gradient(45deg, #1a1a2e, #16213e); 
+                      border: 1px solid #ff00ff; border-radius: 5px;
+                      transition: all 0.3s; font-family: 'Arial', sans-serif;
+                      box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);"
+               onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 15px rgba(255, 0, 255, 0.5)'; this.style.backgroundColor='#0f3460'" 
+               onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(255, 0, 255, 0.3)'; this.style.backgroundColor='transparent'">
+               Contatti
+            </a>
         </div>
     </div>
 </nav>
 
-<div class="container-fluid p-4" style="max-width: 1200px; margin: 0 auto;">
-    <div class="text-center mb-5">
-        <h1 class="display-4" style="font-weight: bold; color: #343a40;">Contatti</h1>
-        <p class="lead" style="color: #6c757d;">Siamo qui per aiutarti. Contattaci per qualsiasi domanda, richiesta o supporto.</p>
+<!-- Main Container -->
+<div class="container-fluid p-4" style="max-width: 1200px; margin: 0 auto; background-color: #0f0f1a; min-height: calc(100vh - 150px);">
+    <div class="text-center mb-5" style="position: relative; overflow: hidden; padding: 2rem; border-radius: 10px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #00ffff; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);">
+        <h1 class="display-4" style="font-weight: bold; color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.7); font-family: 'Agency FB', sans-serif; letter-spacing: 2px;">CONTATTI</h1>
+        <p class="lead" style="color: #e6e6e6; font-family: 'Arial', sans-serif;">Il nostro team di supporto è pronto ad aiutarti. Contattaci per qualsiasi domanda o problema!</p>
+        <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);"></div>
+        <div style="position: absolute; bottom: 0; left: 0; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255, 0, 255, 0.2) 0%, transparent 70%);"></div>
     </div>
 
     <!-- Mappa e Informazioni di Contatto -->
     <div class="row mb-5" style="display: flex; gap: 2rem; justify-content: center;">
         <!-- Mappa -->
         <div class="col-md-6" style="flex: 1; min-width: 300px;">
-            <div class="card shadow-sm h-100" style="border: none; border-radius: 10px; overflow: hidden;">
+            <div class="h-100" style="border-radius: 10px; overflow: hidden; border: 1px solid #00ffff; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); position: relative;">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3018.113123634814!2d16.27931531541002!3d41.31989497928948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13381d8e1f9b7d1f%3A0x9f0a7d7b8b8b8b8b!2sVia%20Roma%2C%2076111%20Barletta%20BT%2C%20Italia!5e0!3m2!1sit!2sit!4v1622549400000!5m2!1sit!2sit" 
                         width="100%" 
                         height="400" 
@@ -31,117 +51,201 @@
                         allowfullscreen="" 
                         loading="lazy">
                 </iframe>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);"></div>
             </div>
         </div>
 
         <!-- Informazioni di Contatto -->
         <div class="col-md-6" style="flex: 1; min-width: 300px;">
-            <div class="card shadow-sm h-100" style="border: none; border-radius: 10px;">
-                <div class="card-body">
-                    <h3 class="card-title mb-4" style="color: #343a40;">Informazioni di Contatto</h3>
-                    <div class="mb-4">
-                        <h5 style="color: #007bff;">📍 Indirizzo</h5>
-                        <p class="text-muted">Via Roma, 123<br>76121 Barletta (BT), Italia</p>
-                    </div>
-                    <div class="mb-4">
-                        <h5 style="color: #28a745;">📞 Telefono</h5>
-                        <p class="text-muted">+39 06 1234 5678<br>Lun-Ven, 9:00 - 18:00</p>
-                    </div>
-                    <div class="mb-4">
-                        <h5 style="color: #dc3545;">✉️ Email</h5>
-                        <p class="text-muted">supporto@ordininja.it<br>risposta entro 24 ore</p>
-                    </div>
-                    <!-- Pulsante "Contattaci" -->
-                    <button id="showFormButton" class="btn btn-primary" style="background-color: #007bff; border: none; padding: 0.75rem 2rem; border-radius: 8px;">Contattaci</button>
+            <div class="h-100" style="border-radius: 10px; border: 1px solid #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.2); background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255, 0, 255, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+                
+                <h3 class="mb-4" style="color: #00ffff; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); font-family: 'Agency FB', sans-serif; font-size: 1.8rem; position: relative;">INFORMAZIONI DI CONTATTO</h3>
+                
+                <div class="mb-4" style="background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border-left: 3px solid #00ffff;">
+                    <h5 style="color: #00ffff; font-family: 'Arial', sans-serif;">📍 Indirizzo</h5>
+                    <p style="color: #e6e6e6; margin-bottom: 0;">Via Roma, 123<br>76121 Barletta (BT), Italia</p>
                 </div>
+                
+                <div class="mb-4" style="background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border-left: 3px solid #ff00ff;">
+                    <h5 style="color: #ff00ff; font-family: 'Arial', sans-serif;">📞 Telefono</h5>
+                    <p style="color: #e6e6e6; margin-bottom: 0;">+39 06 1234 5678<br>Lun-Ven, 9:00 - 18:00</p>
+                </div>
+                
+                <div class="mb-4" style="background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; border-left: 3px solid #00ffff;">
+                    <h5 style="color: #00ffff; font-family: 'Arial', sans-serif;">✉️ Email</h5>
+                    <p style="color: #e6e6e6; margin-bottom: 0;">supporto@gamingstore.it<br>risposta entro 24 ore</p>
+                </div>
+                
+                <!-- Pulsante "Contattaci" -->
+                <button id="showFormButton" 
+                        style="background: linear-gradient(45deg, #00ffff, #ff00ff); 
+                               border: none; padding: 0.75rem 2rem; border-radius: 5px; 
+                               color: #1a1a2e; font-weight: bold; font-family: 'Arial', sans-serif;
+                               cursor: pointer; transition: all 0.3s; position: relative;
+                               overflow: hidden; box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);"
+                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(255, 0, 255, 0.7)'" 
+                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(0, 255, 255, 0.5)'">
+                    <span style="position: relative; z-index: 2;">CONTATTACI</span>
+                    <span style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent); transform: rotate(45deg); transition: all 0.5s; opacity: 0;"></span>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Form di Contatto (nascosto inizialmente) -->
     <div class="row" style="display: flex; justify-content: center;">
-        <div class="col-md-8" id="contactForm" style="flex: 1; min-width: 300px; display: none;">
-            <div class="card shadow-sm" style="border: none; border-radius: 10px;">
-                <div class="card-body">
-                    <h3 class="card-title text-center mb-4" style="color: #343a40;">Scrivici un Messaggio</h3>
-                    <form>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="nome" style="color: #343a40;">Nome</label>
-                                    <input type="text" class="form-control" id="nome" placeholder="Inserisci il tuo nome" style="border-radius: 8px;">
-                                </div>
+        <div class="col-md-8" id="contactForm" style="flex: 1; min-width: 300px; display: none; position: relative; overflow: hidden;">
+            <div style="border-radius: 10px; border: 1px solid #00ffff; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem;">
+                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255, 0, 255, 0.1) 0%, transparent 70%);"></div>
+                <div style="position: absolute; bottom: 0; left: 0; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);"></div>
+                
+                <h3 class="text-center mb-4" style="color: #ff00ff; text-shadow: 0 0 5px rgba(255, 0, 255, 0.5); font-family: 'Agency FB', sans-serif; font-size: 1.8rem; position: relative;">SCRIVICI UN MESSAGGIO</h3>
+                
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nome" style="color: #00ffff; font-family: 'Arial', sans-serif;">Nome</label>
+                                <input type="text" class="form-control" id="nome" placeholder="Inserisci il tuo nome" 
+                                       style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid #00ffff; color: #e6e6e6; transition: all 0.3s;"
+                                       onfocus="this.style.borderColor='#ff00ff'; this.style.boxShadow='0 0 10px rgba(255, 0, 255, 0.5)'"
+                                       onblur="this.style.borderColor='#00ffff'; this.style.boxShadow='none'">
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="cognome" style="color: #343a40;">Cognome</label>
-                                    <input type="text" class="form-control" id="cognome" placeholder="Inserisci il tuo cognome" style="border-radius: 8px;">
-                                </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cognome" style="color: #00ffff; font-family: 'Arial', sans-serif;">Cognome</label>
+                                <input type="text" class="form-control" id="cognome" placeholder="Inserisci il tuo cognome" 
+                                       style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid #00ffff; color: #e6e6e6; transition: all 0.3s;"
+                                       onfocus="this.style.borderColor='#ff00ff'; this.style.boxShadow='0 0 10px rgba(255, 0, 255, 0.5)'"
+                                       onblur="this.style.borderColor='#00ffff'; this.style.boxShadow='none'">
                             </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="email" style="color: #343a40;">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Inserisci la tua email" style="border-radius: 8px;">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="messaggio" style="color: #343a40;">Messaggio</label>
-                            <textarea class="form-control" id="messaggio" rows="5" placeholder="Scrivi il tuo messaggio" style="border-radius: 8px;"></textarea>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary" style="background-color: #007bff; border: none; padding: 0.75rem 2rem; border-radius: 8px;">Invia Messaggio</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email" style="color: #00ffff; font-family: 'Arial', sans-serif;">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Inserisci la tua email" 
+                               style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid #00ffff; color: #e6e6e6; transition: all 0.3s;"
+                               onfocus="this.style.borderColor='#ff00ff'; this.style.boxShadow='0 0 10px rgba(255, 0, 255, 0.5)'"
+                               onblur="this.style.borderColor='#00ffff'; this.style.boxShadow='none'">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="messaggio" style="color: #00ffff; font-family: 'Arial', sans-serif;">Messaggio</label>
+                        <textarea class="form-control" id="messaggio" rows="5" placeholder="Scrivi il tuo messaggio" 
+                                  style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid #00ffff; color: #e6e6e6; transition: all 0.3s;"
+                                  onfocus="this.style.borderColor='#ff00ff'; this.style.boxShadow='0 0 10px rgba(255, 0, 255, 0.5)'"
+                                  onblur="this.style.borderColor='#00ffff'; this.style.boxShadow='none'"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" 
+                                style="background: linear-gradient(45deg, #ff00ff, #00ffff); 
+                                       border: none; padding: 0.75rem 2.5rem; border-radius: 5px; 
+                                       color: #1a1a2e; font-weight: bold; font-family: 'Arial', sans-serif;
+                                       cursor: pointer; transition: all 0.3s; position: relative;
+                                       overflow: hidden; box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);"
+                                onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(0, 255, 255, 0.7)'" 
+                                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(255, 0, 255, 0.5)'">
+                            <span style="position: relative; z-index: 2;">INVIA MESSAGGIO</span>
+                            <span style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent); transform: rotate(45deg); transition: all 0.5s; opacity: 0;"></span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script per gestire la visibilità del form -->
+<!-- Footer Gaming Style -->
+<footer style="background-color: #1a1a2e; padding: 2rem; margin-top: 4rem; border-top: 1px solid #00ffff; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(255, 0, 255, 0.05) 100%);"></div>
+    <div class="text-center" style="color: #e6e6e6; position: relative;">
+        <p style="margin: 0; font-family: 'Arial', sans-serif;">© 2025 <span style="color: #00ffff; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);">GAME</span><span style="color: #ff00ff; text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);">NINJA</span>. Tutti i diritti riservati.</p>
+        <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem;">
+            <a href="#" style="color: #00ffff; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.textShadow='0 0 10px rgba(0, 255, 255, 0.7)'" onmouseout="this.style.textShadow='none'">Termini di servizio</a>
+            <a href="#" style="color: #ff00ff; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.textShadow='0 0 10px rgba(255, 0, 255, 0.7)'" onmouseout="this.style.textShadow='none'">Privacy Policy</a>
+            <a href="#" style="color: #00ffff; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.textShadow='0 0 10px rgba(0, 255, 255, 0.7)'" onmouseout="this.style.textShadow='none'">Cookie Policy</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Script per gestire la visibilità del form con animazione -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const showFormButton = document.getElementById('showFormButton');
         const contactForm = document.getElementById('contactForm');
 
         showFormButton.addEventListener('click', function() {
-            contactForm.style.display = 'block';
-            window.scrollTo({ top: contactForm.offsetTop, behavior: 'smooth' });
+            // Animazione del pulsante
+            this.innerHTML = '<span style="position: relative; z-index: 2;">APERTURA...</span>';
+            setTimeout(() => {
+                // Mostra il form con animazione
+                contactForm.style.display = 'block';
+                contactForm.style.opacity = '0';
+                contactForm.style.transform = 'translateY(20px)';
+                
+                let opacity = 0;
+                let position = 20;
+                const fadeIn = setInterval(() => {
+                    opacity += 0.05;
+                    position -= 1;
+                    contactForm.style.opacity = opacity;
+                    contactForm.style.transform = `translateY(${position}px)`;
+                    
+                    if (opacity >= 1) {
+                        clearInterval(fadeIn);
+                        contactForm.style.transform = 'translateY(0)';
+                    }
+                }, 16);
+                
+                // Scroll alla posizione del form
+                window.scrollTo({
+                    top: contactForm.offsetTop - 50,
+                    behavior: 'smooth'
+                });
+                
+                // Ripristina il testo del pulsante
+                this.innerHTML = '<span style="position: relative; z-index: 2;">CONTATTACI</span>';
+            }, 500);
         });
     });
 </script>
 
-<!-- Footer -->
-<footer style="background-color: #343a40; padding: 2rem; margin-top: 4rem;">
-    <div class="text-center" style="color: white;">
-        <p style="margin: 0;">© 2025 OrdiNinja. Tutti i diritti riservati.</p>
-    </div>
-</footer>
-
+<!-- Stili aggiuntivi -->
 <style>
-    .card {
-        transition: transform 0.3s, box-shadow 0.3s;
+    @@import url('https://fonts.googleapis.com/css2?family=Agency+FB&display=swap');
+    
+    body {
+        background-color: #0f0f1a;
+        color: #e6e6e6;
+        font-family: 'Arial', sans-serif;
     }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    
+    /* Effetto hover per i pulsanti con animazione */
+    button:hover span:last-child {
+        animation: shine 1.5s;
     }
-
-    .form-control {
-        transition: border-color 0.3s, box-shadow 0.3s;
+    
+    @@keyframes shine {
+        0% { left: -100%; opacity: 0; }
+        50% { opacity: 1; }
+        100% { left: 100%; opacity: 0; }
     }
-
+    
+    /* Effetto per i campi del form */
     .form-control:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        color: #ffffff !important;
     }
-
-    .btn-primary {
-        transition: background-color 0.3s, transform 0.3s;
+    
+    /* Effetto di transizione per le card */
+    .card-transition {
+        transition: all 0.5s ease;
     }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-        transform: translateY(-2px);
+    
+    .card-transition:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 15px 30px rgba(0, 255, 255, 0.3) !important;
     }
 </style>

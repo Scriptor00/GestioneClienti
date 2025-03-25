@@ -3,362 +3,671 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] ?? "Privacy Policy"</title>
+    <title>@ViewData["Title"] ?? "Privacy Policy" - GameNinja</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1e2b37;
-            --secondary-color: #2c3e50;
-            --accent-color: #3498db;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --text-color: #333;
-            --light-text: #ecf0f1;
+            --primary-color: #0d6efd;
+            --secondary-color: #ff4b2b;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #2d2d2d;
+            --light-text: #ffffff;
+            --accent-text: #00ffff;
         }
 
         body {
-            background-color: var(--light-color);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
         }
 
+        /* Navbar Gaming Style */
         .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: var(--dark-bg);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+            border-bottom: 1px solid var(--primary-color);
+            padding: 0.8rem 1rem;
         }
 
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-family: 'Orbitron', sans-serif;
             color: var(--light-text) !important;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            letter-spacing: 1px;
         }
 
-        .navbar-nav .nav-link {
+        .navbar-brand span {
+            color: var(--secondary-color);
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+        }
+
+        .nav-link {
             color: var(--light-text) !important;
             font-weight: 500;
+            padding: 0.5rem 1.5rem !important;
+            margin: 0 0.2rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .navbar-nav .nav-link.active {
-            color: var(--accent-color) !important;
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s;
         }
 
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
+        .nav-link:hover::before {
+            width: 100%;
         }
 
-        h1 {
+        .nav-link.active {
+            background: linear-gradient(45deg, rgba(13, 110, 253, 0.3), transparent);
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+        }
+
+        /* Main Container */
+        .privacy-container {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #121212 100%);
+            border-radius: 15px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 30px rgba(13, 110, 253, 0.3);
+            padding: 3rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .privacy-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(13, 110, 253, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .privacy-container::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -30%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 75, 43, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        /* Titles */
+        .privacy-title {
+            font-family: 'Orbitron', sans-serif;
             color: var(--primary-color);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            color: var(--primary-color);
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .lead {
-            font-size: 1.25rem;
-            color: var(--text-color);
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            font-size: 2.8rem;
             margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 1rem;
+            display: inline-block;
         }
 
+        .privacy-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-text);
+            font-size: 1.8rem;
+            margin: 2rem 0 1.5rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .privacy-lead {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            color: #e0e0e0;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Accordion Gaming Style */
         .accordion {
-            margin-bottom: 2rem;
+            --bs-accordion-bg: transparent;
+            --bs-accordion-border-color: var(--primary-color);
+            --bs-accordion-active-bg: rgba(13, 110, 253, 0.2);
+            --bs-accordion-active-color: var(--light-text);
+            --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            position: relative;
+            z-index: 1;
         }
 
         .accordion-button {
-            background-color: var(--light-color);
-            color: var(--primary-color);
+            background-color: rgba(45, 45, 45, 0.7);
+            color: var(--light-text);
             font-weight: 600;
             border: 1px solid var(--primary-color);
-            border-radius: 8px;
+            border-radius: 8px !important;
             margin-bottom: 0.5rem;
+            padding: 1.2rem 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
         .accordion-button:not(.collapsed) {
-            background-color: var(--primary-color);
+            background-color: rgba(13, 110, 253, 0.3);
             color: var(--light-text);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+        }
+
+        .accordion-button::after {
+            filter: brightness(0) invert(1);
+        }
+
+        .accordion-button:hover {
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
         }
 
         .accordion-body {
-            background-color: var(--light-color);
+            background-color: rgba(45, 45, 45, 0.7);
             border: 1px solid var(--primary-color);
-            border-radius: 8px;
-            padding: 1rem;
+            border-radius: 0 0 8px 8px;
+            border-top: none;
+            color: #e0e0e0;
+            line-height: 1.7;
+            padding: 1.5rem;
         }
 
-        .form-check-label {
-            font-size: 1rem;
-            color: var(--text-color);
+        /* Form Elements */
+        .form-check {
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-check-input {
+            background-color: var(--darker-bg);
+            border: 1px solid var(--primary-color);
+            width: 1.2em;
+            height: 1.2em;
+            margin-top: 0.2em;
         }
 
         .form-check-input:checked {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
         }
 
-        .btn {
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-check-label {
+            color: #e0e0e0;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-gaming {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: var(--light-text);
+            font-weight: 600;
+            padding: 0.8rem 2rem;
             border-radius: 8px;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.2s ease;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+            z-index: 1;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+        .btn-gaming:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(13, 110, 253, 0.7);
+            color: var(--light-text);
         }
 
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .btn-gaming::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
         }
 
+        .btn-gaming:hover::before {
+            left: 100%;
+        }
+
+        /* Contact Panel */
         .contact-panel {
-            margin-top: 2rem;
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.7) 0%, rgba(26, 26, 26, 0.7) 100%);
+            border-radius: 15px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(13, 110, 253, 0.3);
             padding: 2rem;
-            background-color: var(--light-color);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .contact-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') center/cover;
+            opacity: 0.1;
+            z-index: -1;
         }
 
         .contact-form input,
         .contact-form textarea {
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            font-size: 1rem;
-            border-radius: 8px;
+            background-color: rgba(26, 26, 26, 0.7);
             border: 1px solid var(--primary-color);
-        }
-
-        .contact-form button {
-            background-color: var(--primary-color);
             color: var(--light-text);
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            border: none;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.2rem;
+            transition: all 0.3s;
+            width: 100%;
         }
 
-        .contact-form button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            background-color: rgba(26, 26, 26, 0.9);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(255, 75, 43, 0.5);
+            color: var(--light-text);
+            outline: none;
         }
 
-        .shadow-lg {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .contact-form label {
+            color: var(--accent-text);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-        .rounded {
-            border-radius: 12px;
+        /* Alert */
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #d4edda;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-success::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(40, 167, 69, 0.1), transparent);
+            z-index: -1;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--dark-bg);
+            border-top: 1px solid var(--primary-color);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(255, 75, 43, 0.05) 100%);
+            z-index: 0;
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #e0e0e0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--accent-text);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Animations */
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @@keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .privacy-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .privacy-title {
+                font-size: 2rem;
+            }
+
+            .privacy-subtitle {
+                font-size: 1.5rem;
+            }
+
+            .privacy-lead {
+                font-size: 1rem;
+            }
+
+            .accordion-button {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+
+            .accordion-body {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">GAMING<span>STORE</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="@Url.Action("Home", "Prodotti")">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="@Url.Action("Privacy", "Home")">Privacy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Main Content -->
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">OrdiNinja</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" <a href="@Url.Action("Dashboard", "Home")" >Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/Privacy">Privacy</a>
-                </li>
-            </ul>
+        <div class="privacy-container fade-in">
+            <h1 class="privacy-title slide-up">@ViewData["Title"]</h1>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <p class="privacy-lead slide-up">
+                La presente Politica sulla Privacy descrive come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali quando interagisci con il nostro sito web.
+            </p>
+
+            <div class="accordion slide-up" id="privacyAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="fas fa-shield-alt me-2"></i> 1. Raccolta delle informazioni
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Raccogliamo informazioni che ci fornisci volontariamente quando interagisci con il nostro sito. Ciò include dati come il tuo nome, indirizzo email e altre informazioni di contatto.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <i class="fas fa-cogs me-2"></i> 2. Utilizzo delle informazioni
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Utilizziamo le informazioni raccolte per migliorare il nostro servizio, personalizzare la tua esperienza sul nostro sito e per inviarti comunicazioni relative ai nostri servizi.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <i class="fas fa-lock me-2"></i> 3. Protezione dei dati
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Adottiamo misure di sicurezza per proteggere i tuoi dati personali da accessi non autorizzati, utilizziamo tecnologie di cifratura per garantire che le tue informazioni siano trattate in modo sicuro.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <i class="fas fa-users me-2"></i> 4. Condivisione dei dati
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Non vendiamo né condividiamo le tue informazioni con terze parti, a meno che non sia necessario per soddisfare obblighi legali o per operare il nostro servizio.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            <i class="fas fa-user-shield me-2"></i> 5. Diritti dell'utente
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Hai il diritto di accedere, correggere o richiedere la cancellazione dei tuoi dati personali. Per esercitare questi diritti, contattaci all'indirizzo email carlodicuonzo@yahoo.com
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            <i class="fas fa-sync-alt me-2"></i> 6. Modifiche alla politica sulla privacy
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#privacyAccordion">
+                        <div class="accordion-body">
+                            Ci riserviamo il diritto di aggiornare questa politica in qualsiasi momento. Ti invitiamo a visitare questa pagina regolarmente per eventuali modifiche.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="privacy-subtitle slide-up">Seleziona come vuoi che vengano utilizzati i tuoi dati</h3>
+            <p class="privacy-lead slide-up">Selezionando una delle seguenti opzioni, puoi decidere come i tuoi dati saranno trattati:</p>
+            
+            <form asp-action="SalvaPreferenze" asp-controller="Privacy" method="post" class="slide-up">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataUsage" id="fullConsent" value="full" checked>
+                    <label class="form-check-label" for="fullConsent">
+                        Acconsento all'utilizzo totale dei miei dati per migliorare il servizio e ricevere comunicazioni via Mail.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataUsage" id="limitedConsent" value="limited">
+                    <label class="form-check-label" for="limitedConsent">
+                        Acconsento solo all'utilizzo dei miei dati per migliorare il servizio, ma non per ricevere comunicazioni via Mail.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataUsage" id="noConsent" value="no">
+                    <label class="form-check-label" for="noConsent">
+                        Non acconsento all'utilizzo dei miei dati.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-gaming mt-4">Salva le preferenze</button>
+            </form>
+
+            <div class="contact-panel slide-up">
+                <h4 class="privacy-subtitle">Contattaci</h4>
+                <p>Per qualsiasi domanda o richiesta riguardo alla nostra politica sulla privacy, puoi contattarci tramite il modulo sottostante o utilizzare i seguenti metodi:</p>
+                
+                <p><i class="fas fa-envelope me-2"></i> <strong>Email:</strong> carlodicuonzo@yahoo.com</p>
+                <p><i class="fas fa-phone me-2"></i> <strong>Telefono:</strong> +39 123 456 789</p>
+                
+                <h5 class="privacy-subtitle mt-4">Modulo di Contatto</h5>
+                <form class="contact-form">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="message">Messaggio:</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+
+                    <button type="submit" class="btn btn-gaming">Invia</button>
+                </form>
+            </div>
+
+            <form action="@Url.Action("ScaricaPDF", "Privacy")" method="get" class="slide-up">
+                <button type="submit" class="btn btn-gaming mt-4">
+                    <i class="fas fa-file-pdf me-2"></i> Scarica PDF
+                </button>
+            </form>
         </div>
     </div>
-</nav>
 
-<div class="container mt-5">
-    <h1 class="text-center">@ViewData["Title"]</h1>
-
-     @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <p class="lead text-center">
-        La presente Politica sulla Privacy descrive come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali quando interagisci con il nostro sito web.
-    </p>
-
-    <div class="accordion" id="privacyAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    1. Raccolta delle informazioni
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Raccogliamo informazioni che ci fornisci volontariamente quando interagisci con il nostro sito. Ciò include dati come il tuo nome, indirizzo email e altre informazioni di contatto.
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="@Url.Action("Dashboard", "Home")" class="footer-link">Home</a>
+                    <a href="/Privacy" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Termini di Servizio</a>
+                    <a href="@Url.Action("Contatti", "Home")" class="footer-link">Contatti</a>
+                </div>
+                <div class="copyright">
+                    © 2025 GAMING<span style="color: var(--secondary-color);">STORE</span>. Tutti i diritti riservati.
                 </div>
             </div>
         </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    2. Utilizzo delle informazioni
-                </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Utilizziamo le informazioni raccolte per migliorare il nostro servizio, personalizzare la tua esperienza sul nostro sito e per inviarti comunicazioni relative ai nostri servizi.
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThree">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    3. Protezione dei dati
-                </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Adottiamo misure di sicurezza per proteggere i tuoi dati personali da accessi non autorizzati, utilizziamo tecnologie di cifratura per garantire che le tue informazioni siano trattate in modo sicuro.
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingFour">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                    4. Condivisione dei dati
-                </button>
-            </h2>
-            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Non vendiamo né condividiamo le tue informazioni con terze parti, a meno che non sia necessario per soddisfare obblighi legali o per operare il nostro servizio.
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingFive">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                    5. Diritti dell'utente
-                </button>
-            </h2>
-            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Hai il diritto di accedere, correggere o richiedere la cancellazione dei tuoi dati personali. Per esercitare questi diritti, contattaci all'indirizzo email carlodicuonzo@yahoo.com
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingSix">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                    6. Modifiche alla politica sulla privacy
-                </button>
-            </h2>
-            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    Ci riserviamo il diritto di aggiornare questa politica in qualsiasi momento. Ti invitiamo a visitare questa pagina regolarmente per eventuali modifiche.
-                </div>
-            </div>
-        </div>
-    </div>
+    </footer>
 
-    <h3>Seleziona come vuoi che vengano utilizzati i tuoi dati</h3>
-    <p class="lead">Selezionando una delle seguenti opzioni, puoi decidere come i tuoi dati saranno trattati:</p>
-    
-    <form asp-action="SalvaPreferenze" asp-controller="Privacy" method="post">
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="dataUsage" id="fullConsent" value="full" checked>
-        <label class="form-check-label" for="fullConsent">
-            Acconsento all'utilizzo totale dei miei dati per migliorare il servizio e ricevere comunicazioni via Mail.
-        </label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="dataUsage" id="limitedConsent" value="limited">
-        <label class="form-check-label" for="limitedConsent">
-            Acconsento solo all'utilizzo dei miei dati per migliorare il servizio, ma non per ricevere comunicazioni via Mail.
-        </label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="dataUsage" id="noConsent" value="no">
-        <label class="form-check-label" for="noConsent">
-            Non acconsento all'utilizzo dei miei dati.
-        </label>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-4">Salva le preferenze</button>
-</form>
-
-    <div class="contact-panel">
-        <h4>Contattaci</h4>
-        <p>Per qualsiasi domanda o richiesta riguardo alla nostra politica sulla privacy, puoi contattarci tramite il modulo sottostante o utilizzare i seguenti metodi:</p>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animazione per l'alert di successo
+        var successMessage = document.querySelector('.alert-success');
         
-        <p><strong>Email:</strong> carlodicuonzo@yahoo.com</p>
-        <p><strong>Telefono:</strong> +39 123 456 789</p>
-        
-        <h5>Modulo di Contatto</h5>
-        <form class="contact-form">
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="message">Messaggio:</label>
-            <textarea id="message" name="message" rows="4" required></textarea>
-
-            <button type="submit">Invia</button>
-        </form>
-    </div>
-
-    <form action="@Url.Action("ScaricaPDF", "Privacy")" method="get">
-        <button type="submit" class="btn btn-primary mt-4">
-            Scarica PDF
-        </button>
-    </form>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    
-    var successMessage = document.querySelector('.alert-success');
-    
-    if (successMessage) {
-        setTimeout(function () {
-            successMessage.classList.add('fade');
-            successMessage.classList.remove('show');
-
+        if (successMessage) {
             setTimeout(function () {
-                successMessage.remove(); // Rimuove l'elemento dalla struttura della pagina (DOM)
-            }, 500); 
-        }, 3000); 
-    }
-</script>
+                successMessage.classList.add('fade');
+                successMessage.classList.remove('show');
 
-</script>
+                setTimeout(function () {
+                    successMessage.remove();
+                }, 500); 
+            }, 3000); 
+        }
 
+        // Effetto hover per i pulsanti dell'accordion
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('collapsed')) return;
+                this.style.transform = 'translateX(5px)';
+                this.style.boxShadow = '0 0 15px rgba(13, 110, 253, 0.5)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('collapsed')) return;
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        });
+    </script>
 </body>
 </html>

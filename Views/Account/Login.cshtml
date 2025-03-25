@@ -10,155 +10,257 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #ff4b2b;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --text-light: #f8f9fa;
+        }
+
         body {
-            background: linear-gradient(45deg, #007bff, #66b3ff);
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-light);
         }
 
         .login-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(13, 110, 253, 0.3);
             padding: 40px;
-            max-width: 400px;
             width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--primary-color);
+            backdrop-filter: blur(10px);
         }
 
-        .login-container .form-control {
-            border-radius: 50px;
-            box-shadow: none;
-            border: 1px solid #ccc;
-        }
-
-        .login-container .btn-primary {
-            background: #007bff;
-            border-radius: 50px;
-            padding: 10px 20px;
-            width: 100%;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        .login-container .btn-primary:hover {
-            background: #0056b3;
-        }
-
-        .login-container .form-group {
-            margin-bottom: 20px;
-        }
-
-        .login-container h3 {
+        .login-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: 30px;
-            color: #333;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
         }
 
-        .login-container .text-muted {
-            text-align: center;
-            font-size: 14px;
+        .form-control {
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #333;
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 12px 20px;
+            transition: all 0.3s;
         }
 
-        .login-container .text-muted a {
-            color: #007bff;
-            text-decoration: none;
+        /* PLACEHOLDER BIANCO */
+        .form-control::placeholder {
+            color: #ccc !important;
+            opacity: 1 !important;
         }
 
-        .login-container .text-muted a:hover {
-            text-decoration: underline;
+        /* TESTO SCRITTO BIANCO */
+        .form-control {
+            color: white !important;
         }
 
-        .login-container .forgot-password {
-            text-align: right;
+        .form-control:focus {
+            background-color: rgba(40, 40, 40, 0.9);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            color: var(--text-light);
         }
 
-       
-        .alert-error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .btn-login {
+            background: linear-gradient(45deg, var(--primary-color), #0b5ed7);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
         }
 
-        
+        .btn-login:hover {
+            background: linear-gradient(45deg, #0b5ed7, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.6);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #adb5bd;
+        }
+
         .password-container {
             position: relative;
         }
 
-        .password-container i {
+        #togglePassword {
             position: absolute;
+            right: 15px;
             top: 50%;
-            right: 10px;
             transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #togglePassword:hover {
+            color: var(--primary-color);
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+            border-radius: 8px;
+        }
+
+        .checkbox label {
+            color: #adb5bd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox input {
+            margin-right: 10px;
             cursor: pointer;
         }
 
+        .links-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .links-container a {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        .links-container a:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #6c757d;
+        }
+
+        .register-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #0b5ed7;
+            text-decoration: underline;
+        }
+
+        /* Animazioni */
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+
+        .login-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h3><i class="fas fa-sign-in-alt"></i> Accedi al tuo account</h3>
+        <h3 class="login-title"><i class="bi bi-controller me-2"></i>ACCEDI</h3>
 
-        @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"]?.ToString()))
-        {
-            <div class="alert alert-danger">
-                @ViewData["ErrorMessage"]
-            </div>
-        }
+        @if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </div>
+}
 
         <form method="post" asp-action="Login" asp-controller="Account">
             @Html.AntiForgeryToken()
 
             <div class="form-group">
-    <label for="Username">Username</label>
-    <input type="text" class="form-control" id="Username" name="Username" placeholder="Inserisci il tuo Username" required value="@Model.Username" />
-    @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
-</div>
+                <label for="Username">Username</label>
+                <input type="text" class="form-control" id="Username" name="Username" placeholder="Inserisci il tuo username" required value="@Model.Username" />
+                @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
+            </div>
+
             <div class="form-group password-container">
                 <label for="Password">Password</label>
                 <input type="password" class="form-control" id="Password" name="Password" placeholder="Inserisci la tua password" required />
                 @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
-                <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                <i class="bi bi-eye-fill" id="togglePassword" onclick="togglePasswordVisibility()"></i>
             </div>
+
             <div class="form-group">
-        <div class="checkbox">
-            <label asp-for="RememberMe">
-                <input asp-for="RememberMe" /> @Html.DisplayNameFor(m => m.RememberMe)
-            </label>
-        </div>
-<div class="recupero-password">
-                <a href="@Url.Action("RecuperoPassword", "Account")">Hai dimenticato la password?</a>
+                <div class="checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" /> @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Accedi</button>
+            <button type="submit" class="btn btn-login">ACCEDI</button>
 
-            <div class="text-muted mt-3">
-                <p>Non hai un account? <a href="@Url.Action("Register", "Account")">Registrati qui</a></p>
+            <div class="links-container">
+                <a href="@Url.Action("RecuperoPassword", "Account")">Password dimenticata?</a>
+                <a href="@Url.Action("Register", "Account")">Registrati</a>
             </div>
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function togglePasswordVisibility() {
-            var passwordField = document.getElementById("Password");
-            var toggleIcon = document.getElementById("togglePassword");
+            const passwordField = document.getElementById("Password");
+            const toggleIcon = document.getElementById("togglePassword");
 
             if (passwordField.type === "password") {
                 passwordField.type = "text";
-                toggleIcon.classList.remove("fa-eye");
-                toggleIcon.classList.add("fa-eye-slash");
+                toggleIcon.classList.remove("bi-eye-fill");
+                toggleIcon.classList.add("bi-eye-slash-fill");
             } else {
                 passwordField.type = "password";
-                toggleIcon.classList.remove("fa-eye-slash");
-                toggleIcon.classList.add("fa-eye");
+                toggleIcon.classList.remove("bi-eye-slash-fill");
+                toggleIcon.classList.add("bi-eye-fill");
             }
         }
     </script>
