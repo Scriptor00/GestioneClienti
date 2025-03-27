@@ -65,13 +65,11 @@
             transition: all 0.3s;
         }
 
-        /* Placeholder bianco */
         .form-control::placeholder {
             color: #ccc !important;
             opacity: 1 !important;
         }
 
-        /* Testo inserito bianco */
         .form-control {
             color: white !important;
         }
@@ -144,7 +142,6 @@
             text-decoration: underline;
         }
 
-        /* Animazioni */
         @@keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
             70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
@@ -165,6 +162,14 @@
     <div class="register-container">
         <h3 class="register-title"><i class="bi bi-controller me-2"></i>REGISTRAZIONE</h3>
 
+        <!-- Mostra messaggio di successo se presente -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
         <!-- Visualizza gli errori di validazione -->
         @if (!ViewData.ModelState.IsValid)
         {
@@ -177,32 +182,23 @@
             @Html.AntiForgeryToken()
 
             <div class="form-group">
-                <label for="Nome">Nome</label>
-                <input type="text" class="form-control" id="Nome" name="Nome" placeholder="Inserisci il tuo nome" required value="@Model.Nome" />
-                @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-group">
-                <label for="Email">Email</label>
-                <input type="email" class="form-control" id="Email" name="Email" placeholder="Inserisci la tua email" required value="@Model.Email" />
-                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-group">
                 <label for="Username">Username</label>
-                <input type="text" class="form-control" id="Username" name="Username" placeholder="Scegli un username" required value="@Model.Username" />
+                <input type="text" class="form-control" id="Username" name="Username" 
+                       placeholder="Scegli un username" required value="@Model.Username" />
                 @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">
                 <label for="Password">Password</label>
-                <input type="password" class="form-control" id="Password" name="Password" placeholder="Crea una password" required />
+                <input type="password" class="form-control" id="Password" name="Password" 
+                       placeholder="Crea una password (min. 6 caratteri)" required />
                 @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">
                 <label for="ConfermaPassword">Conferma Password</label>
-                <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword" placeholder="Conferma la password" required />
+                <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword" 
+                       placeholder="Conferma la password" required />
                 @Html.ValidationMessageFor(model => model.ConfermaPassword, "", new { @class = "text-danger" })
             </div>
 

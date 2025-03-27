@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GestioneClienti.Entities;
 using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WebAppEF.Entities;
 using WebAppEF.Models;
 
@@ -52,24 +54,37 @@ namespace GestioneClienti.Repositories
 
         public async Task<bool> RegisterUserAsync(RegisterViewModel model)
         {
-            // controllo l'esistenza dell'utente tramite la sua mail(unique)
-            var existingUser = await _context.Clienti
-                                              .FirstOrDefaultAsync(c => c.Email == model.Email);
-            if (existingUser != null)
-                return false; // Se l'utente esiste già, ritorna false
-
-            var cliente = new Cliente
+            try
             {
-                Nome = model.Nome,
-                Cognome = model.Cognome,
-                Email = model.Email,
-                // Password = model.Password // La password è salvata in chiaro (da proteggere in futuro)
-            };
+                // Verifica se l'username esiste già
+                var existingUser = await _context.Utenti
+                    .FirstOrDefaultAsync(u => u.Username == model.Username);
 
-            await _context.Clienti.AddAsync(cliente);
-            await _context.SaveChangesAsync();
+                if (existingUser != null)
+                {
 
-            return true; // Registrazione avvenuta con successo
+                    return false;
+                }
+
+                // Crea il nuovo utente con password hashata
+                var utente = new Utente
+                {
+                    Username = model.Username,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password), // Hash della password
+                    Role = "User" // Ruolo di default
+                };
+
+                await _context.Utenti.AddAsync(utente);
+                await _context.SaveChangesAsync();
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
 
     }

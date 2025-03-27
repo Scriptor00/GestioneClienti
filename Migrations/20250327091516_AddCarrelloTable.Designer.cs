@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAppEF.Models;
 
@@ -11,9 +12,11 @@ using WebAppEF.Models;
 namespace WebAppEF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327091516_AddCarrelloTable")]
+    partial class AddCarrelloTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,34 +24,6 @@ namespace WebAppEF.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GestioneClienti.Entities.CarrelloItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DataAggiunta")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProdottoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantita")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProdottoId");
-
-                    b.ToTable("Carrello");
-                });
 
             modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
                 {
@@ -207,17 +182,6 @@ namespace WebAppEF.Migrations
                     b.HasKey("IdProdotto");
 
                     b.ToTable("Prodotti");
-                });
-
-            modelBuilder.Entity("GestioneClienti.Entities.CarrelloItem", b =>
-                {
-                    b.HasOne("WebAppEF.Entities.Prodotto", "Prodotto")
-                        .WithMany()
-                        .HasForeignKey("ProdottoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Prodotto");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.DettagliOrdine", b =>

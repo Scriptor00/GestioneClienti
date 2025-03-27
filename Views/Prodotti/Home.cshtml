@@ -965,5 +965,50 @@ body {
             </div>
         </div>
     </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productCards = document.querySelectorAll('.product-card');
+        
+        productCards.forEach(card => {
+            const trailer = card.querySelector('.product-trailer');
+            const image = card.querySelector('.product-image');
+            if (!trailer || !image) return;
+            
+            const youtubeIframe = trailer.querySelector('.youtube-trailer');
+            const localVideo = trailer.querySelector('.local-trailer');
+            
+            // Variabile per memorizzare il tempo di pausa del video locale
+            let videoPausedTime = 0;
+            
+            // Mostra video/nascondi immagine al mouseenter
+            card.addEventListener('mouseenter', function() {
+                image.style.opacity = 0;
+                trailer.style.opacity = 1;
+                
+                if (youtubeIframe) {
+                    // YouTube: usa l'API JS per riprendere dal punto corrente
+                    if (typeof youtubeIframe.contentWindow.postMessage === 'function') {
+                        youtubeIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                    }
+                } else if (localVideo) {
+                    localVideo.currentTime = videoPausedTime; // Riprende dall'ultimo tempo
+                    localVideo.play().catch(e => console.error("Autoplay fallito:", e));
+                }
+            });
+            
+            // Nascondi video/mostra immagine al mouseleave
+            card.addEventListener('mouseleave', function() {
+                image.style.opacity = 1;
+                trailer.style.opacity = 0;
+                
+                if (localVideo) {
+                    videoPausedTime = localVideo.currentTime; // Salva il tempo corrente
+                    localVideo.pause();
+                }
+                // YouTube: non serve fare nulla (continua in background)
+            });
+        });
+    });
+</script>
 </body>
 </html>

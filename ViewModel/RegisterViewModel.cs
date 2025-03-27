@@ -8,26 +8,21 @@ namespace GestioneClienti.ViewModel
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "Il nome è obbligatorio")]
-        public string Nome { get; set; }
-
-        [Required(ErrorMessage = "Il cognome è obbligatorio")]
-        public string Cognome { get; set; }
 
         [Required(ErrorMessage = "L'username è obbligatorio")]
+        [Display(Name = "Username")]
         public string Username { get; set; }
-
-        [Required(ErrorMessage = "L'email è obbligatoria")]
-        [EmailAddress(ErrorMessage = "Inserisci un indirizzo email valido")]
-        public string Email { get; set; }
 
         [Required(ErrorMessage = "La password è obbligatoria")]
         [DataType(DataType.Password)]
+        [MinLength(6, ErrorMessage = "La password deve essere di almeno 6 caratteri")]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Conferma la password")]
+        [Required(ErrorMessage = "Conferma password è obbligatoria")]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Le password non corrispondono")]
+        [Compare("Password", ErrorMessage = "Le password non coincidono")]
+        [Display(Name = "Conferma Password")]
         public string ConfermaPassword { get; set; }
     }
 }

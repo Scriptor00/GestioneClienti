@@ -1,222 +1,238 @@
-@{
-    ViewData["Title"] = "Dashboard";
-    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-}
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1e2b37;
-            --secondary-color: #2c3e50;
-            --accent-color: #3498db;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --text-color: #333;
-            --light-text: #ecf0f1;
+            --admin-primary: #1a237e;
+            --admin-secondary: #283593;
+            --admin-accent: #536dfe;
+            --admin-light: #e8eaf6;
+            --admin-dark: #0d1440;
+            --admin-text: #212121;
+            --admin-text-light: #f5f5f5;
+            --admin-success: #4caf50;
+            --admin-warning: #ff9800;
+            --admin-danger: #f44336;
+            --admin-border: #c5cae9;
         }
 
         body {
-            background-color: var(--light-color);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 0.8rem 1.5rem;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            letter-spacing: 0.5px;
-        }
-
-        .navbar-brand, .navbar a {
-            color: var(--light-text) !important;
-        }
-
-        .navbar a:hover {
-            color: rgba(255, 255, 255, 0.8) !important;
-        }
-
-        .dropdown-menu {
-            background-color: var(--primary-color);
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .dropdown-item {
-            color: var(--light-text) !important;
-            padding: 0.5rem 1rem;
-        }
-
-        .dropdown-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .container-fluid {
-            padding: 0 2rem;
-        }
-
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: none;
-            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--admin-text);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        /* Admin Navbar */
+        .admin-navbar {
+            background-color: var(--admin-primary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 0.8rem 2rem;
         }
 
-        .card-img-top {
-            height: 100px;
-            object-fit: cover;
-        }
-
-        .card-header {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 1.25rem 1.5rem;
-            border-bottom: none;
+        .admin-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: white;
             display: flex;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .card-body {
+        .admin-navbar .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .admin-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .admin-navbar .nav-link:hover {
+            color: white;
+        }
+
+        /* Admin Dropdown */
+        .admin-dropdown .dropdown-menu {
+            background-color: white;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+        }
+
+        .admin-dropdown .dropdown-item {
+            color: var(--admin-text);
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .admin-dropdown .dropdown-item:hover {
+            background-color: var(--admin-light);
+            color: var(--admin-primary);
+        }
+
+        .admin-dropdown .dropdown-divider {
+            border-color: var(--admin-border);
+        }
+
+        /* Main Content */
+        .admin-container {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        /* Admin Cards */
+        .admin-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border-color: var(--admin-accent);
+        }
+
+        .admin-card-header {
+            background-color: var(--admin-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-card-header i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .admin-card-body {
             padding: 1.5rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .card-text {
+        .admin-card-text {
+            color: #555;
             margin-bottom: 1.5rem;
-            font-size: 0.95rem;
             flex-grow: 1;
-            color: rgba(255, 255, 255, 0.9);
         }
 
-        .btn {
+        /* Admin Buttons */
+        .admin-btn {
+            border-radius: 6px;
+            font-weight: 500;
             padding: 0.6rem 1.2rem;
-            font-weight: 500;
-            border-radius: 8px;
+            transition: all 0.2s;
             letter-spacing: 0.3px;
-            transition: all 0.2s ease;
         }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+        .admin-btn-primary {
+            background-color: var(--admin-primary);
+            border-color: var(--admin-primary);
+            color: white;
         }
 
-        .btn-primary:hover {
-            background-color: #16202a;
-            border-color: #16202a;
+        .admin-btn-primary:hover {
+            background-color: var(--admin-secondary);
+            border-color: var(--admin-secondary);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-outline-light {
-            border-width: 2px;
-            font-weight: 500;
+        .admin-btn-outline {
+            border: 2px solid var(--admin-primary);
+            color: var(--admin-primary);
+            background-color: transparent;
         }
 
-        .btn-outline-light:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .admin-btn-outline:hover {
+            background-color: var(--admin-primary);
+            color: white;
         }
 
-        /* Colori delle card ridefiniti */
-        .bg-clients {
-            background-color: #2c3e50;
-        }
-
-        .bg-orders {
-            background-color: #27ae60;
-        }
-
-        .bg-filters {
-            background-color: #d35400;
-        }
-
-        h1.display-4 {
+        /* Welcome Message */
+        .admin-welcome {
             font-weight: 700;
+            color: var(--admin-primary);
             margin-bottom: 0.5rem;
-            color: var(--primary-color);
-            font-size: 2.5rem;
         }
 
-        .lead {
+        .admin-subtitle {
+            color: #666;
             font-size: 1.1rem;
-            color: #6c757d;
+            margin-bottom: 2rem;
         }
 
-        .alert {
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        /* Alert */
+        .admin-alert {
+            border-radius: 6px;
+            border-left: 4px solid var(--admin-success);
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--admin-success);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
         }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
+        .admin-alert i {
+            margin-right: 10px;
+            font-size: 1.2rem;
         }
 
-        @* @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        } *@
-
-        .fade-out {
-            animation: fadeOut 0.3s ease-out forwards;
-        }
-
-        @* @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        } *@
-
-        .footer {
-            background-color: var(--primary-color);
-            color: var(--light-text);
+        /* Footer */
+        .admin-footer {
+            background-color: var(--admin-primary);
+            color: white;
             padding: 1.5rem 0;
+            text-align: center;
             margin-top: 3rem;
         }
 
-        .footer strong {
-            color: var(--accent-color);
+        .admin-footer p {
+            margin-bottom: 0.5rem;
         }
 
-        /* Responsive adjustments */
-        @* @media (max-width: 768px) { *@
-            .card {
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .admin-container {
+                padding: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .admin-navbar {
+                padding: 0.75rem 1rem;
+            }
+            
+            .admin-container {
+                padding: 1rem;
+            }
+            
+            .admin-card {
                 margin-bottom: 1.5rem;
-            }
-
-            .container-fluid {
-                padding: 0 1rem;
-            }
-
-            h1.display-4 {
-                font-size: 2rem;
             }
         }
     </style>
@@ -229,37 +245,33 @@
 
 <div id="wrapper">
     <div id="page-content-wrapper" class="flex-grow-1">
-        <nav class="navbar navbar-expand-lg">
+        <nav class="navbar navbar-expand-lg admin-navbar">
             <div class="container-fluid">
                 <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-                    <i class="fas fa-laptop-code me-2"></i>OrdiNinja
+                    <i class="fas fa-cogs"></i>Pannello Admin
                 </a>
                 <div class="ms-auto">
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle me-1"></i>
-                            @if (User.Identity?.IsAuthenticated ?? false)
-                            {
-                                <span>@User.Identity.Name</span>
-                            }
-                            else
-                            {
-                                <span>Menu</span>
-                            }
+                    <div class="dropdown admin-dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="me-2 text-end">
+                                <div class="text-white">@User.Identity?.Name</div>
+                                <small style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">Amministratore</small>
+                            </div>
+                            <i class="fas fa-user-shield fs-4 text-white"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-       <li>
-    <a class="dropdown-item" href="@Url.Action("Home", "Prodotti")">
-        
-        <i class="fas fa-gamepad me-2"></i>Gaming Store
-    </a>
-</li>
-
-                            <li><a class="dropdown-item" href="@Url.Action("Privacy", "Home")"><i class="fas fa-shield-alt me-2"></i>Privacy</a></li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("Home", "Prodotti")">
+                                    <i class="fas fa-store me-2"></i>Vai allo Store
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Privacy", "Home")"><i class="fas fa-lock me-2"></i>Privacy</a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Contatti", "Home")"><i class="fas fa-envelope me-2"></i>Contatti</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             @if (User.Identity?.IsAuthenticated ?? false)
                             {
-                                <li><a class="dropdown-item" href="javascript:void(0);" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                <li><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             }
                             else
                             {
@@ -271,66 +283,69 @@
             </div>
         </nav>
 
-        <div class="container-fluid">
+        <div class="container-fluid admin-container">
             @if (TempData["WelcomeMessage"] != null)
             {
-                <div class="alert alert-success mt-4 fade-in" id="welcomeMessage">
-                    <i class="fas fa-check-circle me-2"></i>@TempData["WelcomeMessage"]
+                <div class="admin-alert fade-in" id="welcomeMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <div>@TempData["WelcomeMessage"]</div>
                 </div>
             }
 
-            <div class="row mt-5 text-center">
-                <h1 class="display-4">
-                    @if (User.Identity?.IsAuthenticated ?? false)
-                    {
-                        <span>Benvenuto nella Dashboard, @User.Identity.Name</span>
-                    }
-                    else
-                    {
-                        <span>Benvenuto nella Dashboard</span>
-                    }
-                </h1>
-                <p class="lead mb-5">Gestisci i tuoi clienti, ordini e accedi facilmente a tutte le funzionalità del sistema.</p>
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="admin-welcome">
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <span>Benvenuto nella Dashboard, @User.Identity.Name</span>
+                        }
+                        else
+                        {
+                            <span>Benvenuto nella Dashboard</span>
+                        }
+                    </h1>
+                    <p class="admin-subtitle">Gestisci tutte le funzionalità amministrative del sistema</p>
+                </div>
             </div>
 
-            <div class="row g-4 mt-2">
+            <div class="row g-4">
                 <div class="col-12 col-md-4">
-                    <div class="card text-white bg-clients h-100">
-                        <div class="card-header">
-                            <i class="fas fa-users me-2"></i>Gestione Clienti
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-users"></i>Gestione Clienti
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <p class="card-text">Visualizza, aggiungi, modifica o elimina i dati dei tuoi clienti in modo semplice e intuitivo.</p>
-                            <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-light mt-auto">
-                                <i class="fas fa-arrow-right me-1"></i>Vai alla gestione clienti
+                        <div class="admin-card-body">
+                            <p class="admin-card-text">Visualizza, modifica e gestisci tutti i clienti registrati nel sistema con strumenti avanzati di amministrazione.</p>
+                            <a href="@Url.Action("Index", "Customer")" class="admin-btn admin-btn-primary mt-auto">
+                                <i class="fas fa-arrow-right me-1"></i>Accedi
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-md-4">
-                    <div class="card text-white bg-orders h-100">
-                        <div class="card-header">
-                            <i class="fas fa-boxes me-2"></i>Gestione Ordini
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-shopping-cart"></i>Gestione Ordini
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <p class="card-text">Visualizza, crea e monitora gli ordini dei tuoi clienti con un'interfaccia semplificata.</p>
-                            <a href="@Url.Action("Index", "Ordini")" class="btn btn-outline-light mt-auto">
-                                <i class="fas fa-arrow-right me-1"></i>Vai alla Gestione Ordini
+                        <div class="admin-card-body">
+                            <p class="admin-card-text">Controlla tutti gli ordini, gestisci spedizioni, resi e rimborsi con il pannello di controllo completo.</p>
+                            <a href="@Url.Action("Index", "Ordini")" class="admin-btn admin-btn-primary mt-auto">
+                                <i class="fas fa-arrow-right me-1"></i>Accedi
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-md-4">
-                    <div class="card text-white bg-filters h-100">
-                        <div class="card-header">
-                            <i class="fas fa-search me-2"></i>Filtri di Ricerca
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-filter"></i>Filtri Avanzati
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <p class="card-text">Utilizza i filtri avanzati per trovare rapidamente clienti o ordini specifici nel database.</p>
-                            <a href="@Url.Action("Filtri", "Filtri")" class="btn btn-outline-light mt-auto">
-                                <i class="fas fa-arrow-right me-1"></i>Vai ai Filtri
+                        <div class="admin-card-body">
+                            <p class="admin-card-text">Utilizza i potenti strumenti di filtro per analizzare i dati e generare report dettagliati.</p>
+                            <a href="@Url.Action("Filtri", "Filtri")" class="admin-btn admin-btn-primary mt-auto">
+                                <i class="fas fa-arrow-right me-1"></i>Accedi
                             </a>
                         </div>
                     </div>
@@ -342,28 +357,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Auto-dismiss alert after 5 seconds
     setTimeout(function () {
         var message = document.getElementById("welcomeMessage");
         if (message) {
             message.classList.add('fade-out');
             setTimeout(function() {
-                message.style.display = "none";
+                message.remove();
             }, 300);
         }
     }, 5000);
 
-    // Funzione aggiornata per gestire il logout usando il form POST
+    // Logout confirmation
     function confirmLogout() {
-        if (confirm("Sei sicuro di voler uscire?")) {
+        if (confirm("Sei sicuro di voler uscire dal pannello di amministrazione?")) {
             document.getElementById('logoutForm').submit();
         }
     }
 </script>
 
-<footer class="footer">
-    <div class="container text-center">
-        <p class="mb-1">Sviluppato con professionalità da <strong>Carlo Dicuonzo</strong></p>
-        <p class="mb-0">&copy; 2025 OrdiNinja. Tutti i diritti riservati.</p>
+<footer class="admin-footer">
+    <div class="container">
+        <p>Sviluppato da <strong>Carlo Dicuonzo</strong> per OrdiNinja</p>
+        <p class="mb-0">&copy; 2025 Pannello Amministrativo. Tutti i diritti riservati.</p>
     </div>
 </footer>
 </body>

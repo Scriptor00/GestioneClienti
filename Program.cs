@@ -53,18 +53,22 @@ builder.Services.AddCors(options =>
 });
 
 // Configurazione autenticazione Cookie (cookie authentication)
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "MioProgettoCookie";
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.SlidingExpiration = true;  // Questo fa sì che la scadenza venga rinnovata se l'utente è attivo
-    });
-
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.Cookie.Name = "CookieProgramma";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; 
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromDays(30); 
+    options.SlidingExpiration = true;
+});
 
 // Configurazione autorizzazione
 builder.Services.AddAuthorizationBuilder()
@@ -150,7 +154,7 @@ app.UseCors("AllowWithCredentials");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 
 app.MapControllers();
@@ -158,5 +162,22 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Use(async (context, next) =>
+{
+    // Logga ogni richiesta
+    Console.WriteLine($"Path: {context.Request.Path}");
+    Console.WriteLine($"Authenticated: {context.User?.Identity?.IsAuthenticated}");
+
+    await next();
+
+    // Se c'è un reindirizzamento al login, logga il motivo
+    if (context.Response.StatusCode == 302 &&
+        context.Response.Headers.Location.ToString().Contains("/Account/Login"))
+    {
+        Console.WriteLine("REDIRECT TO LOGIN DETECTED");
+        Console.WriteLine($"Auth Status: {context.User?.Identity?.IsAuthenticated}");
+    }
+});
 
 app.Run();

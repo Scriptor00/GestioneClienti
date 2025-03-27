@@ -16,7 +16,9 @@ namespace WebAppEF.Models
         public DbSet<Prodotto> Prodotti { get; set; }
         public DbSet<Ordine> Ordini { get; set; }
         public DbSet<DettagliOrdine> DettagliOrdini { get; set; }
-        public DbSet<Utente> Utenti { get; set; } // Aggiunto DbSet per l'entità Utente
+        public DbSet<Utente> Utenti { get; set; } 
+
+        public DbSet<CarrelloItem> Carrello { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

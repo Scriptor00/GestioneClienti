@@ -13,6 +13,28 @@
 </head>
 <body>
 
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Accesso richiesto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Devi effettuare l'accesso per aggiungere prodotti al carrello.</p>
+        <form asp-controller="Account" asp-action="Login" method="get">
+          <input type="hidden" id="loginReturnUrl" name="returnUrl" value="">
+          <button type="submit" class="btn btn-primary">Accedi ora</button>
+          <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Più tardi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Container per i toast -->
+<div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999"></div>
+
     <!-- Barra di navigazione -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">

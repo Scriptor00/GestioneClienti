@@ -47,5 +47,16 @@ namespace WebAppEF.Controllers
         {
             return View();
         }
+
+         public IActionResult ModificaProfilo()
+        {
+            return View();
+        }
+
+        
+         public IActionResult Sicurezza()
+        {
+            return View();
+        }
     }
 }

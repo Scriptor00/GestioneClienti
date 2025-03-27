@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - Modifica Profilo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Stile identico alla pagina profilo */
+        .navbar {
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid #0d6efd;
+            padding: 0.8rem 1rem;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand:hover {
+            text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+            transform: scale(1.02);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #0d6efd;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .navbar-brand:hover i {
+            color: #ff4b2b;
+            transform: rotate(15deg);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #ff4b2b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover::before {
+            width: 80%;
+        }
+
+        .nav-link:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        .nav-link:hover i {
+            color: #ff4b2b;
+            transform: scale(1.2);
+        }
+
+        .navbar-toggler {
+            border: 1px solid #0d6efd;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            transition: all 0.3s;
+        }
+
+        .navbar-toggler:hover .navbar-toggler-icon {
+            transform: scale(1.1);
+        }
+
+        .gaming-dropdown {
+            background: linear-gradient(145deg, #1a1a2e 0%, #0a0a1a 100%) !important;
+            border: 1px solid #0d6efd !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4) !important;
+            padding: 0.5rem 0 !important;
+            margin-top: 8px !important;
+        }
+
+        .gaming-dropdown .dropdown-item {
+            color: #e0e0e0 !important;
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 500;
+            transition: all 0.3s !important;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .gaming-dropdown .dropdown-item i {
+            color: #0d6efd !important;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .gaming-dropdown .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.2), transparent) !important;
+            color: #fff !important;
+            border-left: 3px solid #0d6efd;
+            transform: translateX(5px);
+        }
+
+        .gaming-dropdown .dropdown-item:hover i {
+            color: #ff4b2b !important;
+        }
+
+        .gaming-dropdown .dropdown-divider {
+            border-color: rgba(13, 110, 253, 0.3) !important;
+            margin: 0.5rem 0 !important;
+        }
+
+        .logout-btn {
+            color: #ff4b2b !important;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, rgba(255, 75, 43, 0.2), transparent) !important;
+            border-left: 3px solid #ff4b2b !important;
+        }
+
+        .dropdown-toggle::after {
+            border-top-color: #fff;
+            transition: transform 0.3s;
+        }
+
+        .dropdown-toggle:hover::after {
+            transform: rotate(180deg);
+        }
+
+        /* Stili specifici per la pagina di modifica */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        
+        .form-container {
+            background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-radius: 15px;
+            border: 1px solid #0d6efd;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .form-header {
+            border-bottom: 1px solid rgba(13, 110, 253, 0.5);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #0d6efd;
+            text-shadow: 0 0 8px rgba(13, 110, 253, 0.5);
+        }
+        
+        .form-label {
+            color: #adb5bd;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            background-color: #444;
+            border-color: #0d6efd;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+        }
+        
+        .profile-image-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem;
+        }
+        
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #0d6efd;
+            box-shadow: 0 0 20px rgba(13, 110, 253, 0.5);
+        }
+        
+        .change-image-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .change-image-btn:hover {
+            background-color: #ff4b2b;
+            transform: scale(1.1);
+        }
+        
+        #imageUpload {
+            display: none;
+        }
+        
+        footer {
+            background-color: #0d6efd;
+            color: #fff;
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    @{
+        ViewData["Title"] = "Modifica Profilo";
+    }
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
+                <i class="bi bi-controller me-2"></i>GAMING<span style="color: #ff4b2b;">STORE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-gamepad"></i> Giochi
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i> Impostazioni
+                        </a>
+                        <ul class="dropdown-menu gaming-dropdown" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item active" href="#"><i class="fas fa-user-edit"></i> Modifica profilo</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-lock"></i> Sicurezza</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i> Notifiche</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item logout-btn" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-container">
+                    <div class="form-header text-center">
+                        <h2 class="form-title"><i class="fas fa-user-edit me-2"></i> MODIFICA PROFILO</h2>
+                        <p class="text-muted">Aggiorna le tue informazioni personali e le preferenze</p>
+                    </div>
+                    
+                    <form>
+                        <!-- Sezione Immagine Profilo -->
+                        <div class="mb-4 text-center">
+                            <div class="profile-image-container">
+                                <img id="profileImage" src="https://via.placeholder.com/150" class="profile-image">
+                                <label for="imageUpload" class="change-image-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                                <input type="file" id="imageUpload" accept="image/*">
+                            </div>
+                            <small class="text-muted">Clicca sull'icona per cambiare l'immagine</small>
+                        </div>
+                        
+                        <!-- Sezione Informazioni Base -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3"><i class="fas fa-id-card me-2"></i> INFORMAZIONI BASE</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Nome Utente</label>
+                                    <input type="text" class="form-control" id="username" value="Scriptor">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" value="carlodicuonzo@yahoo.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sezione Informazioni Personali -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3"><i class="fas fa-user me-2"></i> INFORMAZIONI PERSONALI</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="firstName" value="Carlo">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Cognome</label>
+                                    <input type="text" class="form-control" id="lastName" value="Dicuonzo">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="birthDate" class="form-label">Data di Nascita</label>
+                                    <input type="date" class="form-control" id="birthDate" value="2000-09-19">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="country" class="form-label">Paese</label>
+                                    <select class="form-control" id="country">
+                                        <option>Seleziona un paese</option>
+                                        <option selected>Italia</option>
+                                        <option>Francia</option>
+                                        <option>Germania</option>
+                                        <option>Spagna</option>
+                                        <option>Regno Unito</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sezione Preferenze -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3"><i class="fas fa-gamepad me-2"></i> PREFERENZE DI GIOCO</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Generi Preferiti</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="action" checked>
+                                        <label class="form-check-label" for="action">Azione</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rpg" checked>
+                                        <label class="form-check-label" for="rpg">RPG</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="fps">
+                                        <label class="form-check-label" for="fps">FPS</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="strategy">
+                                        <label class="form-check-label" for="strategy">Strategia</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="sports">
+                                        <label class="form-check-label" for="sports">Sport</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="playtime" class="form-label">Ore di gioco settimanali</label>
+                                <input type="range" class="form-range" id="playtime" min="0" max="40" value="15">
+                                <div class="d-flex justify-content-between">
+                                    <small>0-5h</small>
+                                    <small>5-10h</small>
+                                    <small>10-20h</small>
+                                    <small>20-30h</small>
+                                    <small>30+</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sezione Bio -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3"><i class="fas fa-pencil-alt me-2"></i> BIOGRAFIA</h5>
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Descrizione</label>
+                                <textarea class="form-control" id="bio" rows="4" placeholder="Raccontaci qualcosa di te...">Giocatore appassionato di RPG e giochi open-world. Amo esplorare mondi vasti e immergermi in storie coinvolgenti.</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Bottoni -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Annulla
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Salva Modifiche
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 GamingStore. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script per la gestione dell'immagine del profilo
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('imageUpload');
+            const profileImage = document.getElementById('profileImage');
+            
+            // Controlla se c'è un'immagine salvata precedentemente
+            const savedImage = localStorage.getItem('profileImage');
+            if (savedImage) {
+                profileImage.src = savedImage;
+            }
+            
+            imageUpload.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        profileImage.src = event.target.result;
+                        localStorage.setItem('profileImage', event.target.result);
+                    }
+                    
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+            
+            // Aggiungi animazione al submit del form
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simula il salvataggio dei dati
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Salvataggio...';
+                submitBtn.disabled = true;
+                
+                // Simula una chiamata AJAX
+                setTimeout(function() {
+                    submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Modifiche salvate!';
+                    
+                    setTimeout(function() {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        
+                        // Mostra un messaggio di successo
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+                        alert.style.zIndex = '1100';
+                        alert.innerHTML = `
+                            <strong>Successo!</strong> Le tue modifiche sono state salvate.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        document.body.appendChild(alert);
+                        
+                        // Chiudi automaticamente l'alert dopo 3 secondi
+                        setTimeout(function() {
+                            const bsAlert = new bootstrap.Alert(alert);
+                            bsAlert.close();
+                        }, 3000);
+                    }, 1500);
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

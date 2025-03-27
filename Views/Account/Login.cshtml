@@ -201,11 +201,36 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .alert-success {
+    background-color: rgba(25, 135, 84, 0.9);
+    border: 1px solid #0f5132;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-out;
+     transition: opacity 0.5s ease-out;
+}
+.fade-out {
+    opacity: 0;
+}
+
+.btn-close {
+    filter: invert(1);
+}
     </style>
 </head>
 <body>
     <div class="login-container">
         <h3 class="login-title"><i class="bi bi-controller me-2"></i>ACCEDI</h3>
+
+        @if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
         @if (!ViewData.ModelState.IsValid)
 {
@@ -264,5 +289,20 @@
             }
         }
     </script>
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alert = document.querySelector('.alert-success');
+        if (alert) {
+            setTimeout(() => {
+                alert.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 500); // Tempo per completare la transizione
+            }, 3000); // 3 secondi prima di iniziare la dissolvenza
+        }
+    });
+</script>
+
 </body>
 </html>
