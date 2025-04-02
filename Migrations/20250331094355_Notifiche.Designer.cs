@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAppEF.Models;
 
@@ -11,9 +12,11 @@ using WebAppEF.Models;
 namespace WebAppEF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331094355_Notifiche")]
+    partial class Notifiche
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,7 +50,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("ProdottoId");
 
-                    b.ToTable("Carrello", (string)null);
+                    b.ToTable("Carrello");
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.Notifica", b =>
@@ -85,7 +88,7 @@ namespace WebAppEF.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifiche", (string)null);
+                    b.ToTable("Notifiche");
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
@@ -116,7 +119,7 @@ namespace WebAppEF.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Utenti", (string)null);
+                    b.ToTable("Utenti");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Cliente", b =>
@@ -149,7 +152,7 @@ namespace WebAppEF.Migrations
 
                     b.HasKey("IdCliente");
 
-                    b.ToTable("Clienti", (string)null);
+                    b.ToTable("Clienti");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.DettagliOrdine", b =>
@@ -178,7 +181,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("IdProdotto");
 
-                    b.ToTable("DettagliOrdini", (string)null);
+                    b.ToTable("DettagliOrdini");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Ordine", b =>
@@ -205,7 +208,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("IdCliente");
 
-                    b.ToTable("Ordini", (string)null);
+                    b.ToTable("Ordini");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Prodotto", b =>
@@ -244,7 +247,7 @@ namespace WebAppEF.Migrations
 
                     b.HasKey("IdProdotto");
 
-                    b.ToTable("Prodotti", (string)null);
+                    b.ToTable("Prodotti");
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.CarrelloItem", b =>

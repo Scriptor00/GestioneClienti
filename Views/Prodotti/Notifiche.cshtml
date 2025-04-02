@@ -1,0 +1,651 @@
+@model GestioneClienti.ViewModel.NotificheViewModel
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - Notifiche</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Stile navbar identico al profilo */
+        .navbar {
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid #0d6efd;
+            padding: 0.8rem 1rem;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand:hover {
+            text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+            transform: scale(1.02);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #0d6efd;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .navbar-brand:hover i {
+            color: #ff4b2b;
+            transform: rotate(15deg);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #ff4b2b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover::before {
+            width: 80%;
+        }
+
+        .nav-link:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        .nav-link:hover i {
+            color: #ff4b2b;
+            transform: scale(1.2);
+        }
+
+        .navbar-toggler {
+            border: 1px solid #0d6efd;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            transition: all 0.3s;
+        }
+
+        .navbar-toggler:hover .navbar-toggler-icon {
+            transform: scale(1.1);
+        }
+
+        .gaming-dropdown {
+            background: linear-gradient(145deg, #1a1a2e 0%, #0a0a1a 100%) !important;
+            border: 1px solid #0d6efd !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4) !important;
+            padding: 0.5rem 0 !important;
+            margin-top: 8px !important;
+        }
+
+        .gaming-dropdown .dropdown-item {
+            color: #e0e0e0 !important;
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 500;
+            transition: all 0.3s !important;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .gaming-dropdown .dropdown-item i {
+            color: #0d6efd !important;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .gaming-dropdown .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.2), transparent) !important;
+            color: #fff !important;
+            border-left: 3px solid #0d6efd;
+            transform: translateX(5px);
+        }
+
+        .gaming-dropdown .dropdown-item:hover i {
+            color: #ff4b2b !important;
+        }
+
+        .gaming-dropdown .dropdown-divider {
+            border-color: rgba(13, 110, 253, 0.3) !important;
+            margin: 0.5rem 0 !important;
+        }
+
+        .logout-btn {
+            color: #ff4b2b !important;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, rgba(255, 75, 43, 0.2), transparent) !important;
+            border-left: 3px solid #ff4b2b !important;
+        }
+
+        .dropdown-toggle::after {
+            border-top-color: #fff;
+            transition: transform 0.3s;
+        }
+
+        .dropdown-toggle:hover::after {
+            transform: rotate(180deg);
+        }
+
+        /* Stile specifico per la pagina Notifiche */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        
+        .notification-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(13, 110, 253, 0.3);
+        }
+        
+        .notification-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #0d6efd;
+            text-shadow: 0 0 8px rgba(13, 110, 253, 0.5);
+            font-size: 2rem;
+        }
+        
+        .notification-actions .btn {
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .notification-card {
+            background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-radius: 10px;
+            border-left: 4px solid;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notification-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+        }
+        
+        .notification-card.unread {
+            border-left-color: #0d6efd;
+            background: linear-gradient(145deg, #2d2d2d 0%, #1a1a2e 100%);
+        }
+        
+        .notification-card.read {
+            border-left-color: #6c757d;
+            opacity: 0.8;
+        }
+        
+        .notification-card.important {
+            border-left-color: #dc3545;
+            background: linear-gradient(145deg, #2d1a1a 0%, #1a1a2e 100%);
+        }
+        
+        .notification-card.promotion {
+            border-left-color: #ffc107;
+            background: linear-gradient(145deg, #2d2d1a 0%, #1a1a2e 100%);
+        }
+        
+        .notification-content {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .unread .notification-icon {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: #0d6efd;
+        }
+        
+        .important .notification-icon {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .promotion .notification-icon {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .notification-time {
+            font-size: 0.8rem;
+            color: #adb5bd;
+            margin-top: 0.5rem;
+        }
+        
+        .notification-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+        
+        .notification-actions .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+        
+        .empty-notifications {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .empty-notifications i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #0d6efd;
+            opacity: 0.5;
+        }
+        
+        .filter-buttons .btn {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    @{
+        ViewData["Title"] = "Notifiche";
+    }
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
+                <i class="bi bi-controller me-2"></i>GAMING<span style="color: #ff4b2b;">STORE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-gamepad"></i> Giochi
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i> Impostazioni
+                        </a>
+                        <ul class="dropdown-menu gaming-dropdown" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="@Url.Action("ModificaProfilo", "Prodotti")"><i class="fas fa-user-edit"></i> Modifica profilo</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Sicurezza", "Prodotti")"><i class="fas fa-lock"></i> Sicurezza</a></li>
+                            <li><a class="dropdown-item active" href="@Url.Action("Notifiche", "Prodotti")"><i class="fas fa-bell"></i> Notifiche</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item logout-btn" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="notification-container">
+        <div class="notification-header">
+            <h1 class="notification-title">
+                <i class="fas fa-bell me-2"></i>Le tue notifiche
+                @if(Model.NumeroNotificheNonLette > 0)
+                {
+                    <span class="badge bg-danger ms-2">@Model.NumeroNotificheNonLette nuove</span>
+                }
+            </h1>
+            <div class="notification-actions">
+                <button class="btn btn-outline-primary btn-sm" id="markAllRead">
+                    <i class="fas fa-check-circle me-1"></i> Segna tutte come lette
+                </button>
+                <button class="btn btn-outline-danger btn-sm" id="deleteAllRead">
+                    <i class="fas fa-trash-alt me-1"></i> Elimina tutte le lette
+                </button>
+            </div>
+        </div>
+        
+        <div class="filter-buttons mb-4">
+            <button class="btn btn-outline-primary filter-btn active" data-filter="all">
+                <i class="fas fa-list me-1"></i> Tutte
+            </button>
+            <button class="btn btn-outline-primary filter-btn" data-filter="unread">
+                <i class="fas fa-envelope me-1"></i> Non lette
+            </button>
+            <button class="btn btn-outline-warning filter-btn" data-filter="promotion">
+                <i class="fas fa-percentage me-1"></i> Offerte
+            </button>
+            <button class="btn btn-outline-danger filter-btn" data-filter="important">
+                <i class="fas fa-exclamation-circle me-1"></i> Importanti
+            </button>
+        </div>
+        
+        @if(Model.Notifiche.Any())
+        {
+            <div class="notification-list">
+                @foreach(var notifica in Model.Notifiche)
+                {
+                    <div class="notification-card @(notifica.Letta ? "read" : "unread") @(notifica.Tipo == "Promozione" ? "promotion" : "") @(notifica.Tipo == "Importante" ? "important" : "")">
+                        <div class="notification-content">
+                            <div class="d-flex align-items-start">
+                                <div class="notification-icon">
+                                    @if(notifica.Tipo == "Promozione")
+                                    {
+                                        <i class="fas fa-percentage"></i>
+                                    }
+                                    else if(notifica.Tipo == "Importante")
+                                    {
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    }
+                                    else if(notifica.Tipo == "Ordine")
+                                    {
+                                        <i class="fas fa-shopping-cart"></i>
+                                    }
+                                    else if(notifica.Tipo == "Gioco")
+                                    {
+                                        <i class="fas fa-gamepad"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-bell"></i>
+                                    }
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">@notifica.Titolo</h5>
+                                    <p class="mb-2">@notifica.Messaggio</p>
+                                    @if(notifica.Tipo == "Promozione" && !string.IsNullOrEmpty(notifica.LinkAzione))
+                                    {
+                                        <a href="@notifica.LinkAzione" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-tag me-1"></i> Sfrutta l'offerta
+                                        </a>
+                                    }
+                                    @if(notifica.Tipo == "Ordine" && notifica.IdRiferimento.HasValue)
+                                    {
+                                        <a href="@Url.Action("DettagliOrdine", "Ordini", new { id = notifica.IdRiferimento })" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye me-1"></i> Vedi ordine
+                                        </a>
+                                    }
+                                    <div class="notification-time">
+                                        <i class="far fa-clock me-1"></i> @notifica.DataInvio.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                @if(!notifica.Letta)
+                                {
+                                    <button class="btn btn-sm btn-outline-success mark-as-read" data-id="@notifica.Id">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
+                                <button class="btn btn-sm btn-outline-danger delete-notification" data-id="@notifica.Id">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            @if(notifica.Tipo == "Promozione")
+                            {
+                                <span class="badge bg-warning text-dark notification-badge">
+                                    <i class="fas fa-tag me-1"></i> Offerta
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-notifications">
+                <i class="far fa-bell-slash"></i>
+                <h3>Nessuna notifica</h3>
+                <p>Non hai ancora ricevuto notifiche. Torna più tardi!</p>
+                <a href="@Url.Action("Home", "Prodotti")" class="btn btn-primary">
+                    <i class="fas fa-gamepad me-1"></i> Vai allo store
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-0">© 2025 GamingStore. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Filtra le notifiche
+            $('.filter-btn').click(function() {
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                const filter = $(this).data('filter');
+                
+                if(filter === 'all') {
+                    $('.notification-card').show();
+                } else {
+                    $('.notification-card').hide();
+                    $('.notification-card.' + filter).show();
+                }
+            });
+            
+            // Segna come letta
+            $('.mark-as-read').click(function() {
+                const notificationId = $(this).data('id');
+                const notificationCard = $(this).closest('.notification-card');
+                
+                // Effetto visivo
+                notificationCard.removeClass('unread').addClass('read');
+                $(this).remove();
+                
+                // Chiamata AJAX al server per aggiornare lo stato
+                $.post('@Url.Action("MarkAsRead", "Notifiche")', { id: notificationId }, function() {
+                    // Aggiorna il contatore delle notifiche non lette
+                    const unreadCount = parseInt($('.notification-title .badge').text()) - 1;
+                    
+                    if(unreadCount > 0) {
+                        $('.notification-title .badge').text(unreadCount + ' nuove');
+                    } else {
+                        $('.notification-title .badge').remove();
+                    }
+                    
+                    // Aggiorna il contatore nel ViewModel
+                    @Model.NumeroNotificheNonLette--;
+                }).fail(function() {
+                    // Ripristina lo stato in caso di errore
+                    notificationCard.removeClass('read').addClass('unread');
+                    alert("Si è verificato un errore durante l'aggiornamento della notifica.");
+                });
+            });
+            
+            // Segna tutte come lette
+            $('#markAllRead').click(function() {
+                if(confirm('Sei sicuro di voler segnare tutte le notifiche come lette?')) {
+                    $('.notification-card.unread').each(function() {
+                        $(this).removeClass('unread').addClass('read');
+                        $(this).find('.mark-as-read').remove();
+                    });
+                    
+                    // Chiamata AJAX al server
+                    $.post('@Url.Action("MarkAllAsRead", "Notifiche")', function() {
+                        $('.notification-title .badge').remove();
+                        @Model.NumeroNotificheNonLette = 0;
+                    }).fail(function() {
+                        alert("Si è verificato un errore durante l'aggiornamento delle notifiche.");
+                    });
+                }
+            });
+            
+            // Elimina notifica
+            $('.delete-notification').click(function() {
+                const notificationId = $(this).data('id');
+                const notificationCard = $(this).closest('.notification-card');
+                
+                if(confirm('Sei sicuro di voler eliminare questa notifica?')) {
+                    // Effetto visivo
+                    notificationCard.fadeOut(300, function() {
+                        $(this).remove();
+                        
+                        // Controlla se ci sono ancora notifiche
+                        if($('.notification-card').length === 0) {
+                            $('.notification-list').html(`
+                                <div class="empty-notifications">
+                                    <i class="far fa-bell-slash"></i>
+                                    <h3>Nessuna notifica</h3>
+                                    <p>Non hai più notifiche. Torna più tardi!</p>
+                                    <a href="@Url.Action("Home", "Prodotti")" class="btn btn-primary">
+                                        <i class="fas fa-gamepad me-1"></i> Vai allo store
+                                    </a>
+                                </div>
+                            `);
+                        }
+                    });
+                    
+                    // Chiamata AJAX al server
+                    $.post('@Url.Action("DeleteNotification", "Notifiche")', { id: notificationId }, function() {
+                        // Aggiorna il contatore se la notifica era non letta
+                        if(notificationCard.hasClass('unread')) {
+                            const unreadCount = parseInt($('.notification-title .badge').text()) - 1;
+                            
+                            if(unreadCount > 0) {
+                                $('.notification-title .badge').text(unreadCount + ' nuove');
+                            } else {
+                                $('.notification-title .badge').remove();
+                            }
+                            
+                            // Aggiorna il contatore nel ViewModel
+                            @Model.NumeroNotificheNonLette--;
+                        }
+                    }).fail(function() {
+                        alert("Si è verificato un errore durante l'eliminazione della notifica.");
+                        notificationCard.show();
+                    });
+                }
+            });
+            
+            // Elimina tutte le notifiche lette
+            $('#deleteAllRead').click(function() {
+                if(confirm('Sei sicuro di voler eliminare tutte le notifiche già lette?')) {
+                    $('.notification-card.read').each(function() {
+                        const notificationId = $(this).find('.delete-notification').data('id');
+                        
+                        // Effetto visivo
+                        $(this).fadeOut(300, function() {
+                            $(this).remove();
+                            
+                            // Controlla se ci sono ancora notifiche
+                            if($('.notification-card').length === 0) {
+                                $('.notification-list').html(`
+                                    <div class="empty-notifications">
+                                        <i class="far fa-bell-slash"></i>
+                                        <h3>Nessuna notifica</h3>
+                                        <p>Non hai più notifiche. Torna più tardi!</p>
+                                        <a href="@Url.Action("Home", "Prodotti")" class="btn btn-primary">
+                                            <i class="fas fa-gamepad me-1"></i> Vai allo store
+                                        </a>
+                                    </div>
+                                `);
+                            }
+                        });
+                        
+                        // Chiamata AJAX al server
+                        $.post('@Url.Action("DeleteNotification", "Notifiche")', { id: notificationId })
+                            .fail(function() {
+                                alert("Si è verificato un errore durante l'eliminazione di una notifica.");
+                            });
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

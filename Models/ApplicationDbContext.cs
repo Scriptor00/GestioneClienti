@@ -4,21 +4,19 @@ using WebAppEF.Entities;
 
 namespace WebAppEF.Models
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
-        // Costruttore che passa le opzioni di configurazione al DbContext
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
 
         // Definizione delle DbSet per le entità
         public DbSet<Cliente> Clienti { get; set; }
         public DbSet<Prodotto> Prodotti { get; set; }
         public DbSet<Ordine> Ordini { get; set; }
         public DbSet<DettagliOrdine> DettagliOrdini { get; set; }
-        public DbSet<Utente> Utenti { get; set; } 
+        public DbSet<Utente> Utenti { get; set; }
 
         public DbSet<CarrelloItem> Carrello { get; set; }
+
+        public DbSet<Notifica> Notifiche { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +68,13 @@ namespace WebAppEF.Models
                       .IsRequired()
                       .HasMaxLength(50);
             });
+
+
+            modelBuilder.Entity<Notifica>()
+                .HasOne(n => n.Utente)
+                .WithMany(u => u.Notifiche)
+                .HasForeignKey(n => n.UtenteId)
+                .OnDelete(DeleteBehavior.Cascade); // Opzionale: cancella le notifiche se l'utente viene eliminato
         }
     }
 }

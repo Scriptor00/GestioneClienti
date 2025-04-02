@@ -20,7 +20,6 @@
             padding: 0.8rem 1rem;
             position: relative;
             z-index: 1000;
-    using GestioneClienti.ViewModel;
         }
 
         .navbar::before {
@@ -369,17 +368,78 @@
         .bs-tooltip-top .tooltip-arrow::before {
             border-top-color: #0d6efd;
         }
+
+        /* Stili per i badge di sicurezza password */
+        .bg-success { background-color: #28a745 !important; } /* Molto sicura */
+        .bg-primary { background-color: #0d6efd !important; } /* Sicura */
+        .bg-warning { background-color: #ffc107 !important; color: #000 !important; } /* Moderata */
+        .bg-danger { background-color: #dc3545 !important; } /* Critica */
+        .bg-secondary { background-color: #6c757d !important; } /* Sconosciuta */
     </style>
 </head>
 <body>
     @{
         ViewData["Title"] = "Sicurezza Account";
+        // Simulazione del livello di sicurezza della password (nella realtà dovrebbe venire dal modello)
+        int passwordSecurityLevel = CalculatePasswordSecurityLevel(Model?.PasswordCorrente);
+    }
+
+    @functions {
+        int CalculatePasswordSecurityLevel(string password)
+        {
+            if (string.IsNullOrEmpty(password)) return 0;
+            
+            int score = 0;
+            
+            // Lunghezza
+            if (password.Length >= 12) score += 2;
+            else if (password.Length >= 8) score += 1;
+            
+            // Complessità
+            if (password.Any(char.IsUpper) && password.Any(char.IsLower)) score += 1;
+            if (password.Any(char.IsDigit)) score += 1;
+            if (password.Any(c => !char.IsLetterOrDigit(c))) score += 1;
+            
+            // Mappatura a livelli 1-4
+            return score switch
+            {
+                >= 5 => 4,    // Molto sicura (12+ caratteri, maiuscole, minuscole, numeri, simboli)
+                4 => 3,       // Sicura
+                2 or 3 => 2,  // Moderata
+                1 => 1,      // Critica
+                _ => 0        // Sconosciuta
+            };
+        }
+        
+        string GetPasswordSecurityClass(int level)
+        {
+            return level switch
+            {
+                4 => "bg-success",    // Molto sicura
+                3 => "bg-primary",    // Sicura
+                2 => "bg-warning",    // Moderata
+                1 => "bg-danger",     // Critica
+                _ => "bg-secondary"  // Sconosciuta
+            };
+        }
+
+        string GetPasswordSecurityText(int level)
+        {
+            return level switch
+            {
+                4 => "MOLTO SICURA",
+                3 => "SICURA",
+                2 => "MODERATA",
+                1 => "CRITICA",
+                _ => "SCONOSCIUTA"
+            };
+        }
     }
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
-                <i class="bi bi-controller me-2"></i>GAMING<span style="color: #ff4b2b;">STORE</span>
+                <i class="fas fa-gamepad me-2"></i>GAMING<span style="color: #ff4b2b;">STORE</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
@@ -429,73 +489,40 @@
                         <h4 class="security-card-title"><i class="fas fa-key"></i> Password</h4>
                         <div class="security-status">
                             <span class="security-status-text">Password attuale: ********</span>
-                            <span class="badge bg-success security-status-badge">SICURA</span>
+                            <span class="badge @GetPasswordSecurityClass(passwordSecurityLevel) security-status-badge">
+                                @GetPasswordSecurityText(passwordSecurityLevel)
+                            </span>
                         </div>
-                        <p class="text-muted">Ultima modifica: 15 giorni fa</p>
+                        <p class="text-muted">Ultima modifica: @DateTime.Now.AddDays(-15).ToString("dd/MM/yyyy")</p>
                         <button class="btn btn-primary btn-security" id="changePasswordBtn">
                             <i class="fas fa-sync-alt me-2"></i> Cambia Password
                         </button>
                         
-     <div class="security-form" id="passwordForm">
-    <form method="post" action="@Url.Action("ChangePassword", "Account")">
-        @Html.AntiForgeryToken()
-        <div class="mb-3">
-            <label for="PasswordCorrente" class="form-label">Password attuale</label>
-            <input type="password" class="form-control" id="PasswordCorrente" name="PasswordCorrente" required>
-        </div>
-        <div class="mb-3">
-            <label for="NuovaPassword" class="form-label">Nuova password</label>
-            <input type="password" class="form-control" id="NuovaPassword" name="NuovaPassword" required>
-            <div class="password-strength">
-                <div class="password-strength-bar" id="passwordStrengthBar"></div>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="ConfermaPassword" class="form-label">Conferma nuova password</label>
-            <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword" required>
-        </div>
-        <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary" id="cancelPasswordBtn">
-                Annulla
-            </button>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i> Salva Password
-            </button>
-        </div>
-    </form>
-</div>
-                    </div>
-                    
-                    <!-- Sezione Autenticazione a Due Fattori -->
-                    <div class="security-card">
-                        <h4 class="security-card-title"><i class="fas fa-mobile-alt"></i> Autenticazione a Due Fattori</h4>
-                        <div class="security-status">
-                            <span class="security-status-text">Stato attuale: Disattivata</span>
-                            <span class="badge bg-danger security-status-badge">VULNERABILE</span>
-                        </div>
-                        <p class="text-muted">Aggiungi un ulteriore livello di sicurezza al tuo account</p>
-                        <button class="btn btn-primary btn-security" id="enable2faBtn">
-                            <i class="fas fa-lock me-2"></i> Attiva 2FA
-                        </button>
-                        
-                        <!-- Form 2FA (nascosto inizialmente) -->
-                        <div class="security-form" id="twoFaForm">
-                            <div class="text-center mb-4">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/GamingStore:Scriptor?secret=JBSWY3DPEHPK3PXP&issuer=GamingStore" 
-                                     alt="QR Code" class="img-fluid mb-3" style="max-width: 200px;">
-                                <p class="text-muted">Scansiona questo QR code con la tua app di autenticazione</p>
-                            </div>
-                            <form>
+                        <div class="security-form" id="passwordForm">
+                            <form method="post" action="@Url.Action("ChangePassword", "Account")">
+                                @Html.AntiForgeryToken()
                                 <div class="mb-3">
-                                    <label for="verificationCode" class="form-label">Codice di verifica</label>
-                                    <input type="text" class="form-control" id="verificationCode" placeholder="Inserisci il codice a 6 cifre" required>
+                                    <label for="PasswordCorrente" class="form-label">Password attuale</label>
+                                    <input type="password" class="form-control" id="PasswordCorrente" name="PasswordCorrente" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="NuovaPassword" class="form-label">Nuova password</label>
+                                    <input type="password" class="form-control" id="NuovaPassword" name="NuovaPassword" required>
+                                    <div class="password-strength">
+                                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                                    </div>
+                                    <small class="text-muted">Usa almeno 12 caratteri, maiuscole, minuscole, numeri e simboli</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ConfermaPassword" class="form-label">Conferma nuova password</label>
+                                    <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword" required>
                                 </div>
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button type="button" class="btn btn-outline-secondary" id="cancel2faBtn">
+                                    <button type="button" class="btn btn-outline-secondary" id="cancelPasswordBtn">
                                         Annulla
                                     </button>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-check me-2"></i> Verifica
+                                        <i class="fas fa-save me-2"></i> Salva Password
                                     </button>
                                 </div>
                             </form>
@@ -518,7 +545,7 @@
                                 </div>
                                 <div class="activity-location">Milano, Italia</div>
                                 <div class="activity-ip">IP: 192.168.1.1</div>
-                                <div class="activity-date">Oggi, 14:30</div>
+                                <div class="activity-date">Oggi, @DateTime.Now.ToString("HH:mm")</div>
                             </div>
                             
                             <!-- Altri dispositivi -->
@@ -574,145 +601,135 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container text-center">
-            <p class="mb-0">© 2025 GamingStore. Tutti i diritti riservati.</p>
+            <p class="mb-0">© @DateTime.Now.Year GamingStore. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // Inizializza i tooltip
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inizializza i tooltip
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
 
-    // Gestione cambio password
-    const changePasswordBtn = document.getElementById('changePasswordBtn');
-    const passwordForm = document.getElementById('passwordForm');
-    const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+            // Gestione cambio password
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const passwordForm = document.getElementById('passwordForm');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
 
-    changePasswordBtn.addEventListener('click', function() {
-        passwordForm.style.display = passwordForm.style.display === 'block' ? 'none' : 'block';
-    });
+            changePasswordBtn.addEventListener('click', function() {
+                passwordForm.style.display = passwordForm.style.display === 'block' ? 'none' : 'block';
+            });
 
-    cancelPasswordBtn.addEventListener('click', function() {
-        passwordForm.style.display = 'none';
-    });
-
-    // Gestione 2FA
-    const enable2faBtn = document.getElementById('enable2faBtn');
-    const twoFaForm = document.getElementById('twoFaForm');
-    const cancel2faBtn = document.getElementById('cancel2faBtn');
-
-    enable2faBtn.addEventListener('click', function() {
-        twoFaForm.style.display = twoFaForm.style.display === 'block' ? 'none' : 'block';
-        enable2faBtn.textContent = twoFaForm.style.display === 'block' ? 'Annulla Attivazione' : 'Attiva 2FA';
-    });
-
-    cancel2faBtn.addEventListener('click', function() {
-        twoFaForm.style.display = 'none';
-        enable2faBtn.textContent = 'Attiva 2FA';
-    });
-
-    // Password strength indicator
-    const newPassword = document.getElementById('newPassword');
-    const passwordStrengthBar = document.getElementById('passwordStrengthBar');
-
-    newPassword.addEventListener('input', function() {
-        const password = newPassword.value;
-        let strength = 0;
-
-        // Controlla la lunghezza
-        if (password.length >= 8) strength += 1;
-        if (password.length >= 12) strength += 1;
-
-        // Controlla numeri
-        if (/\d/.test(password)) strength += 1;
-
-        // Controlla maiuscole e minuscole
-        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
-
-        // Aggiorna la barra
-        let width = 0;
-        let color = '#dc3545'; // Rosso
-
-        if (strength <= 1) {
-            width = 25;
-            color = '#dc3545'; // Rosso
-        } else if (strength <= 3) {
-            width = 50;
-            color = '#ffc107'; // Giallo
-        } else if (strength <= 4) {
-            width = 75;
-            color = '#28a745'; // Verde
-        } else {
-            width = 100;
-            color = '#0d6efd'; // Blu
-        }
-
-        passwordStrengthBar.style.width = width + '%';
-        passwordStrengthBar.style.backgroundColor = color;
-    });
-
-    // Salva password con AJAX
-    const passwordFormEl = passwordForm.querySelector('form');
-    passwordFormEl.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const submitBtn = passwordFormEl.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Salvataggio...';
-        submitBtn.disabled = true;
-
-        const formData = new FormData(passwordFormEl);
-
-        fetch('/Account/ChangePassword', { // Sostituisci con l'URL corretto
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Errore durante il salvataggio della password.');
-            }
-            return response.json(); // O response.text() se il server non restituisce JSON
-        })
-        .then(data => {
-            submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Password aggiornata!';
-            showAlert('Password aggiornata con successo!', 'success');
-
-            setTimeout(function() {
+            cancelPasswordBtn.addEventListener('click', function() {
                 passwordForm.style.display = 'none';
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 1500);
-        })
-        .catch(error => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            showAlert(error.message, 'danger');
+            });
+
+            // Password strength indicator
+            const newPassword = document.getElementById('NuovaPassword');
+            const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+
+            newPassword.addEventListener('input', function() {
+                const password = newPassword.value;
+                let strength = 0;
+
+                // Controlla la lunghezza
+                if (password.length >= 12) strength += 2;
+                else if (password.length >= 8) strength += 1;
+
+                // Controlla numeri
+                if (/\d/.test(password)) strength += 1;
+
+                // Controlla maiuscole e minuscole
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+
+                // Controlla simboli
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+
+                // Aggiorna la barra
+                let width = 0;
+                let color = '#dc3545'; // Rosso
+
+                if (strength <= 1) {
+                    width = 25;
+                    color = '#dc3545'; // Rosso
+                } else if (strength <= 3) {
+                    width = 50;
+                    color = '#ffc107'; // Giallo
+                } else if (strength <= 4) {
+                    width = 75;
+                    color = '#28a745'; // Verde
+                } else {
+                    width = 100;
+                    color = '#0d6efd'; // Blu
+                }
+
+                passwordStrengthBar.style.width = width + '%';
+                passwordStrengthBar.style.backgroundColor = color;
+            });
+
+            // Salva password con AJAX
+            const passwordFormEl = passwordForm.querySelector('form');
+            passwordFormEl.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const submitBtn = passwordFormEl.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Salvataggio...';
+                submitBtn.disabled = true;
+
+                const formData = new FormData(passwordFormEl);
+
+                fetch('/Account/ChangePassword', { 
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante il salvataggio della password.');
+                    }
+                    return response.json(); 
+                })
+                .then(data => {
+                    submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Password aggiornata!';
+                    showAlert('Password aggiornata con successo!', 'success');
+
+                    setTimeout(function() {
+                        passwordForm.style.display = 'none';
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        // Ricarica la pagina per aggiornare lo stato della password
+                        window.location.reload();
+                    }, 1500);
+                })
+                .catch(error => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showAlert(error.message, 'danger');
+                });
+            });
+
+            // Funzione per mostrare alert
+            function showAlert(message, type) {
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+                alert.style.zIndex = '1100';
+                alert.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.body.appendChild(alert);
+
+                // Chiudi automaticamente dopo 3 secondi
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 3000);
+            }
         });
-    });
-
-    // Funzione per mostrare alert
-    function showAlert(message, type) {
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
-        alert.style.zIndex = '1100';
-        alert.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.body.appendChild(alert);
-
-        // Chiudi automaticamente dopo 3 secondi
-        setTimeout(function() {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 3000);
-    }
-});
-</script>
+    </script>
 </body>
 </html>

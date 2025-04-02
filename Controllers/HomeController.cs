@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +74,38 @@ namespace WebAppEF.Controllers
         {
 
             return View();
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult AggiungiProdotto()
+        {
+            return View(new ProdottoViewModel());
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AggiungiProdotto(Prodotto prodotto)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    prodotto.DataInserimento = DateTime.Now;
+
+                    _context.Prodotti.Add(prodotto);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Index", "Prodotti"); 
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Errore durante l'aggiunta del prodotto");
+                    ModelState.AddModelError("", "Si è verificato un errore durante il salvataggio.");
+                }
+            }
+
+            return View(prodotto);
         }
     }
 }

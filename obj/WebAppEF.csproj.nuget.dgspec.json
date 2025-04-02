@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {}
+    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {}
   },
   "projects": {
-    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {
+    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
+        "projectUniqueName": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "projectName": "WebAppEF",
-        "projectPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
+        "projectPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "packagesPath": "C:\\Users\\A573_Apulia\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\obj\\",
+        "outputPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -42,8 +42,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -115,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.407/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

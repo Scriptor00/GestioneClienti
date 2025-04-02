@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Catalogo Prodotti";
+    int pageSize = 8;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    var pagedProducts = Model.ToList(); 
 }
 
 <!DOCTYPE html>
@@ -127,7 +131,9 @@ body {
     transform: scale(1.1);
 }
 
-
+#categoria, .card-text small.text-muted {
+    color: white !important;
+}
 
 .card {
     transition: transform 0.2s, box-shadow 0.2s;
@@ -202,13 +208,7 @@ body {
     background-color: #0056b3;
     border-color: #004085;
 }
-#categoria {
-    color: red;
-}
 
-.card-text small.text-muted {
-    color: white;
-}
 .gaming-dropdown {
     background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
     border: 1px solid #0d6efd;
@@ -276,6 +276,49 @@ body {
     animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
 
+/* Stile per la paginazione */
+.pagination-container {
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.page-item .page-link {
+    background-color: #2d2d2d;
+    border: 1px solid #0d6efd;
+    color: #fff;
+    margin: 0 5px;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(145deg, #0d6efd 0%, #1a6fd8 100%);
+    border-color: #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    transform: scale(1.05);
+}
+
+.page-item.disabled .page-link {
+    background-color: #1a1a1a;
+    border-color: #555;
+    color: #777;
+}
+
+.page-item .page-link:hover {
+    background: linear-gradient(145deg, #1a6fd8 0%, #0d6efd 100%);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
+}
+
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+    border-radius: 6px;
+}
+
 /* Media query per mobile */
 @@media (max-width: 768px) {
     .navbar-collapse {
@@ -294,6 +337,11 @@ body {
     
     .nav-link::before {
         display: none;
+    }
+    
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -368,36 +416,57 @@ body {
     <div class="container mt-5">
         <h1 class="text-center text-primary mb-4">Catalogo Prodotti</h1>
 
-        <!-- Filtri di Ricerca e Ordinamento -->
-        <div class="row mb-4 search-container">
-            <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Cerca prodotto..." id="searchInput">
-            </div>
-            <div class="col-md-3">
-                <select class="form-select" id="categoryFilter">
-                    <option value="">Tutte le categorie</option>
-                    <option value="Console">Console</option>
-                    <option value="Accessori">Accessori</option>
-                    <option value="Giochi">Giochi</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select" id="sortByPrice">
-                    <option value="">Ordina per prezzo</option>
-                    <option value="asc">Prezzo crescente</option>
-                    <option value="desc">Prezzo decrescente</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100" id="searchButton">
-                    <i class="bi bi-search me-2"></i>Cerca
-                </button>
-            </div>
-        </div>
+       <div class="row mb-4 search-container">
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="Cerca prodotto..." id="searchInput" value="@ViewBag.Search" style="background-color: #333; border: 1px solid #555; color: #fff;">
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" id="categoryFilter" style="background-color: #333; border: 1px solid #555; color: #fff;">
+            <option value="">Tutte le categorie</option>
+            <option value="Console">Console</option>
+            <option value="Accessori">Accessori</option>
+            <option value="Giochi">Giochi</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" id="sortByPrice" style="background-color: #333; border: 1px solid #555; color: #fff;">
+            <option value="">Ordina per prezzo</option>
+            <option value="asc">Prezzo crescente</option>
+            <option value="desc">Prezzo decrescente</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100" id="searchButton" style="background-color: #0d6efd; border-color: #0d6efd;">
+            <i class="bi bi-search me-2"></i>Cerca
+        </button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchButton').addEventListener('click', function() {
+        const search = document.getElementById('searchInput').value;
+        const category = document.getElementById('categoryFilter').value;
+        const sort = document.getElementById('sortByPrice').value;
+        window.location.href = `/Prodotti/Index?search=${search}&category=${category}&sort=${sort}`;
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortFilter = document.getElementById('sortByPrice');
+
+        if ("@ViewBag.Category" !== "") {
+            categoryFilter.value = "@ViewBag.Category";
+        }
+
+        if ("@ViewBag.Sort" !== "") {
+            sortFilter.value = "@ViewBag.Sort";
+        }
+    });
+</script>
 
         <!-- Griglia dei Prodotti -->
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4" id="productGrid">
-            @foreach (var prodotto in Model)
+            @foreach (var prodotto in pagedProducts)
             {
                 <div class="col">
                     <div class="card h-100">
@@ -405,7 +474,7 @@ body {
 
                         <div class="card-body">
                             <h5 class="card-title">@prodotto.NomeProdotto</h5>
-<p class="card-text text-muted" id="categoria">@prodotto.Categoria</p>
+                            <p class="card-text text-muted" id="categoria">@prodotto.Categoria</p>
                             <p class="card-text">
                                 <strong>Prezzo:</strong> @prodotto.Prezzo.ToString("C")
                             </p>
@@ -420,10 +489,9 @@ body {
                                     <span class="badge bg-danger">Esaurito</span>
                                 }
                             </p>
-                           <p class="card-text">
-    <small class="text-muted">Inserito il: @prodotto.DataInserimento.ToShortDateString()</small>
-</p>
-
+                            <p class="card-text">
+                                <small class="text-muted">Inserito il: @prodotto.DataInserimento.ToShortDateString()</small>
+                            </p>
                         </div>
 
                         <div class="card-footer">
@@ -439,7 +507,59 @@ body {
                 </div>
             }
         </div>
+
+       
+    @if (totalPages > 1)
+{
+    <div class="pagination-container">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })">@i</a>
+                    </li>
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
     </div>
+}
+
+        </div>
 
     <!-- Notifica Aggiunta al Carrello -->
     <div id="cart-notification" class="alert alert-success position-fixed bottom-0 end-0 m-3 d-none" role="alert"></div>
@@ -455,56 +575,7 @@ body {
         </div>
     </footer>
 
-    <!-- Script per Filtri di Ricerca e Ordinamento -->
-    <script>
-        document.getElementById('searchButton').addEventListener('click', function () {
-            applyFilters();
-        });
-
-        document.getElementById('sortByPrice').addEventListener('change', function () {
-            applyFilters();
-        });
-
-        function applyFilters() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategory = document.getElementById('categoryFilter').value;
-            const sortByPrice = document.getElementById('sortByPrice').value;
-            const productGrid = document.getElementById('productGrid');
-            const products = Array.from(productGrid.getElementsByClassName('col'));
-
-            // Filtra i prodotti
-            products.forEach(product => {
-                const productName = product.querySelector('.card-title').textContent.toLowerCase();
-                const productCategory = product.querySelector('.card-text.text-muted').textContent;
-
-                const matchesSearch = productName.includes(searchText);
-                const matchesCategory = selectedCategory === "" || productCategory === selectedCategory;
-
-                if (matchesSearch && matchesCategory) {
-                    product.style.display = 'block';
-                } else {
-                    product.style.display = 'none';
-                }
-            });
-
-            // Ordina i prodotti
-            if (sortByPrice === "asc" || sortByPrice === "desc") {
-                products.sort((a, b) => {
-                    const priceA = parseFloat(a.querySelector('.card-text strong').nextSibling.textContent.trim().replace('€', '').replace(',', '.'));
-                    const priceB = parseFloat(b.querySelector('.card-text strong').nextSibling.textContent.trim().replace('€', '').replace(',', '.'));
-
-                    if (sortByPrice === "asc") {
-                        return priceA - priceB;
-                    } else {
-                        return priceB - priceA;
-                    }
-                });
-
-                // Riordina la griglia
-                products.forEach(product => productGrid.appendChild(product));
-            }
-        }
-    </script>
+    
 
     <!-- Script per Aggiunta al Carrello -->
     <script>

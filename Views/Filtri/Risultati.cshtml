@@ -12,168 +12,325 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
-        /* Stili personalizzati per gli stati degli ordini */
-        .badge-annullato {
-            background-color: #dc3545; /* Rosso */
-            color: white;
-        }
-        .badge-confermato {
-            background-color: #28a745; /* Verde */
-            color: white;
-        }
-        .badge-spedito {
-            background-color: #ffc107; /* Giallo */
-            color: black;
+        :root {
+            --admin-primary: #1a237e;
+            --admin-secondary: #283593;
+            --admin-accent: #536dfe;
+            --admin-light: #e8eaf6;
+            --admin-dark: #0d1440;
+            --admin-text: #212121;
+            --admin-text-light: #f5f5f5;
+            --admin-border: #c5cae9;
         }
 
-        /* Stile per le intestazioni fisse */
-        .table thead th {
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--admin-text);
+            min-height: 100vh;
+        }
+
+        /* Admin Container */
+        .admin-container {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin: 2rem auto;
+        }
+
+        .admin-title {
+            font-weight: 700;
+            color: var(--admin-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-title i {
+            margin-right: 10px;
+        }
+
+        /* Buttons */
+        .admin-btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .admin-btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+
+        .admin-btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tables */
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-table thead th {
+            background-color: var(--admin-primary);
+            color: white;
+            padding: 1rem;
             position: sticky;
-            top: 0; /* Fissa l'intestazione in cima alla tabella */
-            background-color: #f8f9fa; /* Colore di sfondo per l'intestazione */
-            z-index: 1; /* Assicura che l'intestazione sia sopra le righe della tabella */
+            top: 0;
+            z-index: 10;
         }
 
-        /* Stile per il contenitore della tabella */
+        .admin-table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .admin-table tbody tr:hover {
+            background-color: var(--admin-light);
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--admin-border);
+            vertical-align: top;
+        }
+
+        /* Table Container */
         .table-container {
-            max-height: 500px; /* Altezza massima del contenitore */
-            overflow-y: auto; /* Abilita lo scrolling verticale */
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        /* Badges */
+        .badge-annullato {
+            background-color: #dc3545;
+            color: white;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .badge-confermato {
+            background-color: #28a745;
+            color: white;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .badge-spedito {
+            background-color: #ffc107;
+            color: black;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .badge-default {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        /* Alert */
+        .admin-alert {
+            border-radius: 6px;
+            border-left: 4px solid #17a2b8;
+            background-color: rgba(23, 162, 184, 0.1);
+            color: #0c5460;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-alert i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .admin-container {
+                padding: 1.5rem;
+                margin: 1.5rem;
+            }
+            
+            .admin-table thead th, 
+            .admin-table td {
+                padding: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center text-primary mb-4">Risultati della Ricerca</h1>
-        
-        <a href="@Url.Action("Filtri", "Filtri")" class="btn btn-secondary mb-4">
-            <i class="bi bi-arrow-left me-2"></i>Nuova Ricerca
-        </a>
-
-        @if (Model.Clienti != null && Model.Clienti.Count > 0)
-        {
-            <h3>Clienti Trovati</h3>
-            <div class="table-container">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Cognome</th>
-                            <th>Email</th>
-                            <th>Ordini</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var cliente in Model.Clienti)
-                        {
-                            <tr>
-                                <td>@cliente.Nome</td>
-                                <td>@cliente.Cognome</td>
-                                <td>@cliente.Email</td>
-                                <td>
-                                    @if (cliente.Ordini != null && cliente.Ordini.Any())
-                                    {
-                                        <ul>
-                                            @foreach (var ordine in cliente.Ordini)
-                                            {
-                                                <li>
-                                                    <strong>Ordine #@ordine.IdOrdine</strong> 
-                                                    - @ordine.DataOrdine.ToShortDateString() 
-                                                    - @ordine.TotaleOrdine.ToString("C")
-                                                    - Stato: 
-                                                    @if (ordine.Stato == StatoOrdine.Annullato)
-                                                    {
-                                                        <span class="badge badge-annullato">@ordine.Stato</span>
-                                                    }
-                                                    else if (ordine.Stato == StatoOrdine.Confermato)
-                                                    {
-                                                        <span class="badge badge-confermato">@ordine.Stato</span>
-                                                    }
-                                                    else if (ordine.Stato == StatoOrdine.Spedito)
-                                                    {
-                                                        <span class="badge badge-spedito">@ordine.Stato</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-secondary">@ordine.Stato</span>
-                                                    }
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Nessun ordine</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-
-        @if (Model.Ordini != null && Model.Ordini.Count > 0)
-        {
-            <h3>Ordine Trovato</h3>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID Ordine</th>
-                        <th>Data Ordine</th>
-                        <th>Totale</th>
-                        <th>Stato</th>
-                        <th>Cliente</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var ordine in Model.Ordini)
-                    {
-                        <tr>
-                            <td>@ordine.IdOrdine</td>
-                            <td>@ordine.DataOrdine.ToShortDateString()</td>
-                            <td>@ordine.TotaleOrdine.ToString("C")</td>
-                            <td>
-                                @if (ordine.Stato == StatoOrdine.Annullato)
-                                {
-                                    <span class="badge badge-annullato">@ordine.Stato</span>
-                                }
-                                else if (ordine.Stato == StatoOrdine.Confermato)
-                                {
-                                    <span class="badge badge-confermato">@ordine.Stato</span>
-                                }
-                                else if (ordine.Stato == StatoOrdine.Spedito)
-                                {
-                                    <span class="badge badge-spedito">@ordine.Stato</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">@ordine.Stato</span>
-                                }
-                            </td>
-                            <td>
-                                @if (ordine.Cliente != null)
-                                {
-                                    @ordine.Cliente.Nome @(" ") @ordine.Cliente.Cognome
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Cliente non trovato</span>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-
-        @if ((Model.Clienti == null || Model.Clienti.Count == 0) && (Model.Ordini == null || Model.Ordini.Count == 0))
-        {
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i>Nessun risultato trovato per la ricerca.
-            </div>
-        }
+    <!-- Breadcrumb Navigation -->
+    <div class="admin-breadcrumb">
+        <div class="container-fluid">
+            <a href="@Url.Action("Filtri", "Filtri")" class="admin-btn admin-btn-secondary mb-4">
+                <i class="fas fa-arrow-left me-2"></i> Nuova Ricerca
+            </a>
+        </div>
     </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="admin-container">
+            <h1 class="admin-title">
+                <i class="fas fa-search me-2"></i>Risultati della Ricerca
+            </h1>
+
+            @if (Model.Clienti != null && Model.Clienti.Count > 0)
+            {
+                <h3 class="mt-4 mb-3" style="color: var(--admin-primary);">
+                    <i class="fas fa-users me-2"></i>Clienti Trovati
+                </h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Cognome</th>
+                                <th>Email</th>
+                                <th>Ordini</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cliente in Model.Clienti)
+                            {
+                                <tr>
+                                    <td>@cliente.Nome</td>
+                                    <td>@cliente.Cognome</td>
+                                    <td>@cliente.Email</td>
+                                    <td>
+                                        @if (cliente.Ordini != null && cliente.Ordini.Any())
+                                        {
+                                            <ul style="padding-left: 1rem; margin-bottom: 0;">
+                                                @foreach (var ordine in cliente.Ordini)
+                                                {
+                                                    <li style="margin-bottom: 0.5rem;">
+                                                        <strong>Ordine #@ordine.IdOrdine</strong> 
+                                                        - @ordine.DataOrdine.ToShortDateString() 
+                                                        - @ordine.TotaleOrdine.ToString("C")
+                                                        - Stato: 
+                                                        @if (ordine.Stato == StatoOrdine.Annullato)
+                                                        {
+                                                            <span class="badge-annullato">@ordine.Stato</span>
+                                                        }
+                                                        else if (ordine.Stato == StatoOrdine.Confermato)
+                                                        {
+                                                            <span class="badge-confermato">@ordine.Stato</span>
+                                                        }
+                                                        else if (ordine.Stato == StatoOrdine.Spedito)
+                                                        {
+                                                            <span class="badge-spedito">@ordine.Stato</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge-default">@ordine.Stato</span>
+                                                        }
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Nessun ordine</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (Model.Ordini != null && Model.Ordini.Count > 0)
+            {
+                <h3 class="mt-4 mb-3" style="color: var(--admin-primary);">
+                    <i class="fas fa-shopping-cart me-2"></i>Ordini Trovati
+                </h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID Ordine</th>
+                                <th>Data Ordine</th>
+                                <th>Totale</th>
+                                <th>Stato</th>
+                                <th>Cliente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ordine in Model.Ordini)
+                            {
+                                <tr>
+                                    <td>@ordine.IdOrdine</td>
+                                    <td>@ordine.DataOrdine.ToShortDateString()</td>
+                                    <td>@ordine.TotaleOrdine.ToString("C")</td>
+                                    <td>
+                                        @if (ordine.Stato == StatoOrdine.Annullato)
+                                        {
+                                            <span class="badge-annullato">@ordine.Stato</span>
+                                        }
+                                        else if (ordine.Stato == StatoOrdine.Confermato)
+                                        {
+                                            <span class="badge-confermato">@ordine.Stato</span>
+                                        }
+                                        else if (ordine.Stato == StatoOrdine.Spedito)
+                                        {
+                                            <span class="badge-spedito">@ordine.Stato</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-default">@ordine.Stato</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (ordine.Cliente != null)
+                                        {
+                                            @ordine.Cliente.Nome @(" ") @ordine.Cliente.Cognome
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Cliente non trovato</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if ((Model.Clienti == null || Model.Clienti.Count == 0) && (Model.Ordini == null || Model.Ordini.Count == 0))
+            {
+                <div class="admin-alert">
+                    <i class="fas fa-info-circle"></i>
+                    <div>Nessun risultato trovato per la ricerca.</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

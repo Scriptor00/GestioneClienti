@@ -8,24 +8,41 @@ using WebAppEF.ViewModel;
 
 namespace WebAppEF.Controllers
 {
-    public class CustomerController(ApplicationDbContext context, ICustomerRepository customerRepository, ILogger<CustomerController> logger) : Controller
+    public class CustomerController : Controller
     {
-        private readonly ICustomerRepository _customerRepository = customerRepository;
-        private readonly ApplicationDbContext _context = context;
-        private readonly ILogger<CustomerController> _logger = logger;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly ILogger<CustomerController> _logger;
+
+        public CustomerController(
+            ICustomerRepository customerRepository,
+            ILogger<CustomerController> logger)
+        {
+            _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
+            const int pageSize = 10;
+            
             try
             {
                 _logger.LogInformation("Recupero clienti - Pagina {Page}", page);
-                int totalItems = await _customerRepository.CountAsync();
-                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                
+                var totalItems = await _customerRepository.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
                 var clienti = await _customerRepository.GetAllPagedAsync(page, pageSize);
 
-                var viewModel = new PaginazioneViewModel { Clienti = clienti, CurrentPage = page, TotalPages = totalPages };
-                _logger.LogInformation("Clienti recuperati con successo: {TotalItems} totali, {TotalPages} pagine", totalItems, totalPages);
+                var viewModel = new PaginazioneViewModel 
+                { 
+                    Clienti = clienti, 
+                    CurrentPage = page, 
+                    TotalPages = totalPages 
+                };
+                
+                _logger.LogInformation("Clienti recuperati con successo: {TotalItems} totali, {TotalPages} pagine", 
+                    totalItems, totalPages);
+                
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -43,6 +60,7 @@ namespace WebAppEF.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cliente cliente)
         {
             if (!ModelState.IsValid)
@@ -50,48 +68,32 @@ namespace WebAppEF.Controllers
                 return View(cliente);
             }
 
-            // Controllo email
-            if (!ValidazioneCliente.IsValidEmail(cliente.Email))
-            {
-                ModelState.AddModelError("Email", "L'email fornita non è valida.");
-                return View(cliente);
-            }
-
-            if (!ValidazioneCliente.LunghezzaMail(cliente.Email))
-            {
-                ModelState.AddModelError("Email", "L'email deve essere tra 5 e 255 caratteri.");
-                return View(cliente);
-            }
-
-            bool emailExists = await _context.Clienti.AnyAsync(c => c.Email == cliente.Email);
-            if (emailExists)
-            {
-                ModelState.AddModelError("Email", "Questa email è già registrata.");
-                return View(cliente);
-            }
-
-            if (ValidazioneCliente.HasSpecialCharacters(cliente.Nome) || ValidazioneCliente.HasSpecialCharacters(cliente.Cognome))
-            {
-                ModelState.AddModelError("Nome", "Il nome non può contenere caratteri speciali.");
-                ModelState.AddModelError("Cognome", "Il cognome non può contenere caratteri speciali.");
-                return View(cliente);
-            }
-
             try
             {
                 await _customerRepository.AddAsync(cliente);
-                _logger.LogInformation("Cliente creato con successo: {Cliente}", cliente);
+                _logger.LogInformation("Cliente creato con successo: ID {Id}", cliente.IdCliente);
 
-                TempData["SuccessMessage"] = "Cliente salvato correttamente!";
-                return RedirectToAction("Index");
+                TempData["SuccessMessage"] = "Cliente creato correttamente!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Errore di validazione durante la creazione del cliente");
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(cliente);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Operazione non valida durante la creazione del cliente");
+                ModelState.AddModelError("Email", ex.Message);
+                return View(cliente);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Errore durante la creazione del cliente");
-                ModelState.AddModelError("", "Errore durante il salvataggio.");
+                TempData["ErrorMessage"] = "Si è verificato un errore durante la creazione del cliente.";
+                return View(cliente);
             }
-
-            return View(cliente);
         }
 
         [HttpGet]
@@ -112,80 +114,130 @@ namespace WebAppEF.Controllers
                 return Json(new { valid = false, message = "L'email non è valida." });
             }
 
-            bool exists = await _context.Clienti.AnyAsync(c => c.Email == email);
-            if (exists)
+            try
             {
-                return Json(new { valid = false, message = "Questa email è già registrata." });
-            }
+                bool exists = await _customerRepository.EmailExistsAsync(email);
+                if (exists)
+                {
+                    return Json(new { valid = false, message = "Questa email è già registrata." });
+                }
 
-            return Json(new { valid = true });
+                return Json(new { valid = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante il controllo dell'email");
+                return Json(new { valid = false, message = "Errore durante il controllo dell'email." });
+            }
         }
 
-
-
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            _logger.LogInformation("Accesso al form di modifica per cliente con ID {Id}", id);
-            var customer = _context.Clienti.Find(id);
-            if (customer == null)
+            try
             {
-                _logger.LogWarning("Cliente non trovato per ID {Id}", id);
-                return NotFound();
+                _logger.LogInformation("Accesso al form di modifica per cliente con ID {Id}", id);
+                
+                var customer = await _customerRepository.GetByIdAsync(id);
+                if (customer == null)
+                {
+                    _logger.LogWarning("Cliente non trovato per ID {Id}", id);
+                    return NotFound();
+                }
+
+                return View(new ModificaClienteViewModel 
+                { 
+                    IdCliente = customer.IdCliente, 
+                    Nome = customer.Nome, 
+                    Cognome = customer.Cognome, 
+                    Email = customer.Email, 
+                    Attivo = customer.Attivo 
+                });
             }
-            return View(new ModificaClienteViewModel { IdCliente = customer.IdCliente, Nome = customer.Nome, Cognome = customer.Cognome, Email = customer.Email, Attivo = customer.Attivo });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante il recupero del cliente con ID {Id}", id);
+                TempData["ErrorMessage"] = "Errore durante il recupero del cliente.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(ModificaClienteViewModel viewModel)
+        public async Task<IActionResult> Edit(ModificaClienteViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Errore nel ModelState per modifica cliente {IdCliente}", viewModel.IdCliente);
-                TempData["ErrorMessage"] = "Errore durante l'aggiornamento.";
                 return View(viewModel);
             }
 
-            var customer = _context.Clienti.Find(viewModel.IdCliente);
-            if (customer == null)
+            try
+            {
+                var customer = new Cliente
+                {
+                    IdCliente = viewModel.IdCliente,
+                    Nome = viewModel.Nome,
+                    Cognome = viewModel.Cognome,
+                    Email = viewModel.Email,
+                    Attivo = viewModel.Attivo
+                };
+
+                await _customerRepository.UpdateAsync(customer);
+                
+                _logger.LogInformation("Cliente aggiornato con successo: ID {IdCliente}", viewModel.IdCliente);
+                TempData["SuccessMessage"] = "Cliente aggiornato con successo!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (KeyNotFoundException)
             {
                 _logger.LogWarning("Cliente non trovato per modifica: ID {IdCliente}", viewModel.IdCliente);
                 return NotFound();
             }
-
-            customer.Nome = viewModel.Nome;
-            customer.Cognome = viewModel.Cognome;
-            customer.Email = viewModel.Email;
-            customer.Attivo = viewModel.Attivo;
-            _context.SaveChanges();
-
-            _logger.LogInformation("Cliente aggiornato con successo: {IdCliente}", customer.IdCliente);
-            TempData["SuccessMessage"] = "Cliente aggiornato con successo!";
-            return View(viewModel);
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Errore di validazione durante l'aggiornamento del cliente");
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(viewModel);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Operazione non valida durante l'aggiornamento del cliente");
+                ModelState.AddModelError("Email", ex.Message);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'aggiornamento del cliente {IdCliente}", viewModel.IdCliente);
+                TempData["ErrorMessage"] = "Errore durante l'aggiornamento del cliente.";
+                return View(viewModel);
+            }
         }
 
+        [HttpGet]
+       
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 _logger.LogInformation("Tentativo di eliminazione cliente con ID {Id}", id);
-                var cliente = await _customerRepository.GetByIdAsync(id);
-                if (cliente == null)
-                {
-                    _logger.LogWarning("Cliente non trovato per eliminazione: ID {Id}", id);
-                    TempData["ErrorMessage"] = "Cliente non trovato.";
-                    return RedirectToAction(nameof(Index));
-                }
-
+                
                 await _customerRepository.DeleteAsync(id);
+                
                 _logger.LogInformation("Cliente con ID {Id} eliminato con successo", id);
+                TempData["SuccessMessage"] = "Cliente eliminato con successo!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (KeyNotFoundException)
+            {
+                _logger.LogWarning("Cliente non trovato per eliminazione: ID {Id}", id);
+                TempData["ErrorMessage"] = "Cliente non trovato.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Errore durante l'eliminazione del cliente con ID {Id}", id);
-                TempData["ErrorMessage"] = "Errore durante l'eliminazione.";
+                TempData["ErrorMessage"] = "Errore durante l'eliminazione del cliente.";
                 return RedirectToAction(nameof(Index));
             }
         }

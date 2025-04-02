@@ -7,6 +7,8 @@ using WebAppEF.Models;
 using WebAppEF.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using WebAppEF.Data;
+using GestioneClienti.Repositories;
+using GestioneClienti.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +82,7 @@ builder.Services.AddAuthorizationBuilder()
 // Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
+builder.Services.AddScoped<INotificaRepository, NotificaRepository>();
 
 // Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -108,7 +111,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        DbInitializer.Initialize(context); // Popola il database
+        context.Database.Migrate();  // Assicurati che il database sia migrato
+        NotificheFake.Initialize(context);  // Popola la tabella Notifiche
     }
     catch (Exception ex)
     {
@@ -126,6 +130,7 @@ using (var scope = app.Services.CreateScope())
         context.Database.Migrate();
         if (!context.Clienti.Any()) context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
         if (!context.Ordini.Any()) context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
+        
         context.SaveChanges();
     }
     catch (Exception ex)
@@ -155,7 +160,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
-
 
 app.MapControllers();
 app.MapRazorPages();

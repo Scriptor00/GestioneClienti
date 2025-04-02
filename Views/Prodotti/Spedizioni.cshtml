@@ -1,0 +1,557 @@
+@{
+    ViewData["Title"] = "Informazioni Spedizioni";
+}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        /* Stili personalizzati */
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid #0d6efd;
+            padding: 0.8rem 1rem;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+        }
+
+        .shipping-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #1a1a2e 100%);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shipping-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.03)" d="M0,0 L100,0 L100,100 L0,100 Z" /></svg>');
+            background-size: cover;
+        }
+
+        .shipping-card {
+            background-color: #2d2d2d;
+            border-radius: 12px;
+            border: 1px solid #0d6efd;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .shipping-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.4);
+        }
+
+        .shipping-card-header {
+            background: linear-gradient(90deg, #0d6efd 0%, #1a6fd8 100%);
+            color: white;
+            padding: 1.2rem;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .shipping-card-body {
+            padding: 1.5rem;
+        }
+
+        .shipping-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+            margin: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #0d6efd, transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3rem;
+            top: 0.3rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.3);
+        }
+
+        .timeline-item h5 {
+            color: #0d6efd;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-question {
+            color: #0d6efd;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .faq-question:hover {
+            color: #ff4b2b;
+        }
+
+        .faq-answer {
+            padding-top: 0.5rem;
+            color: #ccc;
+        }
+
+        .contact-box {
+            background: rgba(13, 110, 253, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(13, 110, 253, 0.3);
+            transition: all 0.3s;
+        }
+
+        .contact-box:hover {
+            background: rgba(13, 110, 253, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Stili comuni con la view precedente */
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand:hover {
+            text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+            transform: scale(1.02);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #0d6efd;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .navbar-brand:hover i {
+            color: #ff4b2b;
+            transform: rotate(15deg);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .footer {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 20px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Animazioni */
+        @@keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Media query per mobile */
+        @@media (max-width: 768px) {
+            .shipping-header {
+                padding: 2rem 0;
+            }
+            
+            .shipping-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .timeline {
+                padding-left: 2rem;
+            }
+            
+            .timeline::before {
+                left: 0.9rem;
+            }
+            
+            .timeline-item::before {
+                left: -2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar (coerente con la view precedente) -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
+                <i class="bi bi-controller me-2"></i>Gaming Store
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Prodotti")">
+                            <i class="bi bi-list-ul me-1"></i>Catalogo
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="@Url.Action("Spedizioni", "Prodotti")">
+                            <i class="bi bi-truck me-1"></i>Spedizioni
+                        </a>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="@Url.Action("Profilo", "Prodotti")">
+                                    <i class="bi bi-person-gear me-2"></i>Profilo
+                                </a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Carrello", "Prodotti")">
+                                    <i class="bi bi-collection-play me-2"></i>I miei ordini
+                                </a></li>
+                                <li><hr class="dropdown-divider my-2" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item logout-btn">
+                                            <i class="bi bi-power me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">
+                                <i class="bi bi-person-circle me-1"></i>Account
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Spedizioni -->
+    <div class="shipping-header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3"><i class="bi bi-truck"></i> Informazioni sulle Spedizioni</h1>
+            <p class="lead">Consegna rapida e sicura dei tuoi prodotti gaming</p>
+        </div>
+    </div>
+
+    <!-- Sezione Principale -->
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Opzioni di Spedizione -->
+                <h2 class="mb-4"><i class="bi bi-lightning-charge text-primary"></i> Metodi di Spedizione</h2>
+                
+                <div class="row">
+                    <!-- Standard -->
+                    <div class="col-md-6 mb-4">
+                        <div class="shipping-card h-100">
+                            <div class="shipping-card-header">
+                                <i class="bi bi-truck me-2"></i> Spedizione Standard
+                            </div>
+                            <div class="shipping-card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><strong>Tempi:</strong> 3-5 giorni lavorativi</span>
+                                    <span class="badge bg-primary">€ 4,90</span>
+                                </div>
+                                <p>Consegna a domicilio con corriere espresso. Tracking disponibile.</p>
+                                <small class="text-muted">Gratuita per ordini superiori a € 49,90</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Express -->
+                    <div class="col-md-6 mb-4">
+                        <div class="shipping-card h-100">
+                            <div class="shipping-card-header">
+                                <i class="bi bi-rocket-takeoff me-2"></i> Spedizione Express
+                            </div>
+                            <div class="shipping-card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><strong>Tempi:</strong> 1-2 giorni lavorativi</span>
+                                    <span class="badge bg-primary">€ 9,90</span>
+                                </div>
+                                <p>Consegna prioritaria con corriere. Tracking in tempo reale.</p>
+                                <small class="text-muted">Disponibile solo per Italia continentale</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ritiro in Negozio -->
+                    <div class="col-md-6 mb-4">
+                        <div class="shipping-card h-100">
+                            <div class="shipping-card-header">
+                                <i class="bi bi-shop me-2"></i> Ritiro in Negozio
+                            </div>
+                            <div class="shipping-card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><strong>Tempi:</strong> 1-2 giorni lavorativi</span>
+                                    <span class="badge bg-success">GRATIS</span>
+                                </div>
+                                <p>Ritira il tuo ordine nel nostro store fisico a Barletta.</p>
+                                <small class="text-muted">Riceverai un'email quando l'ordine sarà pronto</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lockers -->
+                    <div class="col-md-6 mb-4">
+                        <div class="shipping-card h-100">
+                            <div class="shipping-card-header">
+                                <i class="bi bi-box-seam me-2"></i> Locker 24/7
+                            </div>
+                            <div class="shipping-card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><strong>Tempi:</strong> 2-3 giorni lavorativi</span>
+                                    <span class="badge bg-primary">€ 3,90</span>
+                                </div>
+                                <p>Ritira il pacco quando vuoi da uno dei nostri locker.</p>
+                                <small class="text-muted">Disponibile in 50 città italiane</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Processo di Spedizione -->
+                <h2 class="mb-4 mt-5"><i class="bi bi-diagram-3 text-primary"></i> Come funziona la spedizione</h2>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h5>Ordine Confermato</h5>
+                        <p>Riceverai un'email di conferma con tutti i dettagli del tuo ordine.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>Preparazione</h5>
+                        <p>Il nostro team prepara il tuo ordine con cura e lo imballa in modo sicuro.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>Spedizione</h5>
+                        <p>Il corriere ritira il pacco e avvia il processo di consegna.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>In Transito</h5>
+                        <p>Puoi tracciare il tuo pacco in tempo reale tramite il link fornito.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>Consegna</h5>
+                        <p>Il pacco arriva a destinazione! Riceverai una notifica.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ -->
+                <h2 class="mb-4 mt-5"><i class="bi bi-question-circle text-primary"></i> Domande Frequenti</h2>
+                
+                <div class="faq-section">
+                    <div class="faq-item">
+                        <div class="faq-question" data-bs-toggle="collapse" href="#faq1">
+                            <i class="bi bi-chevron-right me-2"></i> Quanto tempo ci vuole per la spedizione?
+                        </div>
+                        <div class="faq-answer collapse show" id="faq1">
+                            I tempi di consegna variano in base al metodo scelto: da 1 giorno lavorativo per l'Express a 3-5 giorni per lo Standard. I tempi possono variare durante i periodi di picco o festivi.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" data-bs-toggle="collapse" href="#faq2">
+                            <i class="bi bi-chevron-right me-2"></i> Posso tracciare il mio ordine?
+                        </div>
+                        <div class="faq-answer collapse show" id="faq2">
+                            Sì, per tutte le spedizioni tranne il ritiro in negozio riceverai un codice di tracciamento via email non appena il pacco viene preso in carico dal corriere.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" data-bs-toggle="collapse" href="#faq3">
+                            <i class="bi bi-chevron-right me-2"></i> Cosa succede se non sono a casa alla consegna?
+                        </div>
+                        <div class="faq-answer collapse show" id="faq3">
+                            Il corriere lascerà un avviso di passaggio e tenterà una seconda consegna il giorno successivo. Dopo 3 tentativi, il pacco verrà restituito a noi.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" data-bs-toggle="collapse" href="#faq4">
+                            <i class="bi bi-chevron-right me-2"></i> Fate spedizioni internazionali?
+                        </div>
+                        <div class="faq-answer collapse show" id="faq4">
+                            Attualmente spediamo solo in Italia. Per richieste particolari puoi contattare il nostro servizio clienti.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="contact-box mb-4">
+                    <h3 class="mb-3"><i class="bi bi-headset me-2"></i> Assistenza Clienti</h3>
+                    <p>Hai domande sulle spedizioni? Il nostro team è qui per aiutarti!</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-envelope me-2"></i> spedizioni@gamingstore.it</li>
+                        <li class="mb-2"><i class="bi bi-telephone me-2"></i> +39 02 1234567</li>
+                        <li><i class="bi bi-clock me-2"></i> Lun-Ven: 9:00-18:00</li>
+                    </ul>
+                    <a href="@Url.Action("Contatti", "Home")" class="btn btn-primary mt-3 w-100">
+                        <i class="bi bi-chat-left-text me-2"></i> Contattaci
+                    </a>
+                </div>
+                
+                <div class="shipping-card mb-4">
+                    <div class="shipping-card-header">
+                        <i class="bi bi-map me-2"></i> Aree di Consegna
+                    </div>
+                    <div class="shipping-card-body">
+                        <p>Spediamo in tutta Italia con tempi variabili in base alla destinazione:</p>
+                        <ul>
+                            <li><strong>Nord Italia:</strong> 1-2 giorni lavorativi</li>
+                            <li><strong>Centro Italia:</strong> 2-3 giorni lavorativi</li>
+                            <li><strong>Sud Italia e Isole:</strong> 3-5 giorni lavorativi</li>
+                        </ul>
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2"></i> Per le isole minori i tempi possono essere più lunghi.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="shipping-card">
+                    <div class="shipping-card-header">
+                        <i class="bi bi-shield-check me-2"></i> Imballaggio Sicuro
+                    </div>
+                    <div class="shipping-card-body">
+                        <p>Tutti i nostri prodotti vengono imballati con:</p>
+                        <ul>
+                            <li>Materiali antiurto</li>
+                            <li>Protezione anti-umidità</li>
+                            <li>Sigilli di sicurezza</li>
+                        </ul>
+                        <img src="https://via.placeholder.com/300x150/2d2d2d/0d6efd?text=Imballaggio+Protettivo" alt="Imballaggio Protettivo" class="img-fluid rounded mt-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer (coerente con la view precedente) -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p>&copy; 2025 Gaming Store. Tutti i diritti riservati.</p>
+            <p>
+                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a> | 
+                <a href="@Url.Action("Contatti", "Home")">Contatti</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Script per le FAQ -->
+    <script>
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('bi-chevron-right')) {
+                    icon.classList.remove('bi-chevron-right');
+                    icon.classList.add('bi-chevron-down');
+                } else {
+                    icon.classList.remove('bi-chevron-down');
+                    icon.classList.add('bi-chevron-right');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

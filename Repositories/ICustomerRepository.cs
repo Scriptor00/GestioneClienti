@@ -1,8 +1,7 @@
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebAppEF.Entities;
-using Microsoft.EntityFrameworkCore;
-using WebAppEF.Models;
 
 namespace WebAppEF.Repositories
 {
@@ -14,10 +13,8 @@ namespace WebAppEF.Repositories
         Task UpdateAsync(Cliente cliente);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
-
-         Task<List<Cliente>> GetAllPagedAsync(int page, int pageSize); 
-        Task<int> CountAsync(); 
+        Task<List<Cliente>> GetAllPagedAsync(int page, int pageSize);
+        Task<int> CountAsync();
+        Task<bool> EmailExistsAsync(string email);
     }
-
-   
 }

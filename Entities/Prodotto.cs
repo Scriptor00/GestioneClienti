@@ -26,7 +26,7 @@ namespace WebAppEF.Entities
 
         public DateTime DataInserimento { get; set; } = DateTime.Now;
 
-        [StringLength(200)] // Lunghezza massima per l'URL dell'immagine
+        [StringLength(200)] 
         public string? ImmagineUrl { get; set; }
 
         public string? TrailerUrl {get; set;}

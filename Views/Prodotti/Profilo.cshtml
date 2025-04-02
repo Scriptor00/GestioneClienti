@@ -1,3 +1,5 @@
+@model GestioneClienti.ViewModel.ProfiloViewModel
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -249,9 +251,9 @@
                         <ul class="dropdown-menu gaming-dropdown" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="@Url.Action("ModificaProfilo", "Prodotti")"><i class="fas fa-user-edit"></i> Modifica profilo</a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Sicurezza", "Prodotti")"><i class="fas fa-lock"></i> Sicurezza</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i> Notifiche</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Notifiche", "Prodotti")"><i class="fas fa-bell"></i> Notifiche</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item logout-btn" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            <li><a class="dropdown-item logout-btn" href="@Url.Action("Login", "Account")"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -274,17 +276,17 @@
                                 </label>
                                 <input type="file" id="profileImageInput" accept="image/*">
                             </div>
-                            <h3 class="mb-3" style="font-family: 'Orbitron', sans-serif; color: #0d6efd; text-shadow: 0 0 8px rgba(13, 110, 253, 0.5);">Scriptor</h3>
+                            <h3 class="mb-3" style="font-family: 'Orbitron', sans-serif; color: #0d6efd; text-shadow: 0 0 8px rgba(13, 110, 253, 0.5);">@Model.Username</h3>
                             <div class="d-flex justify-content-center mb-3">
-                                <span class="badge bg-primary me-2" style="font-size: 0.9rem;">Livello 50</span>
-                                <span class="badge bg-danger" style="font-size: 0.9rem;">Premium</span>
+                                <span class="badge bg-primary me-2" style="font-size: 0.9rem;">@Model.Livello</span>
+                                <span class="badge bg-danger" style="font-size: 0.9rem;">@Model.IsPremium</span>
                             </div>
                             
                             <!-- Statistiche -->
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span style="color: #adb5bd;">Esperienza</span>
-                                    <span style="color: #fff;">75%</span>
+                                    <span style="color: #fff;">@Model.EsperienzaPercentuale</span>
                                 </div>
                                 <div class="progress" style="height: 8px; background-color: #333;">
                                     <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%"></div>
@@ -297,15 +299,15 @@
                             <div class="text-start">
                                 <div class="mb-3">
                                     <h6 style="color: #0d6efd; font-family: 'Orbitron', sans-serif;">INFO ACCOUNT</h6>
-                                    <p class="mb-1"><i class="fas fa-envelope me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">carlodicuonzo@yahoo.com</span></p>
-                                    <p class="mb-1"><i class="fas fa-calendar-alt me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Membro dal: 15/01/2022</span></p>
+                                    <p class="mb-1"><i class="fas fa-envelope me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">@Model.Email</span></p>
+                                    <p class="mb-1"><i class="fas fa-calendar-alt me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Membro dal: @Model.DataRegistrazione</span></p>
                                 </div>
                                 
                                 <div class="mb-3">
                                     <h6 style="color: #0d6efd; font-family: 'Orbitron', sans-serif;">STATISTICHE</h6>
-                                    <p class="mb-1"><i class="fas fa-trophy me-2" style="color: #ffc107;"></i> <span style="color: #fff;">Punteggio: 12,450</span></p>
-                                    <p class="mb-1"><i class="fas fa-gamepad me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Giochi posseduti: 47</span></p>
-                                    <p class="mb-1"><i class="fas fa-clock me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Ore giocate: 328</span></p>
+                                    <p class="mb-1"><i class="fas fa-trophy me-2" style="color: #ffc107;"></i> <span style="color: #fff;">Punteggio: @Model.Punteggio</span></p>
+                                    <p class="mb-1"><i class="fas fa-gamepad me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Giochi posseduti: @Model.GiochiPosseduti</span></p>
+                                    <p class="mb-1"><i class="fas fa-clock me-2" style="color: #adb5bd;"></i> <span style="color: #fff;">Ore giocate: @Model.OreGiocate</span></p>
                                 </div>
                             </div>
                         </div>
@@ -329,7 +331,7 @@
                                                 <i class="fas fa-trophy" style="font-size: 1.5rem; color: #ffc107;"></i>
                                             </div>
                                             <div>
-                                                <h3 class="mb-0" style="color: #fff;">24/50</h3>
+                                                <h3 class="mb-0" style="color: #fff;">@Model.AchievementsSbloccati</h3>
                                                 <small style="color: #adb5bd;">Achievements sbloccati</small>
                                             </div>
                                         </div>
@@ -343,7 +345,7 @@
                                                 <i class="fas fa-fire" style="font-size: 1.5rem; color: #dc3545;"></i>
                                             </div>
                                             <div>
-                                                <h3 class="mb-0" style="color: #fff;">8/15</h3>
+                                                <h3 class="mb-0" style="color: #fff;">@Model.SfideCompletate</h3>
                                                 <small style="color: #adb5bd;">Sfide completate</small>
                                             </div>
                                         </div>
