@@ -8,10 +8,14 @@ namespace GestioneClienti.ViewModel
 {
     public class RegisterViewModel
     {
-
         [Required(ErrorMessage = "L'username è obbligatorio")]
         [Display(Name = "Username")]
         public string Username { get; set; }
+
+        [Required(ErrorMessage = "L'email è obbligatoria")]
+        [EmailAddress(ErrorMessage = "Inserisci un indirizzo email valido")]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "La password è obbligatoria")]
         [DataType(DataType.Password)]

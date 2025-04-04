@@ -154,9 +154,6 @@ namespace WebAppEF.Controllers
                 return View(ordineViewModel);
             }
         }
-
-
-
         // GET
         public async Task<IActionResult> Edit(int id)
         {

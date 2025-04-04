@@ -162,7 +162,6 @@
     <div class="register-container">
         <h3 class="register-title"><i class="bi bi-controller me-2"></i>REGISTRAZIONE</h3>
 
-        <!-- Mostra messaggio di successo se presente -->
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success">
@@ -170,7 +169,6 @@
             </div>
         }
 
-        <!-- Visualizza gli errori di validazione -->
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="alert alert-danger">
@@ -186,6 +184,13 @@
                 <input type="text" class="form-control" id="Username" name="Username" 
                        placeholder="Scegli un username" required value="@Model.Username" />
                 @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="email" class="form-control" id="Email" name="Email" 
+                       placeholder="Inserisci la tua email" required value="@Model.Email" />
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">

@@ -12,8 +12,8 @@ using WebAppEF.Models;
 namespace WebAppEF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250331094355_Notifiche")]
-    partial class Notifiche
+    [Migration("20250403112029_AddPasswordResetFields")]
+    partial class AddPasswordResetFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,44 +53,6 @@ namespace WebAppEF.Migrations
                     b.ToTable("Carrello");
                 });
 
-            modelBuilder.Entity("GestioneClienti.Entities.Notifica", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DataInvio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("IdRiferimento")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Letta")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LinkAzione")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Messaggio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Titolo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notifiche");
-                });
-
             modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
                 {
                     b.Property<int>("Id")
@@ -99,10 +61,21 @@ namespace WebAppEF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PasswordResetToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpires")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Role")
                         .IsRequired()

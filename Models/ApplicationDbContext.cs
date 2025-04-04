@@ -16,7 +16,6 @@ namespace WebAppEF.Models
 
         public DbSet<CarrelloItem> Carrello { get; set; }
 
-        public DbSet<Notifica> Notifiche { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,11 +69,7 @@ namespace WebAppEF.Models
             });
 
 
-            modelBuilder.Entity<Notifica>()
-                .HasOne(n => n.Utente)
-                .WithMany(u => u.Notifiche)
-                .HasForeignKey(n => n.UtenteId)
-                .OnDelete(DeleteBehavior.Cascade); // Opzionale: cancella le notifiche se l'utente viene eliminato
+           
         }
     }
 }

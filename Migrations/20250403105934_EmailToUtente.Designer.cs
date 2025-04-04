@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAppEF.Models;
 
@@ -11,9 +12,11 @@ using WebAppEF.Models;
 namespace WebAppEF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250403105934_EmailToUtente")]
+    partial class EmailToUtente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +51,53 @@ namespace WebAppEF.Migrations
                     b.HasIndex("ProdottoId");
 
                     b.ToTable("Carrello");
+                });
+
+            modelBuilder.Entity("GestioneClienti.Entities.Notifica", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataInvio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IdRiferimento")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Letta")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LinkAzione")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Messaggio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomeDestinatario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titolo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UtenteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UtenteId");
+
+                    b.ToTable("Notifiche");
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
@@ -231,6 +281,17 @@ namespace WebAppEF.Migrations
                     b.Navigation("Prodotto");
                 });
 
+            modelBuilder.Entity("GestioneClienti.Entities.Notifica", b =>
+                {
+                    b.HasOne("GestioneClienti.Entities.Utente", "Utente")
+                        .WithMany("Notifiche")
+                        .HasForeignKey("UtenteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Utente");
+                });
+
             modelBuilder.Entity("WebAppEF.Entities.DettagliOrdine", b =>
                 {
                     b.HasOne("WebAppEF.Entities.Ordine", "Ordine")
@@ -259,6 +320,11 @@ namespace WebAppEF.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
+                {
+                    b.Navigation("Notifiche");
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Cliente", b =>

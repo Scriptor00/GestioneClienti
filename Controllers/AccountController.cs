@@ -7,13 +7,20 @@ using WebAppEF.Models;
 using Microsoft.EntityFrameworkCore;
 using GestioneClienti.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
+using System.Text.Encodings.Web;
+using GestioneClienti.Repositories;
+using Microsoft.Extensions.Logging; // Assicurati che questo namespace sia presente
 
 namespace GestioneClienti.Controllers
 {
-    public class AccountController(ApplicationDbContext context, ILogger<AccountController> logger) : Controller
+    public class AccountController(ApplicationDbContext context, ILogger<AccountController> logger, IEmailSender emailSender) : Controller
     {
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<AccountController> _logger = logger;
+        private readonly IEmailSender _emailSender = emailSender; // Assegna il parametro del costruttore al campo
 
         [HttpGet]
         public IActionResult Login()
@@ -35,66 +42,107 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
 
-            var utente = await _context.Utenti.FirstOrDefaultAsync(u => u.Username == model.Username);
-
-            if (utente == null)
+            try
             {
-                _logger.LogWarning($"Tentativo di login fallito per {model.Username}: utente non trovato.");
-                ModelState.AddModelError(string.Empty, "Credenziali errate");
+                // Cerca solo i campi necessari per il login
+                var utente = await _context.Utenti
+                    .Where(u => u.Username == model.Username)
+                    .Select(u => new
+                    {
+                        u.Id, // Includi l'Id per un futuro utilizzo
+                        u.Username,
+                        u.PasswordHash,
+                        u.Role,
+                        u.Email
+                    })
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
+
+                if (utente == null)
+                {
+                    // Log informativo senza rivelare troppo
+                    _logger.LogWarning($"Tentativo di login fallito per username: {model.Username}");
+                    ModelState.AddModelError(string.Empty, "Credenziali non valide");
+                    return View(model);
+                }
+
+                // Verifica password con timing costante
+                var passwordValida = VerifyPassword(model.Password, utente.PasswordHash);
+
+                if (!passwordValida)
+                {
+                    _logger.LogWarning($"Password errata per l'utente: {model.Username}");
+                    ModelState.AddModelError(string.Empty, "Credenziali non valide");
+                    return View(model);
+                }
+
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, utente.Username),
+                    new Claim(ClaimTypes.Name, utente.Username),
+                    new Claim(ClaimTypes.Email, utente.Email ?? string.Empty),
+                    new Claim(ClaimTypes.Role, utente.Role ?? "User"),
+                    new Claim("UserId", utente.Id.ToString()) // Aggiungi l'Id come claim
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = model.RememberMe,
+                    ExpiresUtc = model.RememberMe
+                        ? DateTimeOffset.UtcNow.AddDays(30)
+                        : DateTimeOffset.UtcNow.AddMinutes(30),
+                    AllowRefresh = true
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    authProperties);
+
+                _logger.LogInformation($"Login riuscito per: {utente.Username}");
+
+
+                model.Password = string.Empty;
+
+                TempData["WelcomeMessage"] = $"Benvenuto, {utente.Username}!";
+                if (utente.Role == "Admin")
+                {
+                    return RedirectToAction("Dashboard", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Home", "Prodotti");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Errore durante il login per {model.Username}");
+                ModelState.AddModelError(string.Empty, "Si è verificato un errore durante l'accesso");
                 return View(model);
-            }
-
-            _logger.LogDebug($"Password fornita: {model.Password}");
-            _logger.LogDebug($"Hash memorizzato: {utente.PasswordHash}");
-
-            var passwordValida = VerifyPassword(model.Password, utente.PasswordHash);
-
-            if (!passwordValida)
-            {
-                _logger.LogWarning($"Tentativo di login fallito per {model.Username}: password errata.");
-                ModelState.AddModelError(string.Empty, "Credenziali errate");
-                return View(model);
-            }
-
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, utente.Username),
-        new Claim(ClaimTypes.Role, utente.Role)
-    };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = model.RememberMe,
-                ExpiresUtc = model.RememberMe
-                    ? DateTimeOffset.UtcNow.AddDays(30)
-                    : DateTimeOffset.UtcNow.AddMinutes(30)
-            };
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
-
-            _logger.LogInformation($"L'utente {utente.Username} ha effettuato l'accesso con successo.");
-
-            TempData["WelcomeMessage"] = "Benvenuto nella tua Dashboard!";
-
-            if (utente.Role == "Admin")
-            {
-                return RedirectToAction("Dashboard", "Home");
-            }
-            else
-            {
-                return RedirectToAction("Home", "Prodotti");
             }
         }
 
-        private static bool VerifyPassword(string password, string passwordHash)
+        private bool VerifyPassword(string password, string storedHash)
         {
-            // _logger.LogDebug($"Verifica password: password={password}, hash={passwordHash}"); // Log di debug aggiuntivo
-            var result = BCrypt.Net.BCrypt.Verify(password, passwordHash);
-            // _logger.LogDebug($"Verifica password risultato: {result}"); // Log di debug aggiuntivo
-            return result;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(storedHash))
+                {
+                    _logger.LogWarning("Hash password non valido");
+                    return false;
+                }
+
+                return BCrypt.Net.BCrypt.Verify(password, storedHash);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore nella verifica della password");
+                return false;
+            }
         }
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -110,10 +158,10 @@ namespace GestioneClienti.Controllers
             return View(new RegisterViewModel
             {
                 Username = string.Empty,
+                Email = string.Empty,
                 Password = string.Empty,
                 ConfermaPassword = string.Empty
             });
-
         }
 
         [HttpPost]
@@ -127,14 +175,24 @@ namespace GestioneClienti.Controllers
 
             try
             {
-                // Verifica se l'username è già in uso
+                // Verifica se l'username o l'email sono già in uso
                 var existingUser = await _context.Utenti
-                    .FirstOrDefaultAsync(u => u.Username == model.Username);
+                    .FirstOrDefaultAsync(u => u.Username == model.Username || u.Email == model.Email);
 
                 if (existingUser != null)
                 {
-                    ModelState.AddModelError("Username", "Username già in uso");
-                    _logger.LogWarning($"Tentativo di registrazione fallito: username {model.Username} già esistente");
+                    if (existingUser.Username == model.Username)
+                    {
+                        ModelState.AddModelError("Username", "Username già in uso");
+                        _logger.LogWarning($"Username {model.Username} già esistente");
+                    }
+
+                    if (existingUser.Email == model.Email)
+                    {
+                        ModelState.AddModelError("Email", "Email già registrata");
+                        _logger.LogWarning($"Email {model.Email} già registrata");
+                    }
+
                     return View(model);
                 }
 
@@ -142,37 +200,158 @@ namespace GestioneClienti.Controllers
                 var newUser = new Utente
                 {
                     Username = model.Username,
+                    Email = model.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                    Role = "User" // Ruolo di default
+                    Role = "User", // Ruolo di default
+                    PasswordResetToken = null,
+                    PasswordResetTokenExpires = null
                 };
 
                 _context.Utenti.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Nuovo utente registrato: {model.Username}");
+                // Opzionale: Invia email di benvenuto
+                // await _emailService.SendWelcomeEmail(model.Email, model.Username);
+
+                _logger.LogInformation($"Nuovo utente registrato: {model.Username} ({model.Email})");
 
                 TempData["SuccessMessage"] = "Registrazione completata con successo!";
                 return RedirectToAction("Login");
             }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Errore database durante la registrazione");
+                ModelState.AddModelError(string.Empty, "Si è verificato un errore durante il salvataggio dei dati.");
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Errore durante la registrazione");
-                ModelState.AddModelError(string.Empty, "Si è verificato un errore durante la registrazione. Riprova più tardi.");
-                return View(model);
+                _logger.LogError(ex, "Errore generico durante la registrazione");
+                ModelState.AddModelError(string.Empty, "Si è verificato un errore imprevisto. Riprova più tardi.");
             }
+
+            return View(model);
         }
+
+
         [HttpGet]
         public IActionResult RecuperoPassword()
         {
-            return View();
+            return View(new RichiestaRecuperoPasswordViewModel());
+        }
+        private string HashPassword(string password)
+        {
+            try
+            {
+                return BCrypt.Net.BCrypt.HashPassword(password);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'hashing della password");
+                throw; // o ritorna string.Empty se vuoi gestirla in altro modo
+            }
         }
 
         [HttpPost]
-        public IActionResult RecuperoPassword(string email)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecuperoPasswordInviaEmail(RichiestaRecuperoPasswordViewModel model)
         {
-            TempData["Message"] = "Se l'email è registrata, riceverai un'email con le istruzioni per il recupero della password.";
-            return RedirectToAction("RecuperoPassword");
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Utenti.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null)
+                {
+                    ViewBag.Messaggio = "Se l'indirizzo email fornito è valido, ti abbiamo inviato un link per reimpostare la password.";
+                    return View("RecuperoPassword");
+                }
+
+                var token = GeneratePasswordResetToken(); // La tua logica per generare il token
+                user.PasswordResetToken = token;
+                user.PasswordResetTokenExpires = DateTime.UtcNow.AddHours(24);
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                // Costruisci l'URL con l'ID invece dell'email
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token }, protocol: Request.Scheme);
+
+                var emailBody = $"Per reimpostare la tua password, clicca qui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Reimposta Password</a>";
+
+                await _emailSender.SendEmailAsync(model.Email, "Recupero Password", emailBody);
+
+                ViewBag.Messaggio = "Se l'indirizzo email fornito è valido, ti abbiamo inviato un link per reimpostare la password.";
+                return View("RecuperoPassword");
+            }
+
+            return View(model);
         }
+
+        private static string GeneratePasswordResetToken()
+        {
+            const int tokenSizeInBytes = 32; // Genera un token di 32 byte (256 bit)
+            var bytes = RandomNumberGenerator.GetBytes(tokenSizeInBytes);
+            return WebEncoders.Base64UrlEncode(bytes);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(int? userId, string token)
+        {
+            if (userId == null || string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login");
+            }
+
+            var utente = await _context.Utenti.FindAsync(userId);
+
+            if (utente == null ||
+                utente.PasswordResetToken != token || // Il token è già codificato in Base64Url nel DB
+                utente.PasswordResetTokenExpires < DateTime.UtcNow)
+            {
+                TempData["ErrorMessage"] = "Il link per il reset non è valido o è scaduto.";
+                return RedirectToAction("Login"); // O una pagina di errore dedicata
+            }
+
+            var model = new RecuperoPasswordViewModel
+            {
+                Email = utente.Email, // Potresti ancora aver bisogno dell'email (readonly?)
+                Token = token,
+                UserId = userId.Value, // Passa l'UserId al ViewModel
+                NuovaPassword = string.Empty, // Inizializza le proprietà per il form
+                ConfermaPassword = string.Empty
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(RecuperoPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var utente = await _context.Utenti.FindAsync(model.UserId); // Recupera l'utente per ID
+
+            if (utente == null ||
+                utente.PasswordResetToken != model.Token || // Confronta il token ricevuto (già Base64Url)
+                utente.PasswordResetTokenExpires < DateTime.UtcNow)
+            {
+                ModelState.AddModelError(string.Empty, "Il link per il reset non è valido o è scaduto.");
+                return View(model);
+            }
+
+            // Hash della nuova password
+            utente.PasswordHash = HashPassword(model.NuovaPassword);
+            utente.PasswordResetToken = null;
+            utente.PasswordResetTokenExpires = null;
+
+            _context.Utenti.Update(utente);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Password aggiornata con successo!";
+            return RedirectToAction("Login");
+        }
+
 
         [HttpGet]
         public IActionResult AccessDenied()
@@ -252,6 +431,24 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
         }
+
+        [HttpGet("test-email")]
+        public async Task<IActionResult> TestEmail()
+        {
+            try
+            {
+                await _emailSender.SendEmailAsync(
+                    "cdicuonzo@studenti.apuliadigitalmaker.it",
+                    "Test Email Service",
+                    "<h1>Test Email</h1><p>Questo è un test del servizio email</p>");
+
+                return Content("Email inviata con successo!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Test email fallito");
+                return Content($"Errore: {ex.Message}");
+            }
+        }
     }
 }
-
