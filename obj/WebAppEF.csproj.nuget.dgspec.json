@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {}
+    "C:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {}
   },
   "projects": {
-    "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {
+    "C:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
+        "projectUniqueName": "C:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "projectName": "WebAppEF",
-        "projectPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
+        "projectPath": "C:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\WebAppEF.csproj",
         "packagesPath": "C:\\Users\\A573_Apulia\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\obj\\",
+        "outputPath": "C:\\Users\\A573_Apulia\\Desktop\\GestioneClienti\\GestioneClienti\\GestioneClienti\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

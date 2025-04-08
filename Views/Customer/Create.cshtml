@@ -13,230 +13,280 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .page-title {
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: var(--light-text);
-            padding: 1.5rem;
-            border-radius: 12px;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .autocomplete-suggestions {
+            border: 1px solid #ccc;
+            background: #fff;
+            position: absolute;
+            z-index: 1000;
+            margin-top: 5px;
+            width: calc(100% - 2px);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        :root {
-            --primary-color: #1e2b37;
-            --secondary-color: #2c3e50;
-            --accent-color: #3498db;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --text-color: #333;
-            --light-text: #ecf0f1;
+        .autocomplete-suggestion {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
         }
 
-        body {
-            background-color: var(--light-color);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            line-height: 1.6;
+        .autocomplete-suggestion:hover {
+            background: #f5f5f5;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        .address-details {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 2px;
         }
 
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: white;
-            padding: 2rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control, .form-select {
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-
-        .btn {
-            border-radius: 8px;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-success {
-            background-color: #27ae60;
-            border-color: #27ae60;
-        }
-
-        .btn-success:hover {
-            background-color: #219653;
-            border-color: #219653;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-outline-secondary {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: var(--primary-color);
-            color: var(--light-text);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .alert {
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .alert-success {
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-            color: #0f5132;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            color: #842029;
-        }
-
-        .rounded-pill {
-            border-radius: 50px !important;
-        }
-
-        .shadow-lg {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        #IndirizzoCompleto {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236c757d" viewBox="0 0 16 16"><path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/><path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2 class="page-title">
+            <i class="fas fa-user-plus me-2"></i> @ViewData["Title"]
+        </h2>
 
-    <h2 class="page-title">
-        <i class="fas fa-user-plus me-2"></i> @ViewData["Title"]
-    </h2>
-
-    <!-- Messaggi di notifica -->
-    <div>
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show">
                 @TempData["SuccessMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show">
                 @TempData["ErrorMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
+
+        <div class="card shadow-lg p-4 mt-4 border-0 rounded-3">
+            <form id="customerForm" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="Nome" class="form-label fw-bold">Nome *</label>
+                        <input asp-for="Nome" class="form-control form-control-lg border-primary shadow-sm" required />
+                        <span asp-validation-for="Nome" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="Cognome" class="form-label fw-bold">Cognome *</label>
+                        <input asp-for="Cognome" class="form-control form-control-lg border-primary shadow-sm" required />
+                        <span asp-validation-for="Cognome" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Email" class="form-label fw-bold">Email *</label>
+                    <input asp-for="Email" id="Email" class="form-control form-control-lg border-primary shadow-sm" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <small id="emailError" class="text-danger d-none"></small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Ricerca Indirizzo</label>
+                    <div class="position-relative">
+                        <input type="text" id="IndirizzoCompleto" class="form-control form-control-lg border-primary shadow-sm"
+                               placeholder="Digita via, città e paese (min 3 caratteri)" autocomplete="off" />
+                        <div id="autocomplete-results" class="autocomplete-suggestions d-none"></div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-8">
+                            <label asp-for="Indirizzo" class="form-label">Via/Piazza *</label>
+                            <input asp-for="Indirizzo" class="form-control" id="Indirizzo" required />
+                            <span asp-validation-for="Indirizzo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Civico" class="form-label">Civico</label>
+                            <input asp-for="Civico" class="form-control" id="Civico" />
+                            <span asp-validation-for="Civico" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label asp-for="Citta" class="form-label">Città *</label>
+                            <input asp-for="Citta" class="form-control" id="Citta" required />
+                            <span asp-validation-for="Citta" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Paese" class="form-label">Paese *</label>
+                            <input asp-for="Paese" class="form-control" id="Paese" required />
+                            <span asp-validation-for="Paese" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label asp-for="Cap" class="form-label">CAP</label>
+                            <input asp-for="Cap" class="form-control" id="Cap" />
+                            <span asp-validation-for="Cap" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="DataIscrizione" class="form-label fw-bold">Data di Iscrizione *</label>
+                    <input asp-for="DataIscrizione" type="date" class="form-control form-control-lg border-primary shadow-sm" required />
+                    <span asp-validation-for="DataIscrizione" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4 form-check form-switch">
+                    <input asp-for="Attivo" class="form-check-input" type="checkbox" role="switch" style="width: 3em; height: 1.5em;">
+                    <label asp-for="Attivo" class="form-check-label fw-bold ms-2">Cliente attivo</label>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg shadow-lg px-4 py-2 rounded-pill me-3">
+                        <i class="fas fa-save me-2"></i> Salva Cliente
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg shadow-lg px-4 py-2 rounded-pill">
+                        <i class="fas fa-arrow-left me-2"></i> Torna alla Lista
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Card principale -->
-    <div class="card shadow-lg p-4 mt-4 border-0 rounded-3">
-        <form id="customerForm" asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Validazione email
+            const emailInput = document.getElementById("Email");
+            const emailError = document.getElementById("emailError");
+            const form = document.getElementById("customerForm");
 
-            <!-- Nome e Cognome -->
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <label asp-for="Nome" class="form-label fw-bold">Nome *</label>
-                    <input asp-for="Nome" class="form-control form-control-lg border-primary shadow-sm" required />
-                    <span asp-validation-for="Nome" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <label asp-for="Cognome" class="form-label fw-bold">Cognome *</label>
-                    <input asp-for="Cognome" class="form-control form-control-lg border-primary shadow-sm" required />
-                    <span asp-validation-for="Cognome" class="text-danger"></span>
-                </div>
-            </div>
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                emailError.classList.add("d-none");
+                emailInput.classList.remove("is-invalid");
 
-            <!-- Email -->
-            <div class="mb-4">
-                <label asp-for="Email" class="form-label fw-bold">Email *</label>
-                <input asp-for="Email" class="form-control form-control-lg border-primary shadow-sm" required />
-                <span asp-validation-for="Email" class="text-danger"></span>
-                <small id="emailError" class="text-danger d-none"></small>
-            </div>
+                fetch('@Url.Action("CheckEmailExists", "Customer")?email=' + encodeURIComponent(emailInput.value))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.valid) {
+                            emailError.textContent = data.message;
+                            emailError.classList.remove("d-none");
+                            emailInput.classList.add("is-invalid");
+                        } else {
+                            form.submit();
+                        }
+                    })
+                    .catch(error => console.error("Errore AJAX (Email):", error));
+            });
+            
+            // Autocompletamento indirizzo
+            const indirizzoInput = document.getElementById("IndirizzoCompleto");
+            const autocompleteResults = document.getElementById("autocomplete-results");
+            const indirizzoField = document.getElementById("Indirizzo");
+            const civicoField = document.getElementById("Civico");
+            const cittaField = document.getElementById("Citta");
+            const paeseField = document.getElementById("Paese");
+            const capField = document.getElementById("Cap");
 
-            <!-- Data di Iscrizione -->
-            <div class="mb-4">
-                <label asp-for="DataIscrizione" class="form-label fw-bold">Data di Iscrizione *</label>
-                <input asp-for="DataIscrizione" type="date" class="form-control form-control-lg border-primary shadow-sm" required />
-                <span asp-validation-for="DataIscrizione" class="text-danger"></span>
-            </div>
+            let timeout;
+            indirizzoInput.addEventListener("input", function () {
+                clearTimeout(timeout);
+                const query = this.value.trim();
 
-            <!-- Pulsanti -->
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-success btn-lg shadow-lg px-4 py-2 rounded-pill me-3">
-                    <i class="fas fa-save me-2"></i> Salva Cliente
-                </button>
-                <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg shadow-lg px-4 py-2 rounded-pill">
-                    <i class="fas fa-arrow-left me-2"></i> Torna alla Lista
-                </a>
-            </div>
-        </form>
-    </div>
+                if (query.length < 3) {
+                    autocompleteResults.classList.add("d-none");
+                    return;
+                }
 
-    @section Scripts {
-        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-        <partial name="_ValidationScriptsPartial" />
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let emailInput = document.getElementById("Email");
-                let emailError = document.getElementById("emailError");
-                let form = document.getElementById("customerForm");
-
-                form.addEventListener("submit", function (event) {
-                    event.preventDefault(); // Blocca l'invio del form
-
-                    // Reset messaggi di errore
-                    emailError.classList.add("d-none");
-                    emailInput.classList.remove("is-invalid");
-
-                    let email = emailInput.value;
-
-                    // Chiamata AJAX al controller per la validazione
-                    fetch('@Url.Action("CheckEmailExists", "Customer")?email=' + encodeURIComponent(email))
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.valid) {
-                                emailError.textContent = data.message;
-                                emailError.classList.remove("d-none");
-                                emailInput.classList.add("is-invalid");
-                            } else {
-                                form.submit(); // Se tutto è OK, invia il form
+                timeout = setTimeout(() => {
+                    fetch(`@Url.Action("AutocompleteIndirizzo", "Customer")?query=${encodeURIComponent(query)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Errore HTTP! Status: ${response.status}`);
                             }
+                            return response.json();
                         })
-                        .catch(error => console.error("Errore AJAX:", error));
+                        .then(data => {
+                            console.log("Dati ricevuti dal backend:", data);
+                            autocompleteResults.innerHTML = '';
+
+                            if (!data || data.length === 0) {
+                                autocompleteResults.classList.add("d-none");
+                                return;
+                            }
+
+                            data.forEach(suggestion => {
+                                const div = document.createElement("div");
+                                div.classList.add("autocomplete-suggestion");
+
+                                const street = suggestion.street || '';
+                                const streetNumber = suggestion.streetNumber || '';
+                                const city = suggestion.city || '';
+                                const country = suggestion.country || '';
+                                const postalCode = suggestion.postalCode || '';
+                                
+                                // Creiamo un indirizzo formattato
+                                const formattedAddress = `${street}${streetNumber ? ', ' + streetNumber : ''}, ${city} ${postalCode}, ${country}`;
+
+                                const mainText = document.createElement("div");
+                                mainText.textContent = formattedAddress;
+
+                                const details = document.createElement("div");
+                                details.classList.add("address-details");
+                                details.textContent = `${city} ${postalCode}, ${country}`;
+
+                                div.appendChild(mainText);
+                                div.appendChild(details);
+
+                                div.addEventListener("click", function () {
+                                    indirizzoInput.value = formattedAddress;
+                                    indirizzoField.value = street;
+                                    civicoField.value = streetNumber;
+                                    cittaField.value = city;
+                                    paeseField.value = country;
+                                    capField.value = postalCode;
+                                    autocompleteResults.classList.add("d-none");
+                                });
+
+                                autocompleteResults.appendChild(div);
+                            });
+
+                            autocompleteResults.classList.remove("d-none");
+                        })
+                        .catch(error => {
+                            console.error("Errore durante il recupero dei suggerimenti:", error);
+                            autocompleteResults.innerHTML = '<div class="autocomplete-suggestion">Errore nel caricamento dei suggerimenti</div>';
+                            autocompleteResults.classList.remove("d-none");
+                        });
+                }, 300);
+            });
+
+            // Nascondi suggerimenti quando si clicca fuori
+            document.addEventListener("click", function (event) {
+                if (!indirizzoInput.contains(event.target) && 
+                    !autocompleteResults.contains(event.target)) {
+                    autocompleteResults.classList.add("d-none");
+                }
+            });
+
+            // Permetti modifica manuale dei campi
+            [indirizzoField, civicoField, cittaField, paeseField, capField].forEach(field => {
+                field.addEventListener("focus", function () {
+                    this.readOnly = false;
                 });
             });
-        </script>
-    }
+        });
+    </script>
 </body>
 </html>

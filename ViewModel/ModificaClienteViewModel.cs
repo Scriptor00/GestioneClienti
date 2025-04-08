@@ -8,6 +8,11 @@ namespace WebAppEF.ViewModel
         public string Email { get; set; }
         public bool Attivo { get; set; }
         public DateTime DataIscrizione { get; set; }
+        public string? Indirizzo { get; set; }
+        public string? Civico { get; set; }
+        public string? Citta { get; set; }
+        public string? Paese { get; set; }
+        public string? Cap { get; set; }
 
         // Aggiungi un costruttore che accetta DataIscrizione
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.

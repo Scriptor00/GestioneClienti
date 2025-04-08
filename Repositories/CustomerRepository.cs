@@ -49,7 +49,7 @@ namespace WebAppEF.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Cliente cliente)
+       public async Task UpdateAsync(Cliente cliente)
         {
             var existingCliente = await _context.Clienti.FindAsync(cliente.IdCliente);
             if (existingCliente == null)
@@ -64,14 +64,19 @@ namespace WebAppEF.Repositories
             if (await _context.Clienti.AnyAsync(c => c.Email == cliente.Email && c.IdCliente != cliente.IdCliente))
                 throw new InvalidOperationException("Email già utilizzata da un altro cliente");
 
-            if (ValidazioneCliente.HasSpecialCharacters(cliente.Nome) || 
-               ValidazioneCliente.HasSpecialCharacters(cliente.Cognome))
+            if (ValidazioneCliente.HasSpecialCharacters(cliente.Nome) ||
+                ValidazioneCliente.HasSpecialCharacters(cliente.Cognome))
                 throw new ArgumentException("Nome/Cognome contiene caratteri speciali non validi");
 
             existingCliente.Nome = cliente.Nome;
             existingCliente.Cognome = cliente.Cognome;
             existingCliente.Email = cliente.Email;
             existingCliente.Attivo = cliente.Attivo;
+            existingCliente.Indirizzo = cliente.Indirizzo;
+            existingCliente.Civico = cliente.Civico;
+            existingCliente.Citta = cliente.Citta;
+            existingCliente.Cap = cliente.Cap;
+            existingCliente.Paese = cliente.Paese;
 
             await _context.SaveChangesAsync();
         }

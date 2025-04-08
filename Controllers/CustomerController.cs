@@ -1,3 +1,6 @@
+using System.Text.Json;
+using GestioneClienti.Repositories;
+using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
@@ -12,11 +15,13 @@ namespace WebAppEF.Controllers
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly ILogger<CustomerController> _logger;
+        private readonly IGeocodingService _geocodingService;
 
         public CustomerController(
             ICustomerRepository customerRepository,
-            ILogger<CustomerController> logger)
+            ILogger<CustomerController> logger, IGeocodingService geocodingService)
         {
+            _geocodingService = geocodingService;
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -24,25 +29,25 @@ namespace WebAppEF.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             const int pageSize = 10;
-            
+
             try
             {
                 _logger.LogInformation("Recupero clienti - Pagina {Page}", page);
-                
+
                 var totalItems = await _customerRepository.CountAsync();
                 var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
                 var clienti = await _customerRepository.GetAllPagedAsync(page, pageSize);
 
-                var viewModel = new PaginazioneViewModel 
-                { 
-                    Clienti = clienti, 
-                    CurrentPage = page, 
-                    TotalPages = totalPages 
+                var viewModel = new PaginazioneViewModel
+                {
+                    Clienti = clienti,
+                    CurrentPage = page,
+                    TotalPages = totalPages
                 };
-                
-                _logger.LogInformation("Clienti recuperati con successo: {TotalItems} totali, {TotalPages} pagine", 
+
+                _logger.LogInformation("Clienti recuperati con successo: {TotalItems} totali, {TotalPages} pagine",
                     totalItems, totalPages);
-                
+
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -96,6 +101,67 @@ namespace WebAppEF.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> AutocompleteIndirizzo(
+            string query,
+            [FromQuery] string countryCode = null,
+            [FromQuery] int limit = 10)
+        {
+            try
+            {
+                // Validazione input
+                if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
+                {
+                    _logger.LogWarning("Query di ricerca non valida o troppo corta: {Query}", query);
+                    return BadRequest(new { Message = "La query deve contenere almeno 3 caratteri" });
+                }
+
+                _logger.LogInformation("Avviata ricerca indirizzi per: {Query}", query);
+
+                // Chiamata al servizio di geocoding
+                var suggestions = await _geocodingService.AutocompleteIndirizzoAsync(query, countryCode, limit);
+
+                if (suggestions == null || !suggestions.Any())
+                {
+                    _logger.LogInformation("Nessun risultato trovato per: {Query}", query);
+                    return Ok(new List<AddressAutocompleteViewModel>());
+                }
+
+                // Mappatura da NominatimAddress a AddressAutocompleteViewModel
+                var results = suggestions.Select(s => new AddressAutocompleteViewModel
+                {
+                    Street = s.Via,
+                    StreetNumber = s.Civico,
+                    City = s.Citta,
+                    Country = s.Paese,
+                    PostalCode = s.Cap,
+                    FormattedAddress = s.IndirizzoCompleto
+                }).ToList();
+
+                // _logger.LogDebug("Restituiti {Count} risultati per: {Query}", results.Count, query);
+
+                return Ok(results);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Errore di connessione al servizio di geocoding");
+                return StatusCode(502, new { Message = "Servizio di geocoding temporaneamente non disponibile" });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Errore nel parsing della risposta dal geocoding");
+                return StatusCode(500, new { Message = "Errore nell'elaborazione della risposta" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Errore imprevisto durante l'autocomplete");
+                return StatusCode(500, new { Message = "Errore interno del server" });
+            }
+        }
+
+
+
         [HttpGet]
         public async Task<JsonResult> CheckEmailExists(string email)
         {
@@ -130,14 +196,14 @@ namespace WebAppEF.Controllers
                 return Json(new { valid = false, message = "Errore durante il controllo dell'email." });
             }
         }
-
+       
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             try
             {
                 _logger.LogInformation("Accesso al form di modifica per cliente con ID {Id}", id);
-                
+
                 var customer = await _customerRepository.GetByIdAsync(id);
                 if (customer == null)
                 {
@@ -145,13 +211,18 @@ namespace WebAppEF.Controllers
                     return NotFound();
                 }
 
-                return View(new ModificaClienteViewModel 
-                { 
-                    IdCliente = customer.IdCliente, 
-                    Nome = customer.Nome, 
-                    Cognome = customer.Cognome, 
-                    Email = customer.Email, 
-                    Attivo = customer.Attivo 
+                return View(new ModificaClienteViewModel
+                {
+                    IdCliente = customer.IdCliente,
+                    Nome = customer.Nome,
+                    Cognome = customer.Cognome,
+                    Email = customer.Email,
+                    Attivo = customer.Attivo,
+                    Indirizzo = customer.Indirizzo, // Popola l'indirizzo
+                    Civico = customer.Civico,       // Popola il civico
+                    Citta = customer.Citta,         // Popola la città
+                    Cap = customer.Cap,             // Popola il CAP
+                    Paese = customer.Paese           // Popola il paese
                 });
             }
             catch (Exception ex)
@@ -180,11 +251,16 @@ namespace WebAppEF.Controllers
                     Nome = viewModel.Nome,
                     Cognome = viewModel.Cognome,
                     Email = viewModel.Email,
-                    Attivo = viewModel.Attivo
+                    Attivo = viewModel.Attivo,
+                    Indirizzo = viewModel.Indirizzo, // Aggiorna l'indirizzo
+                    Civico = viewModel.Civico,       // Aggiorna il civico
+                    Citta = viewModel.Citta,         // Aggiorna la città
+                    Cap = viewModel.Cap,             // Aggiorna il CAP
+                    Paese = viewModel.Paese           // Aggiorna il paese
                 };
 
                 await _customerRepository.UpdateAsync(customer);
-                
+
                 _logger.LogInformation("Cliente aggiornato con successo: ID {IdCliente}", viewModel.IdCliente);
                 TempData["SuccessMessage"] = "Cliente aggiornato con successo!";
                 return RedirectToAction(nameof(Index));
@@ -215,15 +291,15 @@ namespace WebAppEF.Controllers
         }
 
         [HttpGet]
-       
+
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 _logger.LogInformation("Tentativo di eliminazione cliente con ID {Id}", id);
-                
+
                 await _customerRepository.DeleteAsync(id);
-                
+
                 _logger.LogInformation("Cliente con ID {Id} eliminato con successo", id);
                 TempData["SuccessMessage"] = "Cliente eliminato con successo!";
                 return RedirectToAction(nameof(Index));

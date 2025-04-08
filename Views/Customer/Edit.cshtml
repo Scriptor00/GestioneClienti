@@ -36,9 +36,7 @@
                 </div>
                 <div class="card-body">
                     <form method="post" action="@Url.Action("Edit", "Customer")" id="editForm">
-                        @Html.AntiForgeryToken() <!-- Token per evitare errori 400 -->
-                        <!-- Campo nascosto per l'IdCliente -->
-                        <input type="hidden" name="IdCliente" value="@Model.IdCliente" />
+                        @Html.AntiForgeryToken() <input type="hidden" name="IdCliente" value="@Model.IdCliente" />
                         <div class="form-group mb-3">
                             <label for="Nome" class="form-label">Nome</label>
                             <input type="text" class="form-control" name="Nome" value="@Model.Nome" required />
@@ -52,8 +50,27 @@
                             <input type="email" class="form-control" name="Email" value="@Model.Email" required />
                         </div>
                         <div class="form-group mb-3">
+                            <label for="Indirizzo" class="form-label">Indirizzo</label>
+                            <input type="text" class="form-control" name="Indirizzo" value="@Model.Indirizzo" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="Civico" class="form-label">Civico</label>
+                            <input type="text" class="form-control" name="Civico" value="@Model.Civico" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="Citta" class="form-label">Città</label>
+                            <input type="text" class="form-control" name="Citta" value="@Model.Citta" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="Cap" class="form-label">CAP</label>
+                            <input type="text" class="form-control" name="Cap" value="@Model.Cap" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="Paese" class="form-label">Paese</label>
+                            <input type="text" class="form-control" name="Paese" value="@Model.Paese" />
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="Attivo" class="form-label">Attivo</label>
-                            <!-- Non usare più un campo hidden, lasciamo il checkbox che invia 'true' o 'false' -->
                             <input type="checkbox" id="Attivo" name="Attivo" value="true" @(Model.Attivo ? "checked" : "") />
                         </div>
 
@@ -61,9 +78,9 @@
                             <button type="submit" class="btn btn-success btn-lg shadow">
                                 <i class="fas fa-save"></i> Salva Modifiche
                             </button>
-                             <a href="@Url.Action("Index", "Customer")" class="btn btn-secondary btn-lg shadow ms-3">
-        <i class="fas fa-arrow-left"></i> Torna alla lista
-    </a>
+                            <a href="@Url.Action("Index", "Customer")" class="btn btn-secondary btn-lg shadow ms-3">
+                                <i class="fas fa-arrow-left"></i> Torna alla lista
+                            </a>
                             <a href="@Url.Action("Index", "Customer")" class="btn btn-secondary btn-lg shadow ms-3">
                                 <i class="fas fa-times"></i> Annulla
                             </a>

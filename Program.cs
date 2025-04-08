@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
+using GestioneClienti.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,9 +63,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 });
 
+
+
+
 // Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
+builder.Services.AddHttpClient<IGeocodingService, NominatimGeocodingService>();
 
 // Configurazione EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -107,12 +112,22 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
 
-        if (!context.Clienti.Any())
-            context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
-        if (!context.Ordini.Any())
-            context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
+        // Cancella tutti i clienti esistenti
+        if (context.Clienti.Any())
+        {
+            context.Clienti.RemoveRange(context.Clienti);
+            context.SaveChanges(); // Salva la cancellazione prima di ripopolare
+        }
 
-        context.SaveChanges();
+        // Riopopola la tabella Clienti con nuovi dati Bogus
+        context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
+
+        if (!context.Ordini.Any())
+        {
+            context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
+        }
+
+        context.SaveChanges(); // Salva l'inserimento dei nuovi clienti e degli ordini
     }
     catch (Exception ex)
     {

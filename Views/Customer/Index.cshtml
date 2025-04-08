@@ -213,180 +213,187 @@
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="@Url.Action("Dashboard", "Home")">
-            <i class="fas fa-boxes"></i> OrdiNinja
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link " href="@Url.Action("Index", "Ordini")">
-                        <i class="fas fa-list"></i> Gestione Ordini
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="@Url.Action("Index", "Customer")">
-                        <i class="fas fa-users"></i> Gestione Clienti
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Dashboard", "Home")">
-                        <i class="fas fa-home"></i> Torna alla Home
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<div class="container mt-4">
-    <!-- Notifica di successo -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>@TempData["SuccessMessage"]</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="text-end mb-4">
-        <a href="@Url.Action("Create")" class="btn btn-success btn-lg shadow">
-            <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Cliente
-        </a>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover table-bordered shadow-lg">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Cognome</th>
-                    <th>Email</th>
-                    <th>Data Iscrizione</th>
-                    <th>Azioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var cliente in Model.Clienti)
-                {
-                    <tr>
-                        <td>@cliente.Nome</td>
-                        <td>@cliente.Cognome</td>
-                        <td>@cliente.Email</td>
-                        <td>@cliente.DataIscrizione.ToString("dd/MM/yyyy")</td>
-                        <td>
-                            <a href="@Url.Action("Edit", new { id = cliente.IdCliente })" class="btn btn-warning btn-sm shadow">
-                                <i class="fas fa-edit"></i> Modifica
-                            </a>
-                            <a href="@Url.Action("Delete", new { id = cliente.IdCliente })"
-                               class="btn btn-danger btn-sm shadow"
-                               onclick="return confirm('Sei sicuro di voler eliminare questo cliente?')">
-                                <i class="fas fa-trash-alt"></i> Elimina
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Paginazione -->
-    <div class="pagination-container">
-        @if (Model.CurrentPage > 1)
-        {
-            <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
-                <i class="fas fa-angle-double-left"></i> Prima
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Dashboard", "Home")">
+                <i class="fas fa-boxes"></i> OrdiNinja
             </a>
-        }
-
-        @if (Model.CurrentPage > 1)
-        {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn">
-                <i class="fas fa-chevron-left"></i> Precedente
-            </a>
-        }
-
-        <div class="page-numbers d-flex">
-            @if (Model.CurrentPage > 3)
-            {
-                <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
-                    1
-                </a>
-                <span class="pagination-btn">...</span>
-            }
-
-            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
-            {
-                <a href="@Url.Action("Index", new { page = i })" class="pagination-btn @((i == Model.CurrentPage) ? "active" : "")">
-                    @i
-                </a>
-            }
-
-            @if (Model.CurrentPage < Model.TotalPages - 2)
-            {
-                <span class="pagination-btn">...</span>
-                <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
-                    @Model.TotalPages
-                </a>
-            }
-        </div>
-
-        <div class="input-group mx-3">
-            <input type="number" id="pageInput" class="form-control input-page" placeholder="P" min="1" max="@Model.TotalPages" />
-            <div class="input-group-append">
-                <button class="btn btn-primary" id="goToPageButton">Vai</button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="@Url.Action("Index", "Ordini")">
+                            <i class="fas fa-list"></i> Gestione Ordini
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="@Url.Action("Index", "Customer")">
+                            <i class="fas fa-users"></i> Gestione Clienti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Dashboard", "Home")">
+                            <i class="fas fa-home"></i> Torna alla Home
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
+    </nav>
 
-        @if (Model.CurrentPage < Model.TotalPages)
+    <div class="container mt-4">
+        @if (TempData["SuccessMessage"] != null)
         {
-            <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn">
-                Successiva <i class="fas fa-chevron-right"></i>
+            <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>@TempData["SuccessMessage"]</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="text-end mb-4">
+            <a href="@Url.Action("Create")" class="btn btn-success btn-lg shadow">
+                <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Cliente
             </a>
-        }
+        </div>
 
-        @if (Model.CurrentPage < Model.TotalPages)
-        {
-            <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
-                Ultima <i class="fas fa-angle-double-right"></i>
-            </a>
-        }
-    </div>
-</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered shadow-lg">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Email</th>
+                        <th>Indirizzo</th>
+                        <th>Civico</th>
+                        <th>Città</th>
+                        <th>CAP</th>
+                        <th>Paese</th>
+                        <th>Data Iscrizione</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in Model.Clienti)
+                    {
+                        <tr>
+                            <td>@cliente.Nome</td>
+                            <td>@cliente.Cognome</td>
+                            <td>@cliente.Email</td>
+                            <td>@cliente.Indirizzo</td>
+                            <td>@cliente.Civico</td>
+                            <td>@cliente.Citta</td>
+                            <td>@cliente.Cap</td>
+                            <td>@cliente.Paese</td>
+                            <td>@cliente.DataIscrizione.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a href="@Url.Action("Edit", new { id = cliente.IdCliente })" class="btn btn-warning btn-sm shadow">
+                                    <i class="fas fa-edit"></i> Modifica
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = cliente.IdCliente })"
+                                   class="btn btn-danger btn-sm shadow"
+                                   onclick="return confirm('Sei sicuro di voler eliminare questo cliente?')">
+                                    <i class="fas fa-trash-alt"></i> Elimina
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-<script>
-    document.getElementById('goToPageButton').addEventListener('click', function () {
-        var pageInput = document.getElementById('pageInput').value;
-        var totalPages = @Model.TotalPages;
-
-        if (pageInput >= 1 && pageInput <= totalPages) {
-            window.location.href = '@Url.Action("Index", new { page = "__page__" })'.replace('__page__', pageInput);
-        } else {
-            alert('Numero di pagina non valido');
-        }
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(function () {
-            let alertBox = document.getElementById("successMessage");
-            if (alertBox) {
-                alertBox.style.transition = "opacity 0.5s";
-                alertBox.style.opacity = "0";
-                setTimeout(() => {
-                    alertBox.remove(); //rimuvo il messaggio e ristabilisco il DOM
-                    location.reload(); // Ricarica la pagina
-                }, 500); 
+        <div class="pagination-container">
+            @if (Model.CurrentPage > 1)
+            {
+                <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
+                    <i class="fas fa-angle-double-left"></i> Prima
+                </a>
             }
-        }, 3000); 
-    });
-</script>
+
+            @if (Model.CurrentPage > 1)
+            {
+                <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn">
+                    <i class="fas fa-chevron-left"></i> Precedente
+                </a>
+            }
+
+            <div class="page-numbers d-flex">
+                @if (Model.CurrentPage > 3)
+                {
+                    <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
+                        1
+                    </a>
+                    <span class="pagination-btn">...</span>
+                }
+
+                @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                {
+                    <a href="@Url.Action("Index", new { page = i })" class="pagination-btn @((i == Model.CurrentPage) ? "active" : "")">
+                        @i
+                    </a>
+                }
+
+                @if (Model.CurrentPage < Model.TotalPages - 2)
+                {
+                    <span class="pagination-btn">...</span>
+                    <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
+                        @Model.TotalPages
+                    </a>
+                }
+            </div>
+
+            <div class="input-group mx-3">
+                <input type="number" id="pageInput" class="form-control input-page" placeholder="Pag." min="1" max="@Model.TotalPages" />
+                <div class="input-group-append">
+                    <button class="btn btn-primary" id="goToPageButton">Vai</button>
+                </div>
+            </div>
+
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn">
+                    Successiva <i class="fas fa-chevron-right"></i>
+                </a>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
+                    Ultima <i class="fas fa-angle-double-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('goToPageButton').addEventListener('click', function () {
+            var pageInput = document.getElementById('pageInput').value;
+            var totalPages = @Model.TotalPages;
+
+            if (pageInput >= 1 && pageInput <= totalPages) {
+                window.location.href = '@Url.Action("Index", new { page = "__page__" })'.replace('__page__', pageInput);
+            } else {
+                alert('Numero di pagina non valido');
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                let alertBox = document.getElementById("successMessage");
+                if (alertBox) {
+                    alertBox.style.transition = "opacity 0.5s";
+                    alertBox.style.opacity = "0";
+                    setTimeout(() => {
+                        alertBox.remove(); //rimuvo il messaggio e ristabilisco il DOM
+                        location.reload(); // Ricarica la pagina
+                    }, 500);
+                }
+            }, 3000);
+        });
+    </script>
 
 
 </body>
