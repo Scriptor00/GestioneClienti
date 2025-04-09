@@ -173,16 +173,50 @@
                 padding: 1.5rem;
                 margin: 1.5rem;
             }
-            
-            .admin-table thead th, 
+
+            .admin-table thead th,
             .admin-table td {
                 padding: 0.75rem;
             }
         }
+
+        .order-details {
+            display: none; /* I dettagli sono nascosti per default */
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        /* Dettagli Ordini visibili quando la classe "show" è attiva */
+        .order-details.show {
+            display: block; /* I dettagli sono visibili quando il toggle è attivo */
+        }
+
+        /* Badge per lo stato degli ordini */
+        .badge-annullato {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-confermato {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-spedito {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .badge-default {
+            background-color: #6c757d;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <!-- Breadcrumb Navigation -->
     <div class="admin-breadcrumb">
         <div class="container-fluid">
             <a href="@Url.Action("Filtri", "Filtri")" class="admin-btn admin-btn-secondary mb-4">
@@ -191,12 +225,12 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="container-fluid">
         <div class="admin-container">
             <h1 class="admin-title">
                 <i class="fas fa-search me-2"></i>Risultati della Ricerca
             </h1>
+
 
             @if (Model.Clienti != null && Model.Clienti.Count > 0)
             {
@@ -221,40 +255,61 @@
                                     <td>@cliente.Cognome</td>
                                     <td>@cliente.Email</td>
                                     <td>
-                                        @if (cliente.Ordini != null && cliente.Ordini.Any())
-                                        {
-                                            <ul style="padding-left: 1rem; margin-bottom: 0;">
-                                                @foreach (var ordine in cliente.Ordini)
-                                                {
-                                                    <li style="margin-bottom: 0.5rem;">
-                                                        <strong>Ordine #@ordine.IdOrdine</strong> 
-                                                        - @ordine.DataOrdine.ToShortDateString() 
-                                                        - @ordine.TotaleOrdine.ToString("C")
-                                                        - Stato: 
-                                                        @if (ordine.Stato == StatoOrdine.Annullato)
-                                                        {
-                                                            <span class="badge-annullato">@ordine.Stato</span>
-                                                        }
-                                                        else if (ordine.Stato == StatoOrdine.Confermato)
-                                                        {
-                                                            <span class="badge-confermato">@ordine.Stato</span>
-                                                        }
-                                                        else if (ordine.Stato == StatoOrdine.Spedito)
-                                                        {
-                                                            <span class="badge-spedito">@ordine.Stato</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="badge-default">@ordine.Stato</span>
-                                                        }
-                                                    </li>
-                                                }
-                                            </ul>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Nessun ordine</span>
-                                        }
+                                        <button class="btn btn-link" onclick="toggleOrderDetails(@cliente.IdCliente)">
+                                            Vedi Ordini
+                                        </button>
+                                        <div id="order-details-@cliente.IdCliente" class="order-details">
+                                            <h4>Dettagli Ordini</h4>
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID Ordine</th>
+                                                        <th>Data Ordine</th>
+                                                        <th>Totale</th>
+                                                        <th>Stato</th>
+                                                        <th>Cliente Attivo</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var ordine in cliente.Ordini)
+                                                    {
+                                                        <tr>
+                                                            <td>@ordine.IdOrdine</td>
+                                                            <td>@ordine.DataOrdine.ToShortDateString()</td>
+                                                            <td>@ordine.TotaleOrdine.ToString("C")</td>
+                                                            <td>
+                                                                @if (ordine.Stato == StatoOrdine.Annullato)
+                                                                {
+                                                                    <span class="badge badge-annullato">@ordine.Stato</span>
+                                                                }
+                                                                else if (ordine.Stato == StatoOrdine.Confermato)
+                                                                {
+                                                                    <span class="badge badge-confermato">@ordine.Stato</span>
+                                                                }
+                                                                else if (ordine.Stato == StatoOrdine.Spedito)
+                                                                {
+                                                                    <span class="badge badge-spedito">@ordine.Stato</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge badge-default">@ordine.Stato</span>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (cliente.Attivo)
+                                                                {
+                                                                    <span class="badge bg-success">Attivo</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge bg-danger">Non Attivo</span>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -263,65 +318,7 @@
                 </div>
             }
 
-            @if (Model.Ordini != null && Model.Ordini.Count > 0)
-            {
-                <h3 class="mt-4 mb-3" style="color: var(--admin-primary);">
-                    <i class="fas fa-shopping-cart me-2"></i>Ordini Trovati
-                </h3>
-                <div class="table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID Ordine</th>
-                                <th>Data Ordine</th>
-                                <th>Totale</th>
-                                <th>Stato</th>
-                                <th>Cliente</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var ordine in Model.Ordini)
-                            {
-                                <tr>
-                                    <td>@ordine.IdOrdine</td>
-                                    <td>@ordine.DataOrdine.ToShortDateString()</td>
-                                    <td>@ordine.TotaleOrdine.ToString("C")</td>
-                                    <td>
-                                        @if (ordine.Stato == StatoOrdine.Annullato)
-                                        {
-                                            <span class="badge-annullato">@ordine.Stato</span>
-                                        }
-                                        else if (ordine.Stato == StatoOrdine.Confermato)
-                                        {
-                                            <span class="badge-confermato">@ordine.Stato</span>
-                                        }
-                                        else if (ordine.Stato == StatoOrdine.Spedito)
-                                        {
-                                            <span class="badge-spedito">@ordine.Stato</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge-default">@ordine.Stato</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (ordine.Cliente != null)
-                                        {
-                                            @ordine.Cliente.Nome @(" ") @ordine.Cliente.Cognome
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Cliente non trovato</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-
-            @if ((Model.Clienti == null || Model.Clienti.Count == 0) && (Model.Ordini == null || Model.Ordini.Count == 0))
+            @if ((Model.Clienti == null || Model.Clienti.Count == 0))
             {
                 <div class="admin-alert">
                     <i class="fas fa-info-circle"></i>
@@ -330,7 +327,12 @@
             }
         </div>
     </div>
-
+    <script>
+        function toggleOrderDetails(clienteId) {
+            const details = document.getElementById('order-details-' + clienteId);
+            details.classList.toggle('show');
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

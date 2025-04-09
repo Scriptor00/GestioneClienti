@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using GestioneClienti.Repositories;
+using GestioneClienti.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
 builder.Services.AddHttpClient<IGeocodingService, NominatimGeocodingService>();
+builder.Services.AddScoped<RecaptchaService>();
 
 // Configurazione EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

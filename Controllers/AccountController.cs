@@ -12,15 +12,18 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Text.Encodings.Web;
 using GestioneClienti.Repositories;
-using Microsoft.Extensions.Logging; // Assicurati che questo namespace sia presente
+using Microsoft.Extensions.Logging;
+using GestioneClienti.Services; // Assicurati che questo namespace sia presente
 
 namespace GestioneClienti.Controllers
 {
-    public class AccountController(ApplicationDbContext context, ILogger<AccountController> logger, IEmailSender emailSender) : Controller
+    public class AccountController(ApplicationDbContext context, ILogger<AccountController> logger, IEmailSender emailSender, RecaptchaService recaptchaService) : Controller
     {
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<AccountController> _logger = logger;
-        private readonly IEmailSender _emailSender = emailSender; // Assegna il parametro del costruttore al campo
+        private readonly IEmailSender _emailSender = emailSender; 
+        private readonly RecaptchaService _recaptchaService = recaptchaService;
+
 
         [HttpGet]
         public IActionResult Login()
@@ -44,7 +47,7 @@ namespace GestioneClienti.Controllers
 
             try
             {
-                // Cerca solo i campi necessari per il login
+                
                 var utente = await _context.Utenti
                     .Where(u => u.Username == model.Username)
                     .Select(u => new
@@ -60,7 +63,7 @@ namespace GestioneClienti.Controllers
 
                 if (utente == null)
                 {
-                    // Log informativo senza rivelare troppo
+                   
                     _logger.LogWarning($"Tentativo di login fallito per username: {model.Username}");
                     ModelState.AddModelError(string.Empty, "Credenziali non valide");
                     return View(model);
@@ -160,7 +163,8 @@ namespace GestioneClienti.Controllers
                 Username = string.Empty,
                 Email = string.Empty,
                 Password = string.Empty,
-                ConfermaPassword = string.Empty
+                ConfermaPassword = string.Empty,
+                RecaptchaToken = string.Empty
             });
         }
 
@@ -171,6 +175,14 @@ namespace GestioneClienti.Controllers
             {
                 _logger.LogWarning("Tentativo di registrazione con dati non validi");
                 return View(model);
+            }
+
+           var recaptchaValid = await _recaptchaService.VerifyTokenAsync(model.RecaptchaToken);
+           if (!recaptchaValid)
+           {
+             ModelState.AddModelError(string.Empty, "Verifica reCAPTCHA non superata. Riprova.");
+            _logger.LogWarning("Verifica reCAPTCHA fallita");
+             return View(model);
             }
 
             try

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Registrati";
+    var siteKey = "INSERISCI_LA_TUA_SITE_KEY"; // <-- Sostituisci con la tua site key di reCAPTCHA
 }
 
 <!DOCTYPE html>
@@ -13,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -43,6 +45,7 @@
             max-width: 450px;
             border: 1px solid var(--primary-color);
             backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out;
         }
 
         .register-title {
@@ -68,10 +71,6 @@
         .form-control::placeholder {
             color: #ccc !important;
             opacity: 1 !important;
-        }
-
-        .form-control {
-            color: white !important;
         }
 
         .form-control:focus {
@@ -142,16 +141,6 @@
             text-decoration: underline;
         }
 
-        @@keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
-        }
-
-        .register-container {
-            animation: fadeIn 0.5s ease-out;
-        }
-
         @@keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -181,30 +170,34 @@
 
             <div class="form-group">
                 <label for="Username">Username</label>
-                <input type="text" class="form-control" id="Username" name="Username" 
+                <input type="text" class="form-control" id="Username" name="Username"
                        placeholder="Scegli un username" required value="@Model.Username" />
                 @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">
                 <label for="Email">Email</label>
-                <input type="email" class="form-control" id="Email" name="Email" 
+                <input type="email" class="form-control" id="Email" name="Email"
                        placeholder="Inserisci la tua email" required value="@Model.Email" />
                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">
                 <label for="Password">Password</label>
-                <input type="password" class="form-control" id="Password" name="Password" 
+                <input type="password" class="form-control" id="Password" name="Password"
                        placeholder="Crea una password (min. 6 caratteri)" required />
                 @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group">
                 <label for="ConfermaPassword">Conferma Password</label>
-                <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword" 
+                <input type="password" class="form-control" id="ConfermaPassword" name="ConfermaPassword"
                        placeholder="Conferma la password" required />
                 @Html.ValidationMessageFor(model => model.ConfermaPassword, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <div class="g-recaptcha" data-sitekey="6LftMRErAAAAAC5jUxz1qaKSyvO-rsYaEQRQZzWH"></div>
             </div>
 
             <button type="submit" class="btn btn-register">REGISTRATI</button>
@@ -215,6 +208,7 @@
         </form>
     </div>
 
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

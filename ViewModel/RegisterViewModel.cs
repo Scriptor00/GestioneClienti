@@ -28,5 +28,7 @@ namespace GestioneClienti.ViewModel
         [Compare("Password", ErrorMessage = "Le password non coincidono")]
         [Display(Name = "Conferma Password")]
         public string ConfermaPassword { get; set; }
+
+         public string RecaptchaToken { get; set; }
     }
 }

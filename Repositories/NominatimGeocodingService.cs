@@ -121,7 +121,7 @@ namespace GestioneClienti.Repositories
 
             return nominatimResults?.Select(r => new NominatimAddress
             {
-                IndirizzoCompleto = r.DisplayName, // Usa DisplayName come indirizzo completo iniziale
+                IndirizzoCompleto = r.DisplayName, 
                 Via = r.Address?.Road,
                 Civico = r.Address?.HouseNumber,
                 Citta = r.Address?.City ?? r.Address?.Town ?? r.Address?.Village,
