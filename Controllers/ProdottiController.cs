@@ -3,6 +3,8 @@ using WebAppEF.Entities;
 using System.Collections.Generic;
 using WebAppEF.Models;
 using GestioneClienti.ViewModel;
+using Microsoft.Identity.Client;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAppEF.Controllers
 {
@@ -99,9 +101,6 @@ namespace WebAppEF.Controllers
             ViewBag.Password = "laPasswordCorrente";
             return View();
         }
-
-       
-
         public IActionResult Spedizioni()
         {
             return View();
@@ -111,6 +110,97 @@ namespace WebAppEF.Controllers
         {
 
             return View();
+        }
+
+        public IActionResult Tabella()
+        {
+            var prodotti = _context.Prodotti.ToList();
+            return View(prodotti);
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var prodotto = await _context.Prodotti
+                .FirstOrDefaultAsync(m => m.IdProdotto == id);
+            if (prodotto == null)
+            {
+                return NotFound();
+            }
+
+            return View(prodotto);
+        }
+
+        // POST: Prodotti/Delete/{id}
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var prodotto = await _context.Prodotti.FindAsync(id);
+            if (prodotto != null)
+            {
+                _context.Prodotti.Remove(prodotto);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Il prodotto '{prodotto.NomeProdotto}' è stato eliminato con successo.";
+                return RedirectToAction(nameof(Tabella));
+            }
+
+            TempData["ErrorMessage"] = "Si è verificato un errore durante l'eliminazione del prodotto.";
+            return RedirectToAction(nameof(Tabella));
+        }
+
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var prodotto = await _context.Prodotti.FindAsync(id);
+            if (prodotto == null)
+            {
+                return NotFound();
+            }
+            return View(prodotto);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("IdProdotto,NomeProdotto,Categoria,Prezzo,Giacenza,DataInserimento,ImmagineUrl,TrailerUrl")] Prodotto prodotto)
+        {
+            if (id != prodotto.IdProdotto)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(prodotto);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"Il prodotto '{prodotto.NomeProdotto}' è stato modificato con successo.";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Prodotti.Any(e => e.IdProdotto == id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Tabella));
+            }
+            return View(prodotto);
         }
 
     }

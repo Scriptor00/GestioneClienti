@@ -252,11 +252,11 @@ namespace WebAppEF.Controllers
                     Cognome = viewModel.Cognome,
                     Email = viewModel.Email,
                     Attivo = viewModel.Attivo,
-                    Indirizzo = viewModel.Indirizzo, // Aggiorna l'indirizzo
-                    Civico = viewModel.Civico,       // Aggiorna il civico
-                    Citta = viewModel.Citta,         // Aggiorna la città
-                    Cap = viewModel.Cap,             // Aggiorna il CAP
-                    Paese = viewModel.Paese           // Aggiorna il paese
+                    Indirizzo = viewModel.Indirizzo, 
+                    Civico = viewModel.Civico,      
+                    Citta = viewModel.Citta,         
+                    Cap = viewModel.Cap,             
+                    Paese = viewModel.Paese           
                 };
 
                 await _customerRepository.UpdateAsync(customer);

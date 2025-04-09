@@ -1,8 +1,10 @@
-@model WebAppEF.ViewModel.PaginazioneViewModel
+@model List<WebAppEF.Entities.Prodotto>
 
 @{
-    ViewData["Title"] = "Gestione Clienti";
+    ViewData["Title"] = "Gestione Prodotti";
 }
+
+ 
 
 <!DOCTYPE html>
 <html lang="it">
@@ -159,45 +161,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 2rem;
-        }
-
-        .pagination-btn {
-            margin: 0 5px;
-            padding: 8px 12px;
-            border-radius: 5px;
-            background-color: var(--primary-color);
-            color: var(--light-text);
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .pagination-btn.active {
-            background-color: var(--accent-color);
-        }
-
-        .pagination-btn:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-page {
-            width: 60px;
-            text-align: center;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .input-group-append .btn {
-            border-radius: 0 5px 5px 0;
-        }
-
         .text-white {
             color: var(--light-text) !important;
         }
@@ -216,7 +179,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("Dashboard", "Home")">
-                <i class="fas fa-boxes"></i> OrdiNinja
+                <i class="fas fa-cubes"></i> Prodotti Manager
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -224,17 +187,17 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link " href="@Url.Action("Index", "Ordini")">
+                        <a class="nav-link" href="@Url.Action("Index", "Customer")">
+                            <i class="fas fa-users"></i> Gestione Clienti
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Ordini")">
                             <i class="fas fa-list"></i> Gestione Ordini
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="@Url.Action("Index", "Customer")">
-                            <i class="fas fa-users"></i> Gestione Clienti
-                        </a>
-                    </li>
-                     <li class="nav-item"></li>
-                        <a class="nav-link" href="@Url.Action("Tabella", "Prodotti")">
+                        <a class="nav-link active" href="@Url.Action("Tabella", "Prodotti")">
                             <i class="fas fa-box-open"></i> Gestione Prodotti
                         </a>
                     </li>
@@ -258,8 +221,8 @@
         }
 
         <div class="text-end mb-4">
-            <a href="@Url.Action("Create")" class="btn btn-success btn-lg shadow">
-                <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Cliente
+            <a href="@Url.Action("AggiungiProdotto", "Home")" class="btn btn-success btn-lg shadow">
+                <i class="fas fa-plus-circle"></i> Aggiungi Nuovo Prodotto
             </a>
         </div>
 
@@ -267,38 +230,43 @@
             <table class="table table-hover table-bordered shadow-lg">
                 <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Email</th>
-                        <th>Indirizzo</th>
-                        <th>Civico</th>
-                        <th>Città</th>
-                        <th>CAP</th>
-                        <th>Paese</th>
-                        <th>Data Iscrizione</th>
+                        <th>Id Prodotto</th>
+                        <th>Nome Prodotto</th>
+                        <th>Categoria</th>
+                        <th>Prezzo</th>
+                        <th>Giacenza</th>
+                        <th>Data Inserimento</th>
+                        <th>Immagine</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var cliente in Model.Clienti)
+                    @foreach (var prodotto in Model)
                     {
                         <tr>
-                            <td>@cliente.Nome</td>
-                            <td>@cliente.Cognome</td>
-                            <td>@cliente.Email</td>
-                            <td>@cliente.Indirizzo</td>
-                            <td>@cliente.Civico</td>
-                            <td>@cliente.Citta</td>
-                            <td>@cliente.Cap</td>
-                            <td>@cliente.Paese</td>
-                            <td>@cliente.DataIscrizione.ToString("dd/MM/yyyy")</td>
+                            <td>@prodotto.IdProdotto</td>
+                            <td>@prodotto.NomeProdotto</td>
+                            <td>@prodotto.Categoria</td>
+                            <td>@prodotto.Prezzo.ToString("C")</td>
+                            <td>@prodotto.Giacenza</td>
+                            <td>@prodotto.DataInserimento.ToString("dd/MM/yyyy")</td>
                             <td>
-                                <a href="@Url.Action("Edit", new { id = cliente.IdCliente })" class="btn btn-warning btn-sm shadow">
+                                @if (!string.IsNullOrEmpty(prodotto.ImmagineUrl))
+                                {
+                                    <img src="@prodotto.ImmagineUrl" alt="@prodotto.NomeProdotto" style="max-width: 50px; max-height: 50px;" class="rounded" />
+                                }
+                                else
+                                {
+                                    <span>Nessuna immagine</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Edit", "Prodotti", new { id = prodotto.IdProdotto })" class="btn btn-warning btn-sm shadow">
                                     <i class="fas fa-edit"></i> Modifica
                                 </a>
-                                <a href="@Url.Action("Delete", new { id = cliente.IdCliente })"
+                                <a href="@Url.Action("Delete", "Prodotti", new { id = prodotto.IdProdotto })"
                                    class="btn btn-danger btn-sm shadow"
-                                   onclick="return confirm('Sei sicuro di voler eliminare questo cliente?')">
+                                   onclick="return confirm('Sei sicuro di voler eliminare questo prodotto?')">
                                     <i class="fas fa-trash-alt"></i> Elimina
                                 </a>
                             </td>
@@ -308,82 +276,9 @@
             </table>
         </div>
 
-        <div class="pagination-container">
-            @if (Model.CurrentPage > 1)
-            {
-                <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
-                    <i class="fas fa-angle-double-left"></i> Prima
-                </a>
-            }
-
-            @if (Model.CurrentPage > 1)
-            {
-                <a href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })" class="pagination-btn">
-                    <i class="fas fa-chevron-left"></i> Precedente
-                </a>
-            }
-
-            <div class="page-numbers d-flex">
-                @if (Model.CurrentPage > 3)
-                {
-                    <a href="@Url.Action("Index", new { page = 1 })" class="pagination-btn">
-                        1
-                    </a>
-                    <span class="pagination-btn">...</span>
-                }
-
-                @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
-                {
-                    <a href="@Url.Action("Index", new { page = i })" class="pagination-btn @((i == Model.CurrentPage) ? "active" : "")">
-                        @i
-                    </a>
-                }
-
-                @if (Model.CurrentPage < Model.TotalPages - 2)
-                {
-                    <span class="pagination-btn">...</span>
-                    <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
-                        @Model.TotalPages
-                    </a>
-                }
-            </div>
-
-            <div class="input-group mx-3">
-                <input type="number" id="pageInput" class="form-control input-page" placeholder="Pag." min="1" max="@Model.TotalPages" />
-                <div class="input-group-append">
-                    <button class="btn btn-primary" id="goToPageButton">Vai</button>
-                </div>
-            </div>
-
-            @if (Model.CurrentPage < Model.TotalPages)
-            {
-                <a href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })" class="pagination-btn">
-                    Successiva <i class="fas fa-chevron-right"></i>
-                </a>
-            }
-
-            @if (Model.CurrentPage < Model.TotalPages)
-            {
-                <a href="@Url.Action("Index", new { page = Model.TotalPages })" class="pagination-btn">
-                    Ultima <i class="fas fa-angle-double-right"></i>
-                </a>
-            }
         </div>
-    </div>
 
-    <script>
-        document.getElementById('goToPageButton').addEventListener('click', function () {
-            var pageInput = document.getElementById('pageInput').value;
-            var totalPages = @Model.TotalPages;
-
-            if (pageInput >= 1 && pageInput <= totalPages) {
-                window.location.href = '@Url.Action("Index", new { page = "__page__" })'.replace('__page__', pageInput);
-            } else {
-                alert('Numero di pagina non valido');
-            }
-        });
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(function () {
@@ -392,14 +287,14 @@
                     alertBox.style.transition = "opacity 0.5s";
                     alertBox.style.opacity = "0";
                     setTimeout(() => {
-                        alertBox.remove(); //rimuvo il messaggio e ristabilisco il DOM
-                        location.reload(); // Ricarica la pagina
+                        alertBox.remove();
+                        // Volendo, si può ricaricare la pagina dopo la scomparsa del messaggio
+                        // location.reload();
                     }, 500);
                 }
-            }, 3000);
+            }, 3000); // 3 secondi
         });
     </script>
-
 
 </body>
 </html>

@@ -1,0 +1,193 @@
+@model WebAppEF.Entities.Prodotto
+
+@{
+    ViewData["Title"] = "Elimina Prodotto";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .admin-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .admin-heading {
+        font-size: 28px;
+        font-weight: 700;
+        color: #212529;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .btn-outline-secondary,
+    .btn-secondary {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .confirm-card-header {
+        background-color: #d9534f;
+        color: #fff;
+        font-weight: 600;
+        padding: 15px 20px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        font-size: 18px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .alert-warning-admin {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        font-size: 15px;
+    }
+
+    .product-details-heading {
+        font-weight: 600;
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .product-details-dl dt {
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .product-details-dl dd {
+        color: #212529;
+        margin-bottom: 10px;
+    }
+
+    .product-image-card-header {
+        background-color: #f1f1f1;
+        color: #495057;
+        font-weight: 600;
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    .delete-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn-danger {
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 10px 20px;
+    }
+</style>
+
+<div class="container-fluid px-4">
+    <div class="admin-container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="admin-heading">
+                <i class="fas fa-box-open me-2 text-danger"></i>Elimina Prodotto
+            </h1>
+            <a asp-action="Tabella" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Torna alla lista
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="confirm-card-header">
+                <i class="fas fa-exclamation-triangle me-2"></i>Conferma eliminazione
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning-admin">
+                    <h5 class="mb-3">
+                        <i class="fas fa-triangle-exclamation me-2"></i>Attenzione!
+                    </h5>
+                    <p>Stai per eliminare <strong>@Model.NomeProdotto</strong> in modo permanente dal sistema. Questa operazione è irreversibile.</p>
+                    <hr>
+                    <p>Sei sicuro di voler procedere?</p>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <h5 class="product-details-heading">Dettagli Prodotto</h5>
+                        <dl class="row product-details-dl">
+                            <dt class="col-sm-4">Nome Prodotto</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.NomeProdotto)</dd>
+
+                            <dt class="col-sm-4">Categoria</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Categoria)</dd>
+
+                            <dt class="col-sm-4">Prezzo</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Prezzo) €</dd>
+
+                            <dt class="col-sm-4">Giacenza</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Giacenza)</dd>
+
+                            <dt class="col-sm-4">Data Inserimento</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.DataInserimento)</dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="product-image-card-header">
+                                <i class="fas fa-image me-1"></i>Immagine Prodotto
+                            </div>
+                            <div class="card-body text-center">
+                                @if (!string.IsNullOrEmpty(Model.ImmagineUrl))
+                                {
+                                    <img src="@Model.ImmagineUrl" alt="@Model.NomeProdotto"
+                                         class="img-fluid rounded shadow-sm" style="max-height: 180px;">
+                                }
+                                else
+                                {
+                                    <div class="text-muted py-4">
+                                        <i class="fas fa-image fa-3x mb-2"></i>
+                                        <p>Nessuna immagine disponibile</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post" class="mt-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdProdotto" />
+                    <div class="delete-buttons">
+                        <a asp-action="Tabella" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> Annulla
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-1"></i> Conferma eliminazione
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Eventuali script personalizzati
+    </script>
+}

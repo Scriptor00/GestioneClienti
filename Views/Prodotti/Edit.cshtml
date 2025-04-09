@@ -1,0 +1,133 @@
+@model WebAppEF.Entities.Prodotto
+@{
+    ViewData["Title"] = "Modifica Prodotto";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-white p-3 rounded shadow-lg" style="background: linear-gradient(45deg, #28a745, #20c997);">
+            <i class="fas fa-box-open me-2"></i> Modifica Prodotto
+        </h2>
+    </div>
+
+    <div>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header" style="background: #343a40; color: white;">
+                    <h5 class="mb-0">Dettagli del Prodotto</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdProdotto" />
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="NomeProdotto" class="form-label"></label>
+                                    <input asp-for="NomeProdotto" class="form-control" required />
+                                    <span asp-validation-for="NomeProdotto" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Categoria" class="form-label"></label>
+                                    <input asp-for="Categoria" class="form-control" required />
+                                    <span asp-validation-for="Categoria" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Prezzo" class="form-label"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        <input asp-for="Prezzo" class="form-control" required />
+                                    </div>
+                                    <span asp-validation-for="Prezzo" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Giacenza" class="form-label"></label>
+                                    <input asp-for="Giacenza" class="form-control" required />
+                                    <span asp-validation-for="Giacenza" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="DataInserimento" class="form-label"></label>
+                                    <input asp-for="DataInserimento" class="form-control" readonly />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="ImmagineUrl" class="form-label">URL Immagine</label>
+                                    <input asp-for="ImmagineUrl" class="form-control" />
+                                    <span asp-validation-for="ImmagineUrl" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TrailerUrl" class="form-label">URL Trailer</label>
+                            <input asp-for="TrailerUrl" class="form-control" />
+                            <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.ImmagineUrl))
+                        {
+                            <div class="form-group mb-3 text-center">
+                                <img src="@Model.ImmagineUrl" alt="@Model.NomeProdotto" class="img-fluid rounded shadow" style="max-height: 200px;" />
+                            </div>
+                        }
+
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg shadow">
+                                <i class="fas fa-save me-2"></i> Salva Modifiche
+                            </button>
+                            <a asp-action="Tabella" class="btn btn-secondary btn-lg shadow ms-3">
+                                <i class="fas fa-arrow-left me-2"></i> Torna alla lista
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('form').on('submit', function (e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('was-validated');
+            }
+        });
+    });
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
