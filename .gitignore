@@ -1,0 +1,22 @@
+# .NET Core
+bin/
+obj/
+
+# Configurazione locale
+appsettings.Development.json
+appsettings.json
+
+# File generati
+.vscode/
+.idea/
+
+# File di sistema
+Thumbs.db
+*.log
+
+# Cartelle di build
+build/
+
+# Configurazione di Visual Studio
+.vs/
+.vscode/
