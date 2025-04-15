@@ -14,7 +14,7 @@ namespace WebAppEF.Models
         public DbSet<DettagliOrdine> DettagliOrdini { get; set; }
         public DbSet<Utente> Utenti { get; set; }
 
-        public DbSet<CarrelloItem> Carrello { get; set; }
+        public DbSet<CarrelloItem> CarrelloItems { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

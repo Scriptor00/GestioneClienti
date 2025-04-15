@@ -28,8 +28,8 @@ namespace WebAppEF.Entities
         public StatoOrdine Stato { get; set; }  // Uso dell'enum per StatoOrdine
 
         [Required]
-        public decimal TotaleOrdine { get; set; }  
+        public decimal TotaleOrdine { get; set; }
 
-
+      
     }
 }

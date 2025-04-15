@@ -6,40 +6,39 @@ using Newtonsoft.Json;
 namespace GestioneClienti.Services
 {
     public class RecaptchaService
-{
-    private readonly HttpClient _httpClient;
-    private readonly string _secretKey;
-
-    public RecaptchaService(IConfiguration configuration)
     {
-        _httpClient = new HttpClient();
-        _secretKey = configuration["GoogleRecaptcha:SecretKey"];
-    }
+        private readonly HttpClient _httpClient;
+        private readonly string _secretKey;
 
-    public async Task<bool> VerifyTokenAsync(string token)
-    {
-        var response = await _httpClient.PostAsync(
-            $"https://www.google.com/recaptcha/api/siteverify?secret={_secretKey}&response={token}",
-            null);
-
-        if (!response.IsSuccessStatusCode)
+        public RecaptchaService(IConfiguration configuration)
         {
-            return false;
+            _httpClient = new HttpClient();
+            _secretKey = configuration["GoogleRecaptcha:SecretKey"];
         }
 
-        var json = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<RecaptchaResponse>(json);
+        public async Task<bool> VerifyTokenAsync(string token)
+        {
+            var response = await _httpClient.PostAsync(
+                $"https://www.google.com/recaptcha/api/siteverify?secret={_secretKey}&response={token}",
+                null);
 
-        return result?.success ?? false;
-    }
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
 
-    private class RecaptchaResponse
-    {
-        public bool success { get; set; }
-        public string challenge_ts { get; set; }
-        public string hostname { get; set; }
-        public string[] error_codes { get; set; }
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<RecaptchaResponse>(json);
+
+            return result?.success ?? false;
+        }
+
+        private class RecaptchaResponse
+        {
+            public bool success { get; set; }
+            public string challenge_ts { get; set; }
+            public string hostname { get; set; }
+            public string[] error_codes { get; set; }
+        }
     }
-}
-    
 }

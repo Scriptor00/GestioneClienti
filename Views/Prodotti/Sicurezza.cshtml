@@ -614,103 +614,102 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Gestione cambio password
-            const changePasswordBtn = document.getElementById('changePasswordBtn');
-            const passwordForm = document.getElementById('passwordForm');
-            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+          // Gestione cambio password
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const passwordForm = document.getElementById('passwordForm');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
 
-            changePasswordBtn.addEventListener('click', function() {
-                passwordForm.style.display = passwordForm.style.display === 'block' ? 'none' : 'block';
-            });
+            changePasswordBtn.addEventListener('click', function() {
+                passwordForm.style.display = passwordForm.style.display === 'block' ? 'none' : 'block';
+            });
 
-            cancelPasswordBtn.addEventListener('click', function() {
-                passwordForm.style.display = 'none';
-            });
+            cancelPasswordBtn.addEventListener('click', function() {
+                passwordForm.style.display = 'none';
+            });
 
-            // Password strength indicator
-            const newPassword = document.getElementById('NuovaPassword');
-            const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+            // Password strength indicator
+            const newPassword = document.getElementById('NuovaPassword');
+            const passwordStrengthBar = document.getElementById('passwordStrengthBar');
 
-            newPassword.addEventListener('input', function() {
-                const password = newPassword.value;
-                let strength = 0;
+            newPassword.addEventListener('input', function() {
+                const password = newPassword.value;
+                let strength = 0;
 
-                // Controlla la lunghezza
-                if (password.length >= 12) strength += 2;
-                else if (password.length >= 8) strength += 1;
+                // Controlla la lunghezza
+                if (password.length >= 12) strength += 2;
+                else if (password.length >= 8) strength += 1;
 
-                // Controlla numeri
-                if (/\d/.test(password)) strength += 1;
+                // Controlla numeri
+                if (/\d/.test(password)) strength += 1;
 
-                // Controlla maiuscole e minuscole
-                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+                // Controlla maiuscole e minuscole
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
 
-                // Controlla simboli
-                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+                // Controlla simboli
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
 
-                // Aggiorna la barra
-                let width = 0;
-                let color = '#dc3545'; // Rosso
+                // Aggiorna la barra
+                let width = 0;
+                let color = '#dc3545'; // Rosso
 
-                if (strength <= 1) {
-                    width = 25;
-                    color = '#dc3545'; // Rosso
-                } else if (strength <= 3) {
-                    width = 50;
-                    color = '#ffc107'; // Giallo
-                } else if (strength <= 4) {
-                    width = 75;
-                    color = '#28a745'; // Verde
-                } else {
-                    width = 100;
-                    color = '#0d6efd'; // Blu
-                }
+                if (strength <= 1) {
+                    width = 25;
+                    color = '#dc3545'; // Rosso
+                } else if (strength <= 3) {
+                    width = 50;
+                    color = '#ffc107'; // Giallo
+                } else if (strength <= 4) {
+                    width = 75;
+                    color = '#28a745'; // Verde
+                } else {
+                    width = 100;
+                    color = '#0d6efd'; // Blu
+                }
 
-                passwordStrengthBar.style.width = width + '%';
-                passwordStrengthBar.style.backgroundColor = color;
-            });
+                passwordStrengthBar.style.width = width + '%';
+                passwordStrengthBar.style.backgroundColor = color;
+            });
 
-            // Salva password con AJAX
-            const passwordFormEl = passwordForm.querySelector('form');
-            passwordFormEl.addEventListener('submit', function(e) {
-                e.preventDefault();
+            // Salva password con AJAX
+            const passwordFormEl = passwordForm.querySelector('form');
+            passwordFormEl.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-                const submitBtn = passwordFormEl.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
+                const submitBtn = passwordFormEl.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
 
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Salvataggio...';
-                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Salvataggio...';
+                submitBtn.disabled = true;
 
-                const formData = new FormData(passwordFormEl);
+                const formData = new FormData(passwordFormEl);
 
-                fetch('/Account/ChangePassword', { 
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Errore durante il salvataggio della password.');
-                    }
-                    return response.json(); 
-                })
-                .then(data => {
-                    submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Password aggiornata!';
-                    showAlert('Password aggiornata con successo!', 'success');
+                fetch('/Account/ChangePassword', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante il salvataggio della password.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Password aggiornata!';
+                    showAlert('Password aggiornata con successo! Sarai reindirizzato per il login.', 'success');
 
-                    setTimeout(function() {
-                        passwordForm.style.display = 'none';
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        // Ricarica la pagina per aggiornare lo stato della password
-                        window.location.reload();
-                    }, 1500);
-                })
-                .catch(error => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                    showAlert(error.message, 'danger');
-                });
-            });
+                    setTimeout(function() {
+                        passwordForm.style.display = 'none';
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        window.location.href = '/Account/Login';
+                    }, 1500);
+                })
+                .catch(error => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showAlert(error.message, 'danger');
+                });
+            });
 
             // Funzione per mostrare alert
             function showAlert(message, type) {

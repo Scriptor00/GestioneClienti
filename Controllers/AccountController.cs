@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using GestioneClienti.Repositories;
 using Microsoft.Extensions.Logging;
-using GestioneClienti.Services; // Assicurati che questo namespace sia presente
+using GestioneClienti.Services; 
 
 namespace GestioneClienti.Controllers
 {
@@ -52,7 +52,7 @@ namespace GestioneClienti.Controllers
                     .Where(u => u.Username == model.Username)
                     .Select(u => new
                     {
-                        u.Id, // Includi l'Id per un futuro utilizzo
+                        u.Id, 
                         u.Username,
                         u.PasswordHash,
                         u.Role,
@@ -187,7 +187,7 @@ namespace GestioneClienti.Controllers
 
             try
             {
-                // Verifica se l'username o l'email sono già in uso
+                // verifica esistenza username o email
                 var existingUser = await _context.Utenti
                     .FirstOrDefaultAsync(u => u.Username == model.Username || u.Email == model.Email);
 
@@ -214,7 +214,7 @@ namespace GestioneClienti.Controllers
                     Username = model.Username,
                     Email = model.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                    Role = "User", // Ruolo di default
+                    Role = "User", // ruolo di default
                     PasswordResetToken = null,
                     PasswordResetTokenExpires = null
                 };
@@ -244,7 +244,6 @@ namespace GestioneClienti.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         public IActionResult RecuperoPassword()
         {
@@ -259,7 +258,7 @@ namespace GestioneClienti.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Errore durante l'hashing della password");
-                throw; // o ritorna string.Empty se vuoi gestirla in altro modo
+                throw; 
             }
         }
 
@@ -277,14 +276,13 @@ namespace GestioneClienti.Controllers
                     return View("RecuperoPassword");
                 }
 
-                var token = GeneratePasswordResetToken(); // La tua logica per generare il token
+                var token = GeneratePasswordResetToken(); 
                 user.PasswordResetToken = token;
                 user.PasswordResetTokenExpires = DateTime.UtcNow.AddHours(24);
                 _context.Update(user);
                 await _context.SaveChangesAsync();
 
-                // Costruisci l'URL con l'ID invece dell'email
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token = token }, protocol: Request.Scheme);
+               var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token }, protocol: Request.Scheme);
 
                 var emailBody = $"Per reimpostare la tua password, clicca qui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Reimposta Password</a>";
 
@@ -319,7 +317,7 @@ namespace GestioneClienti.Controllers
                 utente.PasswordResetTokenExpires < DateTime.UtcNow)
             {
                 TempData["ErrorMessage"] = "Il link per il reset non è valido o è scaduto.";
-                return RedirectToAction("Login"); // O una pagina di errore dedicata
+                return RedirectToAction("Login"); 
             }
 
             var model = new RecuperoPasswordViewModel
@@ -375,13 +373,15 @@ namespace GestioneClienti.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(CambioPasswordViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             var username = User.Identity?.Name;
             if (string.IsNullOrEmpty(username))
             {
-                await HttpContext.SignOutAsync();
-                return RedirectToAction("Login");
+                return Unauthorized(new { message = "Utente non autenticato" }); 
             }
 
             try
@@ -393,15 +393,13 @@ namespace GestioneClienti.Controllers
 
                 if (utente == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Utente non trovato");
-                    return View(model);
+                    return NotFound(new { message = "Utente non trovato" }); 
                 }
 
                 // 2. Verifica password corrente
                 if (!BCrypt.Net.BCrypt.Verify(model.PasswordCorrente, utente.PasswordHash))
                 {
-                    ModelState.AddModelError("CurrentPassword", "Password corrente non valida");
-                    return View(model);
+                    return BadRequest(new { message = "Password corrente non valida" });
                 }
 
                 // 3. Genera nuovo hash con work factor esplicito
@@ -413,7 +411,7 @@ namespace GestioneClienti.Controllers
 
                 if (rowsAffected != 1)
                 {
-                    throw new Exception("Nessuna riga aggiornata");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Errore durante l'aggiornamento della password" }); // Restituisce 500 come JSON
                 }
 
                 // 5. Verifica immediata che l'update sia avvenuto
@@ -424,42 +422,19 @@ namespace GestioneClienti.Controllers
 
                 if (updatedHash != newHash)
                 {
-                    throw new Exception("Hash non corrispondente dopo l'update");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Errore di verifica dopo l'aggiornamento della password" }); // Restituisce 500 come JSON
                 }
 
-                // 6. Logout forzato
+                // 6. Logout forzato (se vuoi disconnettere l'utente dopo il cambio password)
                 await HttpContext.SignOutAsync();
-
-                // 7. Logging di conferma
                 _logger.LogInformation($"Password cambiata con successo per {username}. Nuovo hash: {updatedHash}");
-
-                TempData["SuccessMessage"] = "Password cambiata con successo! Accedi con la nuova password.";
-                return RedirectToAction("Login");
+               return Json(new { success = true, message = "Password aggiornata con successo! Sarai reindirizzato per il login." });
+               
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Errore durante cambio password per {username}");
-                ModelState.AddModelError(string.Empty, "Errore durante l'operazione. Riprova.");
-                return View(model);
-            }
-        }
-
-        [HttpGet("test-email")]
-        public async Task<IActionResult> TestEmail()
-        {
-            try
-            {
-                await _emailSender.SendEmailAsync(
-                    "cdicuonzo@studenti.apuliadigitalmaker.it",
-                    "Test Email Service",
-                    "<h1>Test Email</h1><p>Questo è un test del servizio email</p>");
-
-                return Content("Email inviata con successo!");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Test email fallito");
-                return Content($"Errore: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { success = false, message = "Errore durante l'operazione. Riprova." }); // Restituisce 500 come JSON
             }
         }
     }
