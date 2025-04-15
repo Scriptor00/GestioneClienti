@@ -284,8 +284,45 @@ namespace GestioneClienti.Controllers
 
                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token }, protocol: Request.Scheme);
 
-                var emailBody = $"Per reimpostare la tua password, clicca qui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Reimposta Password</a>";
+               var emailBody = $@"
+<html>
+  <body style=""font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f0f12; color: #e0e0e0; margin: 0; padding: 20px;"">
+    <div style=""max-width: 600px; margin: 0 auto; border: 1px solid #2a2a3a; border-radius: 8px; overflow: hidden; background-color: #1a1a2a;"">
+      <!-- Header -->
+      <div style=""background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%); padding: 20px; text-align: center;"">
+        <h1 style=""margin: 0; color: white; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"">🔐 Recupero Password</h1>
+      </div>
 
+      <!-- Corpo -->
+      <div style=""padding: 25px;"">
+        <p style=""font-size: 16px; line-height: 1.6;"">Ciao <strong style=""color: #9d50bb;""></strong>,</p>
+        <p style=""font-size: 16px; line-height: 1.6;"">Hai richiesto di reimpostare la password del tuo account. Clicca il pulsante qui sotto per procedere:</p>
+        
+        <!-- Pulsante stile gaming -->
+        <div style=""text-align: center; margin: 25px 0;"">
+          <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+             style=""display: inline-block; padding: 12px 25px; background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%); 
+                    color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;
+                    box-shadow: 0 2px 8px rgba(110, 72, 170, 0.4);"">
+            🎮 Reimposta Password
+          </a>
+        </div>
+
+        <p style=""font-size: 14px; color: #a0a0a0;"">Se non hai richiesto tu questa operazione, ignora questa email.</p>
+        <p style=""font-size: 14px; color: #a0a0a0;"">Il link scadrà tra <strong>24 ore</strong>.</p>
+      </div>
+
+      <!-- Footer -->
+      <div style=""background-color: #0f0f1a; padding: 15px; text-align: center; font-size: 12px; color: #7a7a8c;"">
+        <p style=""margin: 0;"">© 2024 <strong style=""color: #9d50bb;"">[Gaming Store]</strong>. Tutti i diritti riservati.</p>
+        <p style=""margin: 10px 0 0;"">
+          <a href=""https://twitter.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Twitter</a>
+          <a href=""https://instagram.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Instagram</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>";
                 await _emailSender.SendEmailAsync(model.Email, "Recupero Password", emailBody);
 
                 ViewBag.Messaggio = "Se l'indirizzo email fornito è valido, ti abbiamo inviato un link per reimpostare la password.";
