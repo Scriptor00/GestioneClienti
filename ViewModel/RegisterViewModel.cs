@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestioneClienti.ViewModel
 {
@@ -29,6 +30,8 @@ namespace GestioneClienti.ViewModel
         [Display(Name = "Conferma Password")]
         public string ConfermaPassword { get; set; }
 
-         public string RecaptchaToken { get; set; }
+        [Required(ErrorMessage = "La verifica reCAPTCHA è obbligatoria.")]
+        [BindProperty(Name = "g-recaptcha-response")] 
+        public string? RecaptchaResponse { get; set; }
     }
 }

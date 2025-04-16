@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Registrati";
-    var siteKey = "INSERISCI_LA_TUA_SITE_KEY"; // <-- Sostituisci con la tua site key di reCAPTCHA
+    var siteKey = " 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; 
 }
 
 <!DOCTYPE html>
@@ -25,8 +25,8 @@
         }
 
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
-                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                            url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             display: flex;
@@ -198,6 +198,7 @@
 
             <div class="form-group">
                 <div class="g-recaptcha" data-sitekey="6LftMRErAAAAAC5jUxz1qaKSyvO-rsYaEQRQZzWH"></div>
+                @Html.ValidationMessageFor(model => model.RecaptchaResponse, "La verifica reCAPTCHA è obbligatoria.", new { @class = "text-danger" })
             </div>
 
             <button type="submit" class="btn btn-register">REGISTRATI</button>

@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using GestioneClienti.Repositories;
 using Microsoft.Extensions.Logging;
-using GestioneClienti.Services; 
+using GestioneClienti.Services;
 
 namespace GestioneClienti.Controllers
 {
@@ -21,13 +21,18 @@ namespace GestioneClienti.Controllers
     {
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<AccountController> _logger = logger;
-        private readonly IEmailSender _emailSender = emailSender; 
+        private readonly IEmailSender _emailSender = emailSender;
         private readonly RecaptchaService _recaptchaService = recaptchaService;
 
 
         [HttpGet]
         public IActionResult Login()
         {
+            if (TempData["EmailConfermata"] != null)
+            {
+                ViewBag.EmailConfermata = true;
+            }
+
             return View(new LoginViewModel
             {
                 Username = string.Empty,
@@ -47,23 +52,23 @@ namespace GestioneClienti.Controllers
 
             try
             {
-                
                 var utente = await _context.Utenti
                     .Where(u => u.Username == model.Username)
                     .Select(u => new
                     {
-                        u.Id, 
+                        u.Id,
                         u.Username,
                         u.PasswordHash,
                         u.Role,
-                        u.Email
+                        u.Email,
+                        u.EmailConfermata
                     })
                     .AsNoTracking()
                     .FirstOrDefaultAsync();
 
                 if (utente == null)
                 {
-                   
+
                     _logger.LogWarning($"Tentativo di login fallito per username: {model.Username}");
                     ModelState.AddModelError(string.Empty, "Credenziali non valide");
                     return View(model);
@@ -79,6 +84,12 @@ namespace GestioneClienti.Controllers
                     return View(model);
                 }
 
+                if (!utente.EmailConfermata && utente.Role != "Admin")
+                {
+                    _logger.LogWarning($"L'utente {model.Username} ha tentato di accedere senza confermare l'email.");
+                    ModelState.AddModelError(string.Empty, "Devi confermare la tua email prima di poter accedere.");
+                    return View(model);
+                }
 
                 var claims = new List<Claim>
                 {
@@ -86,7 +97,7 @@ namespace GestioneClienti.Controllers
                     new Claim(ClaimTypes.Name, utente.Username),
                     new Claim(ClaimTypes.Email, utente.Email ?? string.Empty),
                     new Claim(ClaimTypes.Role, utente.Role ?? "User"),
-                    new Claim("UserId", utente.Id.ToString()) // Aggiungi l'Id come claim
+                    new Claim("UserId", utente.Id.ToString())
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -128,7 +139,6 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
         }
-
         private bool VerifyPassword(string password, string storedHash)
         {
             try
@@ -164,7 +174,7 @@ namespace GestioneClienti.Controllers
                 Email = string.Empty,
                 Password = string.Empty,
                 ConfermaPassword = string.Empty,
-                RecaptchaToken = string.Empty
+                RecaptchaResponse = string.Empty
             });
         }
 
@@ -177,17 +187,16 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
 
-           var recaptchaValid = await _recaptchaService.VerifyTokenAsync(model.RecaptchaToken);
-           if (!recaptchaValid)
-           {
-             ModelState.AddModelError(string.Empty, "Verifica reCAPTCHA non superata. Riprova.");
-            _logger.LogWarning("Verifica reCAPTCHA fallita");
-             return View(model);
+            var recaptchaValid = await _recaptchaService.VerifyTokenAsync(model.RecaptchaResponse);
+            if (!recaptchaValid)
+            {
+                ModelState.AddModelError(string.Empty, "Verifica reCAPTCHA non superata. Riprova.");
+                _logger.LogWarning("Verifica reCAPTCHA fallita");
+                return View(model);
             }
 
             try
             {
-                // verifica esistenza username o email
                 var existingUser = await _context.Utenti
                     .FirstOrDefaultAsync(u => u.Username == model.Username || u.Email == model.Email);
 
@@ -208,13 +217,16 @@ namespace GestioneClienti.Controllers
                     return View(model);
                 }
 
-                // Crea nuovo utente
+                var emailToken = Guid.NewGuid().ToString();
+
                 var newUser = new Utente
                 {
                     Username = model.Username,
                     Email = model.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                    Role = "User", // ruolo di default
+                    Role = "User",
+                    EmailConfermata = false,
+                    EmailConfermaToken = emailToken,
                     PasswordResetToken = null,
                     PasswordResetTokenExpires = null
                 };
@@ -222,12 +234,11 @@ namespace GestioneClienti.Controllers
                 _context.Utenti.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                // Opzionale: Invia email di benvenuto
-                // await _emailService.SendWelcomeEmail(model.Email, model.Username);
+                await _emailSender.SendEmailConferma(model.Email, model.Username, emailToken);
 
                 _logger.LogInformation($"Nuovo utente registrato: {model.Username} ({model.Email})");
 
-                TempData["SuccessMessage"] = "Registrazione completata con successo!";
+                TempData["SuccessMessage"] = "Registrazione completata! Controlla la tua email per confermare l’account.";
                 return RedirectToAction("Login");
             }
             catch (DbUpdateException dbEx)
@@ -245,6 +256,45 @@ namespace GestioneClienti.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ConfermaEmail(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Token di conferma mancante o non valido.");
+                TempData["ErrorMessage"] = "Token di conferma non valido.";
+                return RedirectToAction("Login");
+            }
+
+            try
+            {
+                var user = await _context.Utenti.FirstOrDefaultAsync(u => u.EmailConfermaToken == token && !u.EmailConfermata);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("Token non valido o utente già confermato.");
+                    TempData["ErrorMessage"] = "Il link di conferma non è valido o l'account è già confermato.";
+                    return RedirectToAction("Login");
+                }
+
+                // Conferma l'email
+                user.EmailConfermata = true;
+                user.EmailConfermaToken = null; // Rimuovi il token di conferma
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Email confermata per l'utente: {user.Username} ({user.Email})");
+
+                TempData["SuccessMessage"] = "Email confermata con successo!";
+                return RedirectToAction("Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante la conferma dell'email.");
+                TempData["ErrorMessage"] = "Si è verificato un errore. Riprova più tardi.";
+                return RedirectToAction("Login");
+            }
+        }
+
+        [HttpGet]
         public IActionResult RecuperoPassword()
         {
             return View(new RichiestaRecuperoPasswordViewModel());
@@ -258,7 +308,7 @@ namespace GestioneClienti.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Errore durante l'hashing della password");
-                throw; 
+                throw;
             }
         }
 
@@ -276,15 +326,14 @@ namespace GestioneClienti.Controllers
                     return View("RecuperoPassword");
                 }
 
-                var token = GeneratePasswordResetToken(); 
+                var token = GeneratePasswordResetToken();
                 user.PasswordResetToken = token;
                 user.PasswordResetTokenExpires = DateTime.UtcNow.AddHours(24);
                 _context.Update(user);
                 await _context.SaveChangesAsync();
 
-               var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token }, protocol: Request.Scheme);
-
-               var emailBody = $@"
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token }, protocol: Request.Scheme);
+                var emailBody = $@"
 <html>
   <body style=""font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f0f12; color: #e0e0e0; margin: 0; padding: 20px;"">
     <div style=""max-width: 600px; margin: 0 auto; border: 1px solid #2a2a3a; border-radius: 8px; overflow: hidden; background-color: #1a1a2a;"">
@@ -354,15 +403,15 @@ namespace GestioneClienti.Controllers
                 utente.PasswordResetTokenExpires < DateTime.UtcNow)
             {
                 TempData["ErrorMessage"] = "Il link per il reset non è valido o è scaduto.";
-                return RedirectToAction("Login"); 
+                return RedirectToAction("Login");
             }
 
             var model = new RecuperoPasswordViewModel
             {
-                Email = utente.Email, // Potresti ancora aver bisogno dell'email (readonly?)
+                Email = utente.Email,
                 Token = token,
-                UserId = userId.Value, // Passa l'UserId al ViewModel
-                NuovaPassword = string.Empty, // Inizializza le proprietà per il form
+                UserId = userId.Value,
+                NuovaPassword = string.Empty,
                 ConfermaPassword = string.Empty
             };
 
@@ -418,7 +467,7 @@ namespace GestioneClienti.Controllers
             var username = User.Identity?.Name;
             if (string.IsNullOrEmpty(username))
             {
-                return Unauthorized(new { message = "Utente non autenticato" }); 
+                return Unauthorized(new { message = "Utente non autenticato" });
             }
 
             try
@@ -430,7 +479,7 @@ namespace GestioneClienti.Controllers
 
                 if (utente == null)
                 {
-                    return NotFound(new { message = "Utente non trovato" }); 
+                    return NotFound(new { message = "Utente non trovato" });
                 }
 
                 // 2. Verifica password corrente
@@ -462,11 +511,11 @@ namespace GestioneClienti.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Errore di verifica dopo l'aggiornamento della password" }); // Restituisce 500 come JSON
                 }
 
-                // 6. Logout forzato (se vuoi disconnettere l'utente dopo il cambio password)
+                // 6. Logout forzato 
                 await HttpContext.SignOutAsync();
                 _logger.LogInformation($"Password cambiata con successo per {username}. Nuovo hash: {updatedHash}");
-               return Json(new { success = true, message = "Password aggiornata con successo! Sarai reindirizzato per il login." });
-               
+                return Json(new { success = true, message = "Password aggiornata con successo! Sarai reindirizzato per il login." });
+
             }
             catch (Exception ex)
             {

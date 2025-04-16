@@ -119,7 +119,7 @@ namespace GestioneClienti.Controllers
       </body>
     </html>";
 
-                    try
+                        try
                         {
                             await _emailSender.SendEmailAsync(userEmail, subject, message);
                             _logger.LogInformation("Email di conferma ordine inviata con successo a {Email}", userEmail);
