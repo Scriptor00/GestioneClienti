@@ -30,7 +30,6 @@ body {
     padding: 0;
 }
 
-
 .navbar {
     background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
@@ -649,9 +648,10 @@ body {
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
-                            </a>
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img id="navbarProfileImage" src="https://via.placeholder.com/30" class="rounded-circle me-1" style="width: 30px; height: 30px; object-fit: cover;">
+        @User.Identity.Name
+    </a>
                             <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
                                 <li>
                                     <a class="dropdown-item" href="@Url.Action("Profilo", "Prodotti")">
@@ -985,7 +985,6 @@ body {
                 trailer.style.opacity = 1;
                 
                 if (youtubeIframe) {
-                    // YouTube: usa l'API JS per riprendere dal punto corrente
                     if (typeof youtubeIframe.contentWindow.postMessage === 'function') {
                         youtubeIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
                     }
@@ -1004,10 +1003,18 @@ body {
                     videoPausedTime = localVideo.currentTime; // Salva il tempo corrente
                     localVideo.pause();
                 }
-                // YouTube: non serve fare nulla (continua in background)
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const savedImage = localStorage.getItem('profileImage');
+    const navbarProfileImage = document.getElementById('navbarProfileImage');
+    
+    if (savedImage && navbarProfileImage) {
+        navbarProfileImage.src = savedImage;
+    }
+});
 </script>
 </body>
 </html>
