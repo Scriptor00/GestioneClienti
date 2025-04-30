@@ -9,6 +9,7 @@
   <ItemGroup>
   <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   <PackageReference Include="Bogus" Version="35.6.2" />
+  <PackageReference Include="MailKit" Version="4.11.0" />
   <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 
   <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.0" />

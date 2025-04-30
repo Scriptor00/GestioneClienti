@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
+using MimeKit;
 
 namespace GestioneClienti.Repositories
 {
@@ -12,9 +10,9 @@ namespace GestioneClienti.Repositories
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailSender> _logger;
 
-        public EmailSender(EmailSettings emailSettings, ILogger<EmailSender> logger)
+        public EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSender> logger)
         {
-            _emailSettings = emailSettings;
+            _emailSettings = emailSettings.Value;
             _logger = logger;
         }
 
@@ -26,48 +24,37 @@ namespace GestioneClienti.Repositories
                 _logger.LogDebug("Configurazione SMTP: Server={SmtpServer}:{SmtpPort}",
                     _emailSettings.SmtpServer, _emailSettings.MailPort);
 
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-
-                using (var client = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.MailPort))
+                using (var client = new SmtpClient())
                 {
-                    client.EnableSsl = _emailSettings.UseSsl;
-                    client.Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password);
-                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    client.Timeout = _emailSettings.Timeout;
+                    await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.MailPort, SecureSocketOptions.StartTls);
 
-                    var mailMessage = new MailMessage
+                    await client.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
+
+                    var message = new MimeMessage();
+                    message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.FromEmail));
+                    message.To.Add(new MailboxAddress("", email));
+                    message.Subject = subject;
+
+                    var bodyBuilder = new BodyBuilder
                     {
-                        From = new MailAddress(_emailSettings.FromEmail, _emailSettings.SenderName),
-                        Subject = subject,
-                        Body = htmlMessage,
-                        IsBodyHtml = true,
-                        Priority = MailPriority.High
+                        HtmlBody = htmlMessage
                     };
-                    mailMessage.To.Add(email);
+                    message.Body = bodyBuilder.ToMessageBody();
 
-                    _logger.LogInformation("Invio email a {Email} con oggetto '{Subject}'",
-                        email, subject);
+                    _logger.LogInformation("Invio email a {Email} con oggetto '{Subject}'", email, subject);
 
-                    await client.SendMailAsync(mailMessage);
+                    await client.SendAsync(message);
+
+                    await client.DisconnectAsync(true);
+
                     _logger.LogInformation("Email inviata con successo a {Email}", email);
                 }
-            }
-            catch (SmtpException smtpEx)
-            {
-                _logger.LogError(smtpEx, "Errore SMTP durante l'invio a {Email}. Status: {StatusCode}",
-                    email, smtpEx.StatusCode);
-                throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Errore durante l'invio a {Email}", email);
                 throw;
             }
-        }
-
-        public Task SendEmailAsync(string to, string from, string subject, string htmlMessage)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task SendWelcomeEmail(string email, string username)
@@ -129,24 +116,24 @@ namespace GestioneClienti.Repositories
 <body>
     <div class='container'>
         <div class='header'>🎮 Benvenuto nella Nostra Gaming Community! 🎮</div>
-        
+
         <p>Ciao <span class='username'>{username}</span>,</p>
-        
+
         <p>Il tuo account è stato creato con successo! Preparati a vivere un'esperienza di gioco straordinaria.</p>
-        
+
         <p>Ecco cosa puoi fare ora:</p>
         <ul>
             <li>Esplora il nostro catalogo di giochi</li>
             <li>Unisciti alla community e trova nuovi compagni di squadra</li>
             <li>Scopri le offerte esclusive per i nuovi membri</li>
         </ul>
-        
+
         <center>
            <a href='http://localhost:5000/Prodotti/Home' class='btn'>INIZIA L'AVVENTURA</a>
         </center>
-        
+
         <p>Se hai bisogno di aiuto, il nostro team di supporto è sempre pronto ad assisterti.</p>
-        
+
         <div class='footer'>
             <p>Ci vediamo in gioco!<br>
             <strong>Il Team di Gaming Store</strong></p>
@@ -158,7 +145,8 @@ namespace GestioneClienti.Repositories
 ";
             await SendEmailAsync(email, subject, htmlMessage);
         }
-       public async Task SendEmailConferma(string email, string username, string token)
+
+        public async Task SendEmailConferma(string email, string username, string token)
         {
             var confermaUrl = $"http://localhost:5000/Account/ConfermaEmail?token={token}";
             var subject = "Conferma la tua registrazione";
@@ -216,17 +204,17 @@ namespace GestioneClienti.Repositories
 <body>
     <div class='container'>
         <div class='header'>🎮 Conferma il tuo account 🎮</div>
-        
+
         <p>Ciao <span class='username'>{username}</span>,</p>
-        
+
         <p>Benvenuto nella nostra gaming community! Per completare la registrazione, conferma il tuo indirizzo email cliccando sul pulsante qui sotto:</p>
-        
+
         <center>
             <a href='{confermaUrl}' class='btn-confirm'>CONFERMA EMAIL</a>
         </center>
-        
+
         <p>Se non hai richiesto la registrazione, puoi ignorare questa email.</p>
-        
+
         <div class='footer'>
             <p>A presto in-game!<br>
             <strong>Il Team di Gaming Store</strong></p>
@@ -238,17 +226,28 @@ namespace GestioneClienti.Repositories
 ";
             await SendEmailAsync(email, subject, body);
         }
+
+        public Task SendEmailAsync(string to, string from, string subject, string htmlMessage)
+        {
+            throw new NotImplementedException();
+        }
     }
+}
+
+public interface IEmailSender
+{
+    Task SendEmailAsync(string email, string subject, string htmlMessage);
+    Task SendWelcomeEmail(string email, string username);
+    Task SendEmailConferma(string email, string username, string token);
 }
 
 public class EmailSettings
 {
     public string SmtpServer { get; set; } = string.Empty;
-    public int MailPort { get; set; } = 2525;
+    public int MailPort { get; set; } = 587; 
     public string SenderName { get; set; } = string.Empty;
     public string FromEmail { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
-    public bool UseSsl { get; set; } = true;
     public int Timeout { get; set; } = 30000;
 }

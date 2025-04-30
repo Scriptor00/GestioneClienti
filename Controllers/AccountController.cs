@@ -9,10 +9,8 @@ using GestioneClienti.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
 using System.Text.Encodings.Web;
 using GestioneClienti.Repositories;
-using Microsoft.Extensions.Logging;
 using GestioneClienti.Services;
 
 namespace GestioneClienti.Controllers
