@@ -57,10 +57,11 @@ namespace GestioneClienti.Repositories
             }
         }
 
-        public async Task SendWelcomeEmail(string email, string username)
-        {
-            string subject = "Benvenuto nella nostra piattaforma!";
-            string htmlMessage = $@"
+       public async Task SendWelcomeEmail(string email, string username)
+{
+    string subject = "Benvenuto nella nostra piattaforma!";
+
+    string htmlMessage = $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -129,7 +130,7 @@ namespace GestioneClienti.Repositories
         </ul>
 
         <center>
-           <a href='http://localhost:5000/Prodotti/Home' class='btn'>INIZIA L'AVVENTURA</a>
+            <a href='http://localhost:5000/Prodotti/Home' class='btn'>INIZIA L'AVVENTURA</a>
         </center>
 
         <p>Se hai bisogno di aiuto, il nostro team di supporto è sempre pronto ad assisterti.</p>
@@ -143,39 +144,42 @@ namespace GestioneClienti.Repositories
 </body>
 </html>
 ";
-            await SendEmailAsync(email, subject, htmlMessage);
-        }
 
-        public async Task SendEmailConferma(string email, string username, string token)
-        {
-            var confermaUrl = $"http://localhost:5000/Account/ConfermaEmail?token={token}";
-            var subject = "Conferma la tua registrazione";
-            var body = $@"
+    await SendEmailAsync(email, subject, htmlMessage);
+}
+
+    
+  public async Task SendEmailConferma(string email, string username, string token)
+{
+    var confermaUrl = $"http://localhost:5000/Account/ConfermaEmail?token={token}";
+    var subject = "Conferma la tua registrazione";
+    var body = $@"
 <!DOCTYPE html>
 <html>
 <head>
     <style>
         body {{
-            background-color: #0f0f1a;
-            color: #e0e0ff;
             font-family: 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
+            margin: 0;
             padding: 20px;
+            background-color: #f9f9f9;
+            color: #333333;
         }}
         .container {{
             max-width: 600px;
             margin: 0 auto;
-            background-color: #1a1a2e;
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 8px;
-            border: 1px solid #2d2d5a;
+            border: 1px solid #e0e0e0;
         }}
         .header {{
             color: #6c5ce7;
             font-size: 24px;
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 5px rgba(108, 92, 231, 0.3);
+            text-shadow: 0 0 2px rgba(108, 92, 231, 0.3);
         }}
         .username {{
             color: #00cec9;
@@ -186,7 +190,7 @@ namespace GestioneClienti.Repositories
             padding: 12px 24px;
             margin: 20px 0;
             background: linear-gradient(135deg, #6c5ce7 0%, #00cec9 100%);
-            color: white !important;
+            color: black !important; /* Testo nero */
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
@@ -195,9 +199,37 @@ namespace GestioneClienti.Repositories
         .footer {{
             margin-top: 30px;
             font-size: 14px;
-            color: #a0a0c0;
-            border-top: 1px solid #2d2d5a;
+            color: #777777;
+            border-top: 1px solid #e0e0e0;
             padding-top: 20px;
+            text-align: center;
+        }}
+
+        @media (prefers-color-scheme: dark) {{
+            body {{
+                background-color: #121212;
+                color: #e0e0e0;
+            }}
+            .container {{
+                background-color: #1e1e1e;
+                border: 1px solid #333333;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            }}
+            .header {{
+                color: #a78bfa;
+                text-shadow: 0 0 5px rgba(167, 139, 250, 0.5);
+            }}
+            .username {{
+                color: #80f7f0;
+            }}
+            .btn-confirm {{
+                background: linear-gradient(135deg, #a78bfa 0%, #80f7f0 100%);
+                color: black !important; /* Testo nero anche nel tema scuro */
+            }}
+            .footer {{
+                color: #a0a0a0;
+                border-top: 1px solid #333333;
+            }}
         }}
     </style>
 </head>
@@ -222,10 +254,11 @@ namespace GestioneClienti.Repositories
         </div>
     </div>
 </body>
-</html>
-";
-            await SendEmailAsync(email, subject, body);
-        }
+</html>";
+
+    await SendEmailAsync(email, subject, body);
+}
+
 
         public Task SendEmailAsync(string to, string from, string subject, string htmlMessage)
         {
@@ -234,12 +267,7 @@ namespace GestioneClienti.Repositories
     }
 }
 
-public interface IEmailSender
-{
-    Task SendEmailAsync(string email, string subject, string htmlMessage);
-    Task SendWelcomeEmail(string email, string username);
-    Task SendEmailConferma(string email, string username, string token);
-}
+
 
 public class EmailSettings
 {

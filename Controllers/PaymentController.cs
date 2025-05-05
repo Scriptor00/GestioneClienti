@@ -4,6 +4,7 @@ using Stripe;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using Microsoft.Extensions.Options;
 
 namespace GestioneClienti.Controllers
 {
@@ -94,38 +95,48 @@ namespace GestioneClienti.Controllers
                         message.Subject = subject;
 
                         var bodyBuilder = new BodyBuilder
-                        {
-                            HtmlBody = $@"
-    <html>
-        <body style=""font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f0f12; color: #e0e0e0; margin: 0; padding: 20px;"">
-            <div style=""max-width: 600px; margin: 0 auto; border: 1px solid #2a2a3a; border-radius: 8px; overflow: hidden; background-color: #1a1a2a;"">
-                <div style=""background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%); padding: 20px; text-align: center;"">
-                    <h1 style=""margin: 0; color: white; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"">🎮 Ordine Confermato! 🎮</h1>
-                </div>
+{
+    HtmlBody = $@"
+<html>
+    <body style=""font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f8; color: #1a1a1a; margin: 0; padding: 20px;"">
+        <div style=""max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background-color: #ffffff;"">
 
-                <div style=""padding: 25px;"">
-                    <p style=""font-size: 16px; line-height: 1.6;"">Grazie per il tuo acquisto nel nostro <strong style=""color: #9d50bb;"">gaming store</strong>! Il tuo supporto ci aiuta a portarti le ultime novità tech.</p>
-
-                    <div style=""background-color: #25253a; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #6e48aa;"">
-                        <p style=""margin: 5px 0;""><strong style=""color: #b8b8ff;"">ID Transazione:</strong> <span style=""font-family: monospace; color: #e0e0e0;"">{charge.Id}</span></p>
-                    </div>
-
-                    <p style=""font-size: 16px; line-height: 1.6;"">Il tuo ordine è in fase di elaborazione. Riceverai un'email con gli aggiornamenti sulla spedizione entro 24 ore.</p>
-
-                    <p style=""font-size: 14px; color: #a0a0a0;"">Hai domande? Rispondi a questa email o contattaci su <a href=""https://discord.gg/tuo-link"" style=""color: #6e48aa; text-decoration: none;"">Discord</a>!</p>
-                </div>
-
-                <div style=""background-color: #0f0f1a; padding: 15px; text-align: center; font-size: 12px; color: #7a7a8c;"">
-                    <p style=""margin: 0;"">© 2024 <strong style=""color: #9d50bb;"">[Gaming Store]</strong>. Tutti i diritti riservati.</p>
-                    <p style=""margin: 10px 0 0;"">
-                        <a href=""https://twitter.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Twitter</a>
-                        <a href=""https://instagram.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Instagram</a>
-                    </p>
-                </div>
+            <div style=""background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%); padding: 20px; text-align: center;"">
+                <h1 style=""margin: 0; color: white; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"">🎮 Ordine Confermato! 🎮</h1>
             </div>
-        </body>
-    </html>"
-                        };
+
+            <div style=""padding: 25px;"">
+                <p style=""font-size: 16px; line-height: 1.6;"">
+                    Grazie per il tuo acquisto nel nostro <strong style=""color: #6e48aa;"">gaming store</strong>! Il tuo supporto ci aiuta a portarti le ultime novità tech.
+                </p>
+
+                <div style=""background-color: #f1ecfc; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #6e48aa;"">
+                    <p style=""margin: 5px 0;""><strong style=""color: #6e48aa;"">ID Transazione:</strong> <span style=""font-family: monospace; color: #333;"">{charge.Id}</span></p>
+                </div>
+
+                <p style=""font-size: 16px; line-height: 1.6;"">
+                    Il tuo ordine è in fase di elaborazione. Riceverai un'email con gli aggiornamenti sulla spedizione entro 24 ore.
+                </p>
+
+                <p style=""font-size: 14px; color: #555;"">
+                    Hai domande? Rispondi a questa email o contattaci su 
+                    <a href=""https://discord.gg/tuo-link"" style=""color: #6e48aa; text-decoration: none;"">Discord</a>!
+                </p>
+            </div>
+
+            <div style=""background-color: #f4f4f8; padding: 15px; text-align: center; font-size: 12px; color: #888;"">
+                <p style=""margin: 0;"">© 2024 <strong style=""color: #6e48aa;"">[Gaming Store]</strong>. Tutti i diritti riservati.</p>
+                <p style=""margin: 10px 0 0;"">
+                    <a href=""https://twitter.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Twitter</a>
+                    <a href=""https://instagram.com/tuostore"" style=""color: #6e48aa; text-decoration: none; margin: 0 10px;"">Instagram</a>
+                </p>
+            </div>
+
+        </div>
+    </body>
+</html>"
+};
+
                         message.Body = bodyBuilder.ToMessageBody();
 
                         try

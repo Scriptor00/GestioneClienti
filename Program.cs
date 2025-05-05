@@ -5,8 +5,6 @@ using Serilog;
 using WebAppEF.Models;
 using WebAppEF.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using GestioneClienti.Repositories;
 using GestioneClienti.Services;
@@ -30,16 +28,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configurazione CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowWithCredentials", builder =>
+    options.AddPolicy("AllowWithCredentials", policyBuilder =>
     {
-        builder.WithOrigins("http://localhost:5000")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
+        policyBuilder.WithOrigins("http://localhost:5000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
     });
 });
 
-// Configurazione autenticazione Cookie (cookie authentication)
+// Configurazione autenticazione Cookie
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -64,9 +62,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 });
 
-
-
-
 // Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
@@ -76,13 +71,14 @@ builder.Services.AddScoped<RecaptchaService>();
 // Configurazione EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
-// Configurazione EmailSender con logging
+// Registrazione EmailSender con interfaccia corretta e logging
 builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
 {
-    var emailSettings = provider.GetRequiredService<IOptions<EmailSettings>>().Value;
+    var emailSettings = provider.GetRequiredService<IOptions<EmailSettings>>();
     var logger = provider.GetRequiredService<ILogger<EmailSender>>();
-    return new EmailSender(emailSettings, logger);
+    return new EmailSender(emailSettings, logger); 
 });
+
 
 // Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -92,7 +88,12 @@ builder.Services.AddSwaggerGen(c =>
         Title = "WebAppEF API",
         Version = "v1",
         Description = "API per la gestione dei clienti e ordini.",
-        Contact = new OpenApiContact { Name = "Carlo", Email = "supporto@webapief.com", Url = new Uri("http://localhost:5000/") }
+        Contact = new OpenApiContact
+        {
+            Name = "Carlo",
+            Email = "supporto@webapief.com",
+            Url = new Uri("http://localhost:5000/")
+        }
     });
 });
 
@@ -118,10 +119,10 @@ using (var scope = app.Services.CreateScope())
         if (context.Clienti.Any())
         {
             context.Clienti.RemoveRange(context.Clienti);
-            context.SaveChanges(); // Salva la cancellazione prima di ripopolare
+            context.SaveChanges();
         }
 
-        // Riopopola la tabella Clienti con nuovi dati Bogus
+        // Riempie la tabella Clienti e Ordini con dati fake
         context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
 
         if (!context.Ordini.Any())
@@ -129,7 +130,7 @@ using (var scope = app.Services.CreateScope())
             context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
         }
 
-        context.SaveChanges(); // Salva l'inserimento dei nuovi clienti e degli ordini
+        context.SaveChanges();
     }
     catch (Exception ex)
     {
@@ -160,13 +161,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 
-app.MapControllers();
-app.MapRazorPages();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Middleware per logging delle richieste
+// Logging delle richieste
 app.Use(async (context, next) =>
 {
     Log.Information($"Request: {context.Request.Method} {context.Request.Path}");
@@ -174,5 +169,10 @@ app.Use(async (context, next) =>
     Log.Information($"Response: {context.Response.StatusCode}");
 });
 
-app.Run();
+app.MapControllers();
+app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.Run();
