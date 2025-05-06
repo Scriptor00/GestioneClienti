@@ -26,5 +26,9 @@ namespace GestioneClienti.Entities
 
         public bool EmailConfermata { get; set; } = false;
         public string? EmailConfermaToken { get; set; }
+
+        public int AccessFailedCount { get; set; } = 0;
+        public bool LockoutEnabled { get; set; } = false;
+        public DateTime? LockoutEnd { get; set; }
     }
 }

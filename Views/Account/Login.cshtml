@@ -247,7 +247,7 @@
     </div>
 }
 
-       <form method="post" asp-action="Login" asp-controller="Account" autocomplete="off"></form>
+       <form method="post" asp-action="Login" asp-controller="Account" autocomplete="off">
     @Html.AntiForgeryToken()
 
     <input type="text" style="display:none;" name="fakeUsername" autocomplete="username" tabindex="-1" aria-hidden="true">

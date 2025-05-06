@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using GestioneClienti.Repositories;
 using GestioneClienti.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,15 +26,23 @@ builder.Host.UseSerilog();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configurazione lockout (tentativi errati di login)
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+});
+
 // Configurazione CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWithCredentials", policyBuilder =>
     {
         policyBuilder.WithOrigins("http://localhost:5000")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
+                     .AllowAnyHeader()
+                     .AllowAnyMethod()
+                     .AllowCredentials();
     });
 });
 
@@ -76,9 +85,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
 {
     var emailSettings = provider.GetRequiredService<IOptions<EmailSettings>>();
     var logger = provider.GetRequiredService<ILogger<EmailSender>>();
-    return new EmailSender(emailSettings, logger); 
+    return new EmailSender(emailSettings, logger);
 });
-
 
 // Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>

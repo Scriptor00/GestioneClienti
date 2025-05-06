@@ -51,36 +51,52 @@ namespace GestioneClienti.Controllers
             try
             {
                 var utente = await _context.Utenti
-                    .Where(u => u.Username == model.Username)
-                    .Select(u => new
-                    {
-                        u.Id,
-                        u.Username,
-                        u.PasswordHash,
-                        u.Role,
-                        u.Email,
-                        u.EmailConfermata
-                    })
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(u => u.Username == model.Username);
 
                 if (utente == null)
                 {
-
-                    _logger.LogWarning($"Tentativo di login fallito per username: {model.Username}");
+                    _logger.LogWarning($"Tentativo di login fallito per username inesistente: {model.Username}");
                     ModelState.AddModelError(string.Empty, "Credenziali non valide");
                     return View(model);
                 }
 
-                // Verifica password con timing costante
+                // Controllo blocco account
+                if (utente.LockoutEnabled && utente.LockoutEnd.HasValue && utente.LockoutEnd > DateTime.UtcNow)
+                {
+                    var minutiRestanti = (utente.LockoutEnd.Value - DateTime.UtcNow).Minutes;
+                    ModelState.AddModelError(string.Empty, $"Account bloccato. Riprova tra {minutiRestanti} minuti.");
+                    return View(model);
+                }
+
+                // Verifica password
                 var passwordValida = VerifyPassword(model.Password, utente.PasswordHash);
 
                 if (!passwordValida)
                 {
-                    _logger.LogWarning($"Password errata per l'utente: {model.Username}");
-                    ModelState.AddModelError(string.Empty, "Credenziali non valide");
+                    utente.AccessFailedCount++;
+
+                    // Se raggiunti 5 tentativi, blocca account per 10 minuti
+                    if (utente.AccessFailedCount >= 5)
+                    {
+                        utente.LockoutEnabled = true;
+                        utente.LockoutEnd = DateTime.UtcNow.AddMinutes(10);
+                        _logger.LogWarning($"Account bloccato per 10 minuti: {utente.Username}");
+                        ModelState.AddModelError(string.Empty, "Hai superato i tentativi massimi. Account bloccato per 10 minuti.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Tentativo fallito {utente.AccessFailedCount}/5 per: {utente.Username}");
+                        ModelState.AddModelError(string.Empty, "Credenziali non valide.");
+                    }
+
+                    await _context.SaveChangesAsync();
                     return View(model);
                 }
+
+                // Reset tentativi falliti dopo login corretto
+                utente.AccessFailedCount = 0;
+                utente.LockoutEnabled = false;
+                utente.LockoutEnd = null;
 
                 if (!utente.EmailConfermata && utente.Role != "Admin")
                 {
@@ -90,13 +106,13 @@ namespace GestioneClienti.Controllers
                 }
 
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, utente.Username),
-                    new Claim(ClaimTypes.Name, utente.Username),
-                    new Claim(ClaimTypes.Email, utente.Email ?? string.Empty),
-                    new Claim(ClaimTypes.Role, utente.Role ?? "User"),
-                    new Claim("UserId", utente.Id.ToString())
-                };
+        {
+            new Claim(ClaimTypes.NameIdentifier, utente.Username),
+            new Claim(ClaimTypes.Name, utente.Username),
+            new Claim(ClaimTypes.Email, utente.Email ?? string.Empty),
+            new Claim(ClaimTypes.Role, utente.Role ?? "User"),
+            new Claim("UserId", utente.Id.ToString())
+        };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -117,10 +133,12 @@ namespace GestioneClienti.Controllers
 
                 _logger.LogInformation($"Login riuscito per: {utente.Username}");
 
+                await _context.SaveChangesAsync(); // Salva reset del conteggio
 
                 model.Password = string.Empty;
 
                 TempData["WelcomeMessage"] = $"Benvenuto, {utente.Username}!";
+
                 if (utente.Role == "Admin")
                 {
                     return RedirectToAction("Dashboard", "Home");
@@ -137,6 +155,7 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
         }
+
         private bool VerifyPassword(string password, string storedHash)
         {
             try
@@ -276,7 +295,7 @@ namespace GestioneClienti.Controllers
 
                 // Conferma l'email
                 user.EmailConfermata = true;
-                user.EmailConfermaToken = null; // Rimuovi il token di conferma
+                user.EmailConfermaToken = null; // Rimozione token di conferma
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Email confermata per l'utente: {user.Username} ({user.Email})");
@@ -541,8 +560,8 @@ namespace GestioneClienti.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Message"] = "Password aggiornata con successo!";
-            return RedirectToAction("Login", new { forcedReload = DateTime.Now.Ticks });        
-            }
+            return RedirectToAction("Login", new { forcedReload = DateTime.Now.Ticks });
+        }
 
 
         [HttpGet]
