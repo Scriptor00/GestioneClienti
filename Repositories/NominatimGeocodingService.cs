@@ -41,7 +41,6 @@ namespace GestioneClienti.Repositories
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            // Configurazione di base per Nominatim
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GestioneClienti/1.0");
         }
 

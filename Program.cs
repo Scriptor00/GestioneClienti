@@ -85,7 +85,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
 {
     var emailSettings = provider.GetRequiredService<IOptions<EmailSettings>>();
     var logger = provider.GetRequiredService<ILogger<EmailSender>>();
-    return new EmailSender(emailSettings, logger);
+    var configuration = provider.GetRequiredService<IConfiguration>(); 
+    return new EmailSender(emailSettings, logger, configuration); 
 });
 
 // Configurazione Swagger

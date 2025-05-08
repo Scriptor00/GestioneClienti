@@ -2,6 +2,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using Microsoft.Extensions.Configuration; // Aggiungi questo namespace
 
 namespace GestioneClienti.Repositories
 {
@@ -9,11 +10,14 @@ namespace GestioneClienti.Repositories
     {
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailSender> _logger;
+        private readonly IConfiguration _configuration; // Aggiungi questa proprietà
 
-        public EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSender> logger)
+        // Modifica il costruttore per accettare IConfiguration
+        public EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSender> logger, IConfiguration configuration)
         {
             _emailSettings = emailSettings.Value;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
@@ -27,7 +31,6 @@ namespace GestioneClienti.Repositories
                 using (var client = new SmtpClient())
                 {
                     await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.MailPort, SecureSocketOptions.StartTls);
-
                     await client.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
 
                     var message = new MimeMessage();
@@ -42,11 +45,8 @@ namespace GestioneClienti.Repositories
                     message.Body = bodyBuilder.ToMessageBody();
 
                     _logger.LogInformation("Invio email a {Email} con oggetto '{Subject}'", email, subject);
-
                     await client.SendAsync(message);
-
                     await client.DisconnectAsync(true);
-
                     _logger.LogInformation("Email inviata con successo a {Email}", email);
                 }
             }
@@ -57,11 +57,12 @@ namespace GestioneClienti.Repositories
             }
         }
 
-       public async Task SendWelcomeEmail(string email, string username)
-{
-    string subject = "Benvenuto nella nostra piattaforma!";
+        public async Task SendWelcomeEmail(string email, string username)
+        {
+            var baseUrl = _configuration["BaseUrl"]; // Ottieni l'URL base dalla configurazione
+            string subject = "Benvenuto nella nostra piattaforma!";
 
-    string htmlMessage = $@"
+            string htmlMessage = $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -130,7 +131,7 @@ namespace GestioneClienti.Repositories
         </ul>
 
         <center>
-            <a href='http://localhost:5000/Prodotti/Home' class='btn'>INIZIA L'AVVENTURA</a>
+            <a href='{baseUrl}/Prodotti/Home' class='btn'>INIZIA L'AVVENTURA</a>
         </center>
 
         <p>Se hai bisogno di aiuto, il nostro team di supporto è sempre pronto ad assisterti.</p>
@@ -145,15 +146,15 @@ namespace GestioneClienti.Repositories
 </html>
 ";
 
-    await SendEmailAsync(email, subject, htmlMessage);
-}
+            await SendEmailAsync(email, subject, htmlMessage);
+        }
 
-    
-  public async Task SendEmailConferma(string email, string username, string token)
-{
-    var confermaUrl = $"http://localhost:5000/Account/ConfermaEmail?token={token}";
-    var subject = "Conferma la tua registrazione";
-    var body = $@"
+        public async Task SendEmailConferma(string email, string username, string token)
+        {
+            var baseUrl = _configuration["BaseUrl"]; // Ottieni l'URL base dalla configurazione
+            var confermaUrl = $"{baseUrl}/Account/ConfermaEmail?token={token}";
+            var subject = "Conferma la tua registrazione";
+            var body = $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -256,9 +257,8 @@ namespace GestioneClienti.Repositories
 </body>
 </html>";
 
-    await SendEmailAsync(email, subject, body);
-}
-
+            await SendEmailAsync(email, subject, body);
+        }
 
         public Task SendEmailAsync(string to, string from, string subject, string htmlMessage)
         {

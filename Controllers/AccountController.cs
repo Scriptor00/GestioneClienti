@@ -75,7 +75,6 @@ namespace GestioneClienti.Controllers
                 {
                     utente.AccessFailedCount++;
 
-                    // Se raggiunti 5 tentativi, blocca account per 10 minuti
                     if (utente.AccessFailedCount >= 5)
                     {
                         utente.LockoutEnabled = true;
@@ -93,7 +92,7 @@ namespace GestioneClienti.Controllers
                     return View(model);
                 }
 
-                // Reset tentativi falliti dopo login corretto
+                // dopo il login reimposto tutto
                 utente.AccessFailedCount = 0;
                 utente.LockoutEnabled = false;
                 utente.LockoutEnd = null;
@@ -133,7 +132,7 @@ namespace GestioneClienti.Controllers
 
                 _logger.LogInformation($"Login riuscito per: {utente.Username}");
 
-                await _context.SaveChangesAsync(); // Salva reset del conteggio
+                await _context.SaveChangesAsync();
 
                 model.Password = string.Empty;
 
@@ -380,7 +379,7 @@ namespace GestioneClienti.Controllers
         }}
         .header h1 {{
             margin: 0;
-            color: white !important;
+            color: black !important;
             font-size: 28px;
             font-weight: bold;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -405,7 +404,7 @@ namespace GestioneClienti.Controllers
             display: inline-block;
             padding: 14px 30px;
             background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%) !important;
-            color: #ffffff !important;
+            color: red !important;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
@@ -413,8 +412,7 @@ namespace GestioneClienti.Controllers
             box-shadow: 0 3px 10px rgba(110, 72, 170, 0.4);
             border: none;
             min-width: 220px;
-            /* Aggiunta bordo per garantire la leggibilità */
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            text-shadow: none !important;
         }}
         .footer {{
             background-color: #f0f0f0 !important;
@@ -445,9 +443,8 @@ namespace GestioneClienti.Controllers
         @media (prefers-color-scheme: dark) {{
             .reset-password-button {{
                 background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%) !important;
-                color: #ffffff !important;
-                /* Aggiunto per garantire che il testo sia visibile anche in dark mode */
-                text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+                color: red !important;
+                text-shadow: none !important;
             }}
         }}
     </style>
@@ -462,7 +459,7 @@ namespace GestioneClienti.Controllers
             <p>Hai richiesto di reimpostare la password del tuo account. Clicca il pulsante qui sotto per procedere:</p>
             
             <div class=""button-container"">
-                <a href=""{HtmlEncoder.Default.Encode(callbackUrl)}"" class=""reset-password-button"" style=""color: #ffffff !important; background: linear-gradient(90deg, #6e48aa 0%, #9d50bb 100%) !important; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"">
+                <a href=""{HtmlEncoder.Default.Encode(callbackUrl)}"" class=""reset-password-button"">
                     🎮 REIMPOSTA PASSWORD
                 </a>
             </div>

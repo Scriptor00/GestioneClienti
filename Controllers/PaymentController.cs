@@ -153,13 +153,11 @@ namespace GestioneClienti.Controllers
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Errore durante l'invio dell'email di conferma ordine a {Email}", userEmail);
-                            // Potresti voler gestire questo errore in modo appropriato (es. loggare, mostrare un messaggio all'utente)
                         }
                     }
                     else
                     {
                         _logger.LogWarning("Impossibile recuperare l'email dell'utente per inviare la conferma dell'ordine.");
-                        // Gestisci il caso in cui l'email non è disponibile
                     }
 
                     return Ok(new { success = true, chargeId = charge.Id });
