@@ -97,7 +97,7 @@ namespace GestioneClienti.Controllers
                 utente.LockoutEnabled = false;
                 utente.LockoutEnd = null;
 
-                if (!utente.EmailConfermata && utente.Role != "Admin")
+            if (!utente.EmailConfermata && utente.Role != "Admin")
                 {
                     _logger.LogWarning($"L'utente {model.Username} ha tentato di accedere senza confermare l'email.");
                     ModelState.AddModelError(string.Empty, "Devi confermare la tua email prima di poter accedere.");

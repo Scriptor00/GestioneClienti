@@ -247,7 +247,14 @@
     </div>
 }
 
-      <form method="post" asp-action="Login" asp-controller="Account" autocomplete="off">
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="alert-message" class="alert alert-warning text-center">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<form method="post" asp-action="Login" asp-controller="Account" autocomplete="off">
     @Html.AntiForgeryToken()
 
     <input type="text" style="display:none;" name="fakeUsername" autocomplete="username" tabindex="-1" aria-hidden="true">
@@ -322,11 +329,42 @@
                 
                 setTimeout(() => {
                     alert.remove();
-                }, 500); // Tempo per completare la transizione
-            }, 3000); // 3 secondi prima di iniziare la dissolvenza
+                }, 500); 
+            }, 3000); 
         }
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const alertBox = document.getElementById("alert-message");
+        if (alertBox) {
+            setTimeout(() => {
+                alertBox.classList.add("fade-out");
+                setTimeout(() => {
+                    alertBox.remove();
+                }, 1000); 
+            }, 5000); 
+        }
+    });
+</script>
+
+<style>
+    @@keyframes fadeOutUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+    }
+
+    .fade-out {
+        animation: fadeOutUp 1s ease forwards;
+    }
+</style>
+
 
 </body>
 </html>

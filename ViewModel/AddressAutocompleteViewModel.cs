@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace GestioneClienti.ViewModel
 {
     public class AddressAutocompleteViewModel
@@ -13,5 +8,7 @@ namespace GestioneClienti.ViewModel
         public string Country { get; set; }      // ex Paese
         public string PostalCode { get; set; }   // ex Cap
         public string FormattedAddress { get; set; } // ex IndirizzoCompleto
+        public string PlaceId { get; set; }           // Google Place ID
+
     }
 }

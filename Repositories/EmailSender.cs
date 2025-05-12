@@ -2,7 +2,6 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Microsoft.Extensions.Configuration; // Aggiungi questo namespace
 
 namespace GestioneClienti.Repositories
 {
@@ -10,10 +9,9 @@ namespace GestioneClienti.Repositories
     {
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailSender> _logger;
-        private readonly IConfiguration _configuration; // Aggiungi questa proprietà
+        private readonly IConfiguration _configuration; 
 
-        // Modifica il costruttore per accettare IConfiguration
-        public EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSender> logger, IConfiguration configuration)
+       public EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSender> logger, IConfiguration configuration)
         {
             _emailSettings = emailSettings.Value;
             _logger = logger;
@@ -59,7 +57,7 @@ namespace GestioneClienti.Repositories
 
         public async Task SendWelcomeEmail(string email, string username)
         {
-            var baseUrl = _configuration["BaseUrl"]; // Ottieni l'URL base dalla configurazione
+            var baseUrl = _configuration["BaseUrl"]; 
             string subject = "Benvenuto nella nostra piattaforma!";
 
             string htmlMessage = $@"
@@ -151,7 +149,7 @@ namespace GestioneClienti.Repositories
 
         public async Task SendEmailConferma(string email, string username, string token)
         {
-            var baseUrl = _configuration["BaseUrl"]; // Ottieni l'URL base dalla configurazione
+            var baseUrl = _configuration["BaseUrl"]; 
             var confermaUrl = $"{baseUrl}/Account/ConfermaEmail?token={token}";
             var subject = "Conferma la tua registrazione";
             var body = $@"

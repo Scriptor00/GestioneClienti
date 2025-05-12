@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebAppEF.Entities;
-using System.Collections.Generic;
 using WebAppEF.Models;
 using GestioneClienti.ViewModel;
-using Microsoft.Identity.Client;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebAppEF.Controllers

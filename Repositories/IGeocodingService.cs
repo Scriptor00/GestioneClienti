@@ -5,7 +5,9 @@ namespace GestioneClienti.Repositories
 {
     public interface IGeocodingService
     {
-        Task<List<GeocodingResult>> GetAddressSuggestionsAsync(string query, string region = null);
-        Task<List<NominatimAddress>> AutocompleteIndirizzoAsync(string query, string countryCode = null, int limit = 10);
+        Task<List<AddressSuggestion>> GetAddressSuggestionsAsync(string input, string region = null, int limit = 5);
+        Task<AddressDetails> GetAddressDetailsAsync(string placeId);
+        Task<AddressDetails> GetPlaceDetailsAsync(string placeId);
+
     }
 }

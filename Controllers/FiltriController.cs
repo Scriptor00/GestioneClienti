@@ -3,9 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
 using WebAppEF.Models;
 using WebAppEF.ViewModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebAppEF.Controllers
 {

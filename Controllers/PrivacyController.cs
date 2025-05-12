@@ -1,4 +1,3 @@
-using PuppeteerSharp;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAppEF.Controllers

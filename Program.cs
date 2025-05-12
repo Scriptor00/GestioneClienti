@@ -74,8 +74,8 @@ builder.Services.AddAuthorization(options =>
 // Iniezione repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
-builder.Services.AddHttpClient<IGeocodingService, NominatimGeocodingService>();
 builder.Services.AddScoped<RecaptchaService>();
+builder.Services.AddHttpClient<IGeocodingService, GoogleMapsGeocodingService>();
 
 // Configurazione EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

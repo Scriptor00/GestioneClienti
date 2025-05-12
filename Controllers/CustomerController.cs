@@ -2,9 +2,7 @@ using System.Text.Json;
 using GestioneClienti.Repositories;
 using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebAppEF.Entities;
-using WebAppEF.Models;
 using WebAppEF.Repositories;
 using WebAppEF.Utilities;
 using WebAppEF.ViewModel;
@@ -102,63 +100,77 @@ namespace WebAppEF.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> AutocompleteIndirizzo(
-            string query,
-            [FromQuery] string countryCode = null,
-            [FromQuery] int limit = 10)
+    [HttpGet]
+public async Task<IActionResult> AutocompleteIndirizzo(
+    string query,
+    [FromQuery] string countryCode = null,
+    [FromQuery] int limit = 10)
+{
+    try
+    {
+        if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
         {
-            try
+            _logger.LogWarning("Query troppo corta o vuota: {Query}", query);
+            return BadRequest(new { Message = "La query deve contenere almeno 3 caratteri" });
+        }
+
+        _logger.LogInformation("Autocomplete indirizzo avviato per: {Query}", query);
+
+        // Chiamata al servizio Google Maps per ottenere i suggerimenti
+        var suggestions = await _geocodingService.GetAddressSuggestionsAsync(query, countryCode);
+
+        if (suggestions == null || !suggestions.Any())
+        {
+            _logger.LogInformation("Nessun risultato trovato per: {Query}", query);
+            return Ok(new List<AddressAutocompleteViewModel>());
+        }
+
+        // Mappatura dei risultati in ViewModel
+        var results = new List<AddressAutocompleteViewModel>();
+
+        foreach (var suggestion in suggestions.Take(limit))
+        {
+            // Ottenere i dettagli del PlaceId
+            var details = await _geocodingService.GetPlaceDetailsAsync(suggestion.PlaceId);
+
+            if (details != null)
             {
-                // Validazione input
-                if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
+                var result = new AddressAutocompleteViewModel
                 {
-                    _logger.LogWarning("Query di ricerca non valida o troppo corta: {Query}", query);
-                    return BadRequest(new { Message = "La query deve contenere almeno 3 caratteri" });
-                }
+                    PlaceId = suggestion.PlaceId,
+                    FormattedAddress = suggestion.Description,
+                    Street = details.Street,
+                    StreetNumber = details.StreetNumber,
+                    City = details.City,
+                    Country = details.Country,
+                    PostalCode = details.PostalCode
+                };
 
-                _logger.LogInformation("Avviata ricerca indirizzi per: {Query}", query);
-
-                // Chiamata al servizio di geocoding
-                var suggestions = await _geocodingService.AutocompleteIndirizzoAsync(query, countryCode, limit);
-
-                if (suggestions == null || !suggestions.Any())
-                {
-                    _logger.LogInformation("Nessun risultato trovato per: {Query}", query);
-                    return Ok(new List<AddressAutocompleteViewModel>());
-                }
-
-                // Mappatura da NominatimAddress a AddressAutocompleteViewModel
-                var results = suggestions.Select(s => new AddressAutocompleteViewModel
-                {
-                    Street = s.Via,
-                    StreetNumber = s.Civico,
-                    City = s.Citta,
-                    Country = s.Paese,
-                    PostalCode = s.Cap,
-                    FormattedAddress = s.IndirizzoCompleto
-                }).ToList();
-
-                // _logger.LogDebug("Restituiti {Count} risultati per: {Query}", results.Count, query);
-
-                return Ok(results);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Errore di connessione al servizio di geocoding");
-                return StatusCode(502, new { Message = "Servizio di geocoding temporaneamente non disponibile" });
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Errore nel parsing della risposta dal geocoding");
-                return StatusCode(500, new { Message = "Errore nell'elaborazione della risposta" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(ex, "Errore imprevisto durante l'autocomplete");
-                return StatusCode(500, new { Message = "Errore interno del server" });
+                results.Add(result);
             }
         }
+
+        return Ok(results);
+    }
+    catch (HttpRequestException ex)
+    {
+        _logger.LogError(ex, "Errore di connessione al servizio Google Maps");
+        return StatusCode(502, new { Message = "Servizio di geocoding non disponibile" });
+    }
+    catch (JsonException ex)
+    {
+        _logger.LogError(ex, "Errore parsing JSON dalla risposta Google");
+        return StatusCode(500, new { Message = "Errore nell'elaborazione della risposta" });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogCritical(ex, "Errore imprevisto durante l'autocomplete");
+        return StatusCode(500, new { Message = "Errore interno del server" });
+    }
+}
+
+
+
 
 
 

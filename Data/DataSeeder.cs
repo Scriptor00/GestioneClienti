@@ -1,7 +1,5 @@
 using Bogus;
 using WebAppEF.Entities;
-using System;
-using System.Collections.Generic;
 
 public class DataSeeder
 {

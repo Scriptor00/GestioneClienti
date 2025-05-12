@@ -1,6 +1,5 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
-using WebAppEF.Entities;
 
 namespace WebAppEF.Utilities
 {
