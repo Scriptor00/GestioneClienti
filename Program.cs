@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using GestioneClienti.Repositories;
 using GestioneClienti.Services;
 using Microsoft.AspNetCore.Identity;
+using GestioneClienti.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,6 +112,8 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
+
+builder.Services.AddSignalR();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -169,6 +172,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
+
+app.MapHub<ChatHub>("/chatHub");
 
 // Logging delle richieste
 app.Use(async (context, next) =>

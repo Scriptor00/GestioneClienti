@@ -107,5 +107,11 @@ namespace WebAppEF.Controllers
 
             return View(prodotto);
         }
+
+        public IActionResult Chat()
+{
+    return View();
+}
+
     }
 }

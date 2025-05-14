@@ -13,6 +13,7 @@
   <PackageReference Include="GoogleMapsApi" Version="1.3.3" />
   <PackageReference Include="MailKit" Version="4.11.0" />
   <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+  <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
 
   <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.0" />
   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />

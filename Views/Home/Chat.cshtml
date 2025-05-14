@@ -1,0 +1,205 @@
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<div class="gaming-chat-container">
+    <h2 class="gaming-chat-title">🎮 Live Chat </h2>
+    
+    <div class="gaming-chat-controls">
+        <input type="text" id="userInput" class="gaming-input" placeholder="Player Name" />
+        <input type="text" id="messageInput" class="gaming-input" placeholder="Type your message..." />
+        <button id="sendButton" class="gaming-button">Send <span class="pulse-effect">➤</span></button>
+    </div>
+    
+    <div class="gaming-chat-messages">
+        <ul id="messagesList" class="gaming-messages-list"></ul>
+    </div>
+    
+    <audio id="notificationSound">
+        <source src="/sounds/livechat-129007.mp3" type="audio/mpeg">
+        Il tuo browser non supporta l'elemento audio.
+    </audio>
+</div>
+
+<style>
+    .gaming-chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #0f0f15;
+        border-radius: 10px;
+        border: 1px solid #2a2a3a;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    
+    .gaming-chat-title {
+        color: #00fffc;
+        text-shadow: 0 0 10px rgba(0, 255, 252, 0.5);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #2a2a3a;
+        padding-bottom: 10px;
+    }
+    
+    .gaming-chat-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .gaming-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px 15px;
+        background-color: #1a1a2a;
+        border: 1px solid #2a2a3a;
+        border-radius: 5px;
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: all 0.3s;
+    }
+    
+    .gaming-input:focus {
+        outline: none;
+        border-color: #00fffc;
+        box-shadow: 0 0 10px rgba(0, 255, 252, 0.3);
+    }
+    
+    .gaming-button {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #00fffc 0%, #0088ff 100%);
+        border: none;
+        border-radius: 5px;
+        color: #0f0f15;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .gaming-button:hover {
+        background: linear-gradient(135deg, #00e6e3 0%, #0077dd 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 255, 252, 0.4);
+    }
+    
+    .pulse-effect {
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @@keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .gaming-chat-messages {
+        background-color: #1a1a2a;
+        border-radius: 8px;
+        padding: 15px;
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #2a2a3a;
+    }
+    
+    .gaming-messages-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .gaming-messages-list li {
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        background-color: #252538;
+        border-radius: 5px;
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-left: 3px solid #00fffc;
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    .gaming-messages-list li:nth-child(odd) {
+        background-color: #2a2a3a;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Scrollbar styling */
+    .gaming-chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .gaming-chat-messages::-webkit-scrollbar-track {
+        background: #1a1a2a;
+    }
+    
+    .gaming-chat-messages::-webkit-scrollbar-thumb {
+        background: #00fffc;
+        border-radius: 4px;
+    }
+    
+    .gaming-chat-messages::-webkit-scrollbar-thumb:hover {
+        background: #00e6e3;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+<script>
+    // Connessione all'hub
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .build();
+
+    const messagesList = document.getElementById("messagesList");
+    const notificationSound = document.getElementById("notificationSound");
+
+    // Ricevi messaggi
+    connection.on("ReceiveMessage", function (user, message) {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="user-name" style="color: #00fffc; font-weight: bold;">${user}:</span> ${message}`;
+        messagesList.appendChild(li);
+        
+        // Scroll to bottom
+        messagesList.parentElement.scrollTop = messagesList.parentElement.scrollHeight;
+        
+        // Play sound with slight delay for better UX
+        setTimeout(() => {
+            notificationSound.play().catch(e => console.log("Audio play failed:", e));
+        }, 300);
+    });
+
+    // Avvia la connessione
+    connection.start().catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    // Invia messaggi
+    document.getElementById("sendButton").addEventListener("click", function (event) {
+        const user = document.getElementById("userInput").value;
+        const message = document.getElementById("messageInput").value;
+        
+        if (user && message) {
+            connection.invoke("SendMessage", user, message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            document.getElementById("messageInput").value = "";
+        }
+        
+        event.preventDefault();
+    });
+    
+    // Allow sending message with Enter key
+    document.getElementById("messageInput").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            document.getElementById("sendButton").click();
+        }
+    });
+</script>
