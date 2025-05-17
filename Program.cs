@@ -13,6 +13,12 @@ using GestioneClienti.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80); 
+});
+
+
 // Configurazione Serilog per logging
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File("C:\\LogsProgetto\\app-log-.txt", rollingInterval: RollingInterval.Day)
