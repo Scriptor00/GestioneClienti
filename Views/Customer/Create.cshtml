@@ -109,7 +109,7 @@
                     <div class="row mt-3">
                         <div class="col-md-8">
                             <label asp-for="Indirizzo" class="form-label">Via/Piazza *</label>
-                            <input asp-for="Indirizzo" class="form-control" id="Indirizzo" required />
+                            <input asp-for="Indirizzo" class="form-control" id="Indirizzo" required readonly/>
                             <span asp-validation-for="Indirizzo" class="text-danger"></span>
                         </div>
                         <div class="col-md-4">
@@ -122,20 +122,20 @@
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label asp-for="Citta" class="form-label">Città *</label>
-                            <input asp-for="Citta" class="form-control" id="Citta" required />
+                            <input asp-for="Citta" class="form-control" id="Citta" required readonly/>
                             <span asp-validation-for="Citta" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-6">
                             <label asp-for="Paese" class="form-label">Paese *</label>
-                            <input asp-for="Paese" class="form-control" id="Paese" required />
+                            <input asp-for="Paese" class="form-control" id="Paese" required readonly />
                             <span asp-validation-for="Paese" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label asp-for="Cap" class="form-label">CAP</label>
-                            <input asp-for="Cap" class="form-control" id="Cap" />
+                            <input asp-for="Cap" class="form-control" id="Cap" readonly />
                             <span asp-validation-for="Cap" class="text-danger"></span>
                         </div>
                     </div>
@@ -281,11 +281,11 @@
             });
 
             // Permetti modifica manuale dei campi
-            [indirizzoField, civicoField, cittaField, paeseField, capField].forEach(field => {
+            @* [indirizzoField, civicoField, cittaField, paeseField, capField].forEach(field => {
                 field.addEventListener("focus", function () {
                     this.readOnly = false;
                 });
-            });
+            }); *@
         });
     </script>
 </body>
