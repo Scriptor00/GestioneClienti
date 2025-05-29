@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 
 namespace ProgettoStage.ViewModel
 {
-     public class CarrelloViewModel
+    public class CarrelloViewModel
     {
-        public List<ArticoloCarrelloViewModel> Articoli { get; set; }
+        public List<ArticoloCarrelloViewModel> Articoli { get; set; } = new List<ArticoloCarrelloViewModel>();
         public decimal TotaleCarrello { get; set; }
 
-        public CarrelloViewModel()
-        {
-            Articoli = new List<ArticoloCarrelloViewModel>();
-        }
+        // Puoi mantenere TotaleArticoli se lo visualizzi da qualche parte, altrimenti puoi rimuoverlo
+        public int TotaleArticoli => Articoli.Sum(a => a.Quantita);
     }
 }
