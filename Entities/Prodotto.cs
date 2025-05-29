@@ -22,9 +22,12 @@ namespace WebAppEF.Entities
 
         public DateTime DataInserimento { get; set; } = DateTime.Now;
 
-        [StringLength(200)] 
+        [StringLength(200)]
         public string? ImmagineUrl { get; set; }
 
-        public string? TrailerUrl {get; set;}
+        public string? TrailerUrl { get; set; }
+        
+        [Timestamp] // AGGIUNGI QUESTA LINEA
+        public byte[] RowVersion { get; set; }
     }
 }

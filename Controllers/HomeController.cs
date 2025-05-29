@@ -53,7 +53,7 @@ namespace WebAppEF.Controllers
             return View();
         }
 
-        // Azione per la privacy
+        
         public IActionResult Privacy()
         {
             _logger.LogInformation("Accesso alla pagina Privacy Policy.");

@@ -203,7 +203,9 @@ namespace GestioneClienti.Controllers
                 return View(model);
             }
 
+#pragma warning disable CS8604 // Possible null reference argument.
             var recaptchaValid = await _recaptchaService.VerifyTokenAsync(model.RecaptchaResponse);
+#pragma warning restore CS8604 // Possible null reference argument.
             if (!recaptchaValid)
             {
                 ModelState.AddModelError(string.Empty, "Verifica reCAPTCHA non superata. Riprova.");
@@ -292,7 +294,6 @@ namespace GestioneClienti.Controllers
                     return RedirectToAction("Login");
                 }
 
-                // Conferma l'email
                 user.EmailConfermata = true;
                 user.EmailConfermaToken = null; // Rimozione token di conferma
                 await _context.SaveChangesAsync();
@@ -350,6 +351,7 @@ namespace GestioneClienti.Controllers
                 await _context.SaveChangesAsync();
 
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, token }, protocol: Request.Scheme);
+#pragma warning disable CS8604 // Possible null reference argument.
                 var emailBody = $@"
 <!DOCTYPE html>
 <html>
@@ -481,6 +483,7 @@ namespace GestioneClienti.Controllers
     </div>
 </body>
 </html>";
+#pragma warning restore CS8604 // Possible null reference argument.
 
 
                 await _emailSender.SendEmailAsync(model.Email, "Recupero Password", emailBody);

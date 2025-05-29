@@ -1,0 +1,1178 @@
+@using ProgettoStage.ViewModel
+@model ProgettoStage.ViewModel.ViewModelCarrello
+
+@{
+    ViewData["Title"] = "Il tuo Carrello";
+}
+
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid #0d6efd;
+            padding: 0.8rem 1rem;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand:hover {
+            text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+            transform: scale(1.02);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #0d6efd;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .navbar-brand:hover i {
+            color: #ff4b2b;
+            transform: rotate(15deg);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #ff4b2b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover::before {
+            width: 80%;
+        }
+
+        .nav-link:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        .nav-link:hover i {
+            color: #ff4b2b;
+            transform: scale(1.2);
+        }
+
+        .navbar-toggler {
+            border: 1px solid #0d6efd;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            transition: all 0.3s;
+        }
+
+        .navbar-toggler:hover .navbar-toggler-icon {
+            transform: scale(1.1);
+        }
+
+
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            border-radius: 12px;
+            background-color: #2d2d2d;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-img-top {
+            height: 150px;
+            object-fit: cover;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .quantity-input-small {
+            width: 80px;
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #0d6efd;
+            border-radius: 5px;
+        }
+        .quantity-input-small:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .footer {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 20px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        .alert {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #333;
+            color: #fff;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-outline-secondary {
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .gaming-dropdown {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #0d6efd;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
+            padding: 0;
+            overflow: hidden;
+            min-width: 220px;
+        }
+
+        .gaming-dropdown .dropdown-item {
+            color: #e0e0e0;
+            padding: 10px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background: transparent;
+        }
+
+        .gaming-dropdown .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
+            color: #fff;
+            border-left: 3px solid #0d6efd;
+            transform: translateX(5px);
+        }
+
+        .gaming-dropdown .dropdown-item i {
+            color: #0d6efd;
+            width: 20px;
+            text-align: center;
+        }
+
+        .gaming-dropdown .dropdown-divider {
+            border-color: rgba(13, 110, 253, 0.3);
+            margin: 0;
+        }
+
+        .logout-btn {
+            color: #ff4b2b !important;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
+            border-left: 3px solid #ff4b2b !important;
+        }
+
+        .gaming-user-menu::after {
+            border-top-color: #0d6efd;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        /* Animazione */
+        @@keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .gaming-dropdown.show {
+            animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        /* Media Query per Mobile */
+        @@media (max-width: 768px) {
+            .navbar-collapse {
+                background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+                border: 1px solid #0d6efd;
+                border-radius: 0 0 10px 10px;
+                padding: 1rem;
+                margin-top: 0.5rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            .nav-link {
+                margin: 0.3rem 0;
+                padding: 0.8rem 1rem !important;
+            }
+            
+            .nav-link::before {
+                display: none;
+            }
+        }
+
+        /* Stili per il popup di pagamento */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .payment-content {
+            background: linear-gradient(145deg, #1a1a2e 0%, #0a0a1a 100%);
+            border: 1px solid #0d6efd;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(13, 110, 253, 0.5);
+            animation: modalFadeIn 0.4s ease-out;
+        }
+
+        @@keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-payment {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-payment:hover {
+            color: #ff4b2b;
+        }
+
+        .payment-methods {
+            margin-top: 20px;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .payment-method:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.2);
+            transform: translateX(5px);
+        }
+
+        .payment-method.selected {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.3);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .payment-method i {
+            font-size: 30px;
+            margin-right: 15px;
+            color: #0d6efd;
+        }
+
+        .payment-details {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .payment-details.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .payment-summary {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        /* Stili per Stripe Elements */
+        .StripeElement {
+            box-sizing: border-box;
+            height: 40px;
+            padding: 10px 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .StripeElement--focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 1px #0d6efd;
+        }
+
+        .StripeElement--invalid {
+            border-color: #dc3545;
+        }
+
+        .StripeElement--webkit-autofill {
+            background-color: #444 !important;
+        }
+
+        .expiry-cvv {
+            display: flex;
+            gap: 15px;
+        }
+
+        .expiry-cvv .form-group {
+            flex: 1;
+        }
+
+        /* Spinner per il caricamento */
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
+                <i class="bi bi-controller me-2"></i>Gaming Store
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")"><i class="bi bi-house-door me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Prodotti"><i class="bi bi-list-ul me-1"></i>Catalogo</a>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="@Url.Action("Profilo", "Account")"> @* Modificato per AccountController *@
+                                        <i class="bi bi-person-gear me-2"></i>Profilo
+                                    </a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("MieiOrdini", "Ordini")"> @* Assumendo un controller Ordini per gli ordini, modifica se diverso *@
+                                        <i class="bi bi-collection-play me-2"></i>I miei ordini
+                                    </a></li>
+                                <li><hr class="dropdown-divider my-2" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item logout-btn">
+                                            <i class="bi bi-power me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">
+                                <i class="bi bi-person-circle me-1"></i>Account
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center text-primary mb-4">Il Tuo Carrello</h1>
+        @Html.AntiForgeryToken() @* Questo genera l'input nascosto con il token antiforgery *@
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (!Model.Articoli.Any())
+        {
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle me-2"></i>Il tuo carrello è vuoto.
+            </div>
+            <div class="text-center">
+                <a href="/Prodotti" class="btn btn-outline-secondary mt-3">
+                    <i class="bi bi-arrow-left me-2"></i>Continua lo Shopping
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-white">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>Prodotto</th>
+                                    <th>Prezzo Unitario</th>
+                                    <th>Quantità Carrello</th>
+                                    <th>Qt.à Magazzino</th>
+                                    <th>Qt.à Prenotata (Altri)</th>
+                                    <th>Qt.à Ordinabile (Tuo)</th>
+                                    <th>Totale Articolo</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody id="carrello-items-body">
+                                @foreach (var item in Model.Articoli)
+                                {
+                                    <tr id="cart-item-row-@item.IdProdotto">
+                                        <td>
+                                            @item.NomeProdotto
+                                            @if (!string.IsNullOrEmpty(item.ImmagineUrl))
+                                            {
+                                                <img src="@item.ImmagineUrl" alt="@item.NomeProdotto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-left: 10px;">
+                                            }
+                                        </td>
+                                        <td class="item-price" data-price="@item.PrezzoUnitario">@item.PrezzoUnitario.ToString("C")</td>
+                                        <td>
+                                            <input type="number" 
+                                                   value="@item.Quantita" 
+                                                   min="0"
+                                                   max="@item.QuantitaOrdinabile"
+                                                   data-product-id="@item.IdProdotto" 
+                                                   class="form-control item-quantity-input quantity-input-small"
+                                                   onchange="updateCartQuantity(this)">
+                                        </td>
+                                        <td><span id="giacenza-reale-@item.IdProdotto">@item.DisponibilitaMagazzino</span></td>
+                                        <td><span id="quantita-prenotata-altri-@item.IdProdotto">@item.QuantitaPrenotataDaAltri</span></td>
+                                        <td><span id="quantita-ordinabile-@item.IdProdotto">@item.QuantitaOrdinabile</span></td>
+                                        <td><span id="item-total-@item.IdProdotto">@( (item.Quantita * item.PrezzoUnitario).ToString("C") )</span></td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm remove-cart-item-btn" data-product-id="@item.IdProdotto">
+                                                <i class="bi bi-trash"></i> Rimuovi
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Riepilogo Ordine</h5>
+                            <hr>
+                            <p class="card-text">
+                                <strong>Totale Prodotti:</strong> <span id="total-items">@Model.TotaleArticoli</span>
+                            </p>
+                            <p class="card-text">
+                                <strong>Totale:</strong> <span id="total-price">@Model.TotaleComplessivo.ToString("C")</span>
+                            </p>
+                            <button class="btn btn-primary w-100" id="checkout-btn">
+                                <i class="bi bi-credit-card me-2"></i>Procedi al Pagamento
+                            </button>
+                            <a href="/Prodotti" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="bi bi-arrow-left me-2"></i>Continua lo Shopping
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div id="payment-modal" class="payment-modal">
+        <div class="payment-content">
+            <span class="close-payment">&times;</span>
+            <h2 class="text-center mb-4"><i class="bi bi-credit-card-2-front me-2"></i>Metodo di Pagamento</h2>
+
+            <div class="payment-summary">
+                <h5>Riepilogo Ordine</h5>
+                <p><strong>Prodotti:</strong> <span id="modal-total-items">0</span></p>
+                <p><strong>Totale:</strong> <span id="modal-total-price">€0.00</span></p>
+            </div>
+
+            <div class="payment-methods">
+                <h5 class="mb-3">Scegli il metodo di pagamento:</h5>
+
+                <div class="payment-method selected" data-method="credit-card">
+                    <i class="bi bi-credit-card"></i>
+                    <div>
+                        <h6>Carta di Credito</h6>
+                        <small class="text-muted">Visa, Mastercard, American Express</small>
+                    </div>
+                </div>
+
+                <div class="payment-method" data-method="paypal">
+                    <i class="bi bi-paypal"></i>
+                    <div>
+                        <h6>PayPal</h6>
+                        <small class="text-muted">Paga con il tuo account PayPal</small>
+                    </div>
+                </div>
+
+                <div class="payment-method" data-method="bank-transfer">
+                    <i class="bi bi-bank"></i>
+                    <div>
+                        <h6>Bonifico Bancario</h6>
+                        <small class="text-muted">Trasferimento bancario</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-details active" id="credit-card-details">
+                <h5 class="mt-4 mb-3"><i class="bi bi-credit-card me-2"></i>Dettagli Carta</h5>
+                <div class="credit-card-form">
+                    <div class="form-group">
+                        <label for="card-element">Numero Carta</label>
+                        <div id="card-element" class="form-control"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-name">Nome sulla Carta</label>
+                        <input type="text" class="form-control" id="card-name" placeholder="Nome Cognome">
+                    </div>
+                </div>
+                <div id="payment-errors" class="text-danger mt-3" role="alert"></div>
+                <button class="btn btn-primary confirm-btn" id="confirm-credit-card">
+                    <i class="bi bi-check-circle me-2"></i>Conferma Pagamento
+                </button>
+            </div>
+
+            <div class="payment-details" id="paypal-details">
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle me-2"></i>Sarai reindirizzato al sito PayPal per completare il pagamento.
+                </div>
+                <button class="btn btn-primary confirm-btn" id="confirm-paypal" style="background-color: #003087;">
+                    <i class="bi bi-paypal me-2"></i>Paga con PayPal
+                </button>
+            </div>
+
+            <div class="payment-details" id="bank-transfer-details">
+                <div class="alert alert-info mt-3">
+                    <h5><i class="bi bi-bank me-2"></i>Dettagli per il Bonifico</h5>
+                    <p><strong>Intestatario:</strong> Gaming Store SRL</p>
+                    <p><strong>IBAN:</strong> IT00X1234567890123456789012</p>
+                    <p><strong>Banca:</strong> Banca Virtuale</p>
+                    <p><strong>Causale:</strong> Ordine #<span id="order-number"></span></p>
+                    <p class="mt-3">L'ordine verrà evaso al ricevimento del pagamento.</p>
+                </div>
+                <button class="btn btn-primary confirm-btn" id="confirm-bank-transfer">
+                    <i class="bi bi-check-circle me-2"></i>Ho effettuato il bonifico
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p>&copy; 2025 Gaming Store. Tutti i diritti riservati.</p>
+            <p>
+                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a> |
+                <a href="@Url.Action("Contatti", "Home")">Contatti</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://unpkg.com/@@microsoft/signalr@6.0.10/dist/browser/signalr.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Inizializza Stripe con la tua chiave pubblica
+        const stripe = Stripe('pk_test_51RDkKhC6u6ziHmcrOSfUvmUDvSGqynwsNqy4GlCuSoBb92v1tIuEBPfFsPh8h1eT2gbBr8jnSGKhVN8mwCS8WSa800t6GU63zI');
+        const elements = stripe.elements();
+
+        // Crea e monta l'elemento della carta di credito
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    color: '#fff',
+                    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#dc3545',
+                    iconColor: '#dc3545'
+                }
+            }
+        });
+        
+        // Solo monta se l'elemento esiste per evitare errori su altre pagine
+        if (document.getElementById('card-element')) {
+            cardElement.mount('#card-element');
+        }
+
+        // Elementi UI del carrello
+        const cartItemsBody = document.getElementById("carrello-items-body");
+        const totalItemsElement = document.getElementById("total-items");
+        const totalPriceElement = document.getElementById("total-price");
+        const checkoutBtn = document.getElementById("checkout-btn");
+
+        // Elementi UI del modal di pagamento
+        const paymentModal = document.getElementById("payment-modal");
+        const closePayment = document.querySelector(".close-payment");
+        const modalTotalItems = document.getElementById("modal-total-items");
+        const modalTotalPrice = document.getElementById("modal-total-price");
+        const paymentMethods = document.querySelectorAll(".payment-method");
+        const paymentDetails = document.querySelectorAll(".payment-details");
+        const paymentErrors = document.getElementById('payment-errors');
+
+        const confirmCreditCardBtn = document.getElementById("confirm-credit-card");
+        const confirmPaypalBtn = document.getElementById("confirm-paypal");
+        const confirmBankTransferBtn = document.getElementById("confirm-bank-transfer");
+        const orderNumberSpan = document.getElementById("order-number");
+
+        let selectedPaymentMethod = 'credit-card';
+
+        // Inizializzazione della connessione SignalR
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(window.location.protocol + "//" + window.location.host + "/disponibilitaHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveProductAvailabilityUpdate", (prodottoId, overallAvailableQuantity, totalBookedQuantity) => {
+            console.log(`SignalR: Aggiornamento per Prodotto ${prodottoId}: Disponibile Complessivo: ${overallAvailableQuantity}, Totale Prenotato: ${totalBookedQuantity}`);
+
+            const elemDisponibile = document.getElementById(`giacenza-reale-${prodottoId}`);
+            if (elemDisponibile) {
+                elemDisponibile.innerText = overallAvailableQuantity;
+                if (overallAvailableQuantity <= 0) {
+                    elemDisponibile.classList.add('text-danger', 'font-weight-bold');
+                } else {
+                    elemDisponibile.classList.remove('text-danger', 'font-weight-bold');
+                }
+            }
+
+            const elemPrenotata = document.getElementById(`quantita-prenotata-altri-${prodottoId}`);
+            if (elemPrenotata) {
+                const currentQuantityInCartInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
+                const currentQuantityInCart = currentQuantityInCartInput ? parseInt(currentQuantityInCartInput.value || '0') : 0;
+                const bookedByOthers = Math.max(0, totalBookedQuantity - currentQuantityInCart);
+                elemPrenotata.innerText = bookedByOthers;
+            }
+
+            const elemOrdinabile = document.getElementById(`quantita-ordinabile-${prodottoId}`);
+            if (elemOrdinabile) {
+                const currentQuantityInCartInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
+                const currentQuantityInCart = currentQuantityInCartInput ? parseInt(currentQuantityInCartInput.value || '0') : 0;
+                const personalOrderable = Math.max(0, overallAvailableQuantity + currentQuantityInCart);
+                elemOrdinabile.innerText = personalOrderable;
+                const quantityInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
+                if (quantityInput) {
+                    quantityInput.max = personalOrderable;
+                }
+            }
+            updateOrderSummaryUI();
+        });
+
+        connection.start().then(() => {
+            console.log("Connessione SignalR avviata con successo.");
+        }).catch(err => console.error("Errore durante l'avvio della connessione SignalR: ", err));
+
+        // Funzione per aggiornare il riepilogo dell'ordine nel DOM
+        function updateOrderSummaryUI() {
+            let currentTotalItems = 0;
+            let currentTotalPrice = 0;
+
+            document.querySelectorAll('#carrello-items-body tr').forEach(row => {
+                if (row.parentNode) {
+                    const quantityInput = row.querySelector('.item-quantity-input');
+                    const priceElement = row.querySelector('.item-price');
+
+                    if (quantityInput && priceElement) {
+                        const quantity = parseInt(quantityInput.value);
+                        const price = parseFloat(priceElement.dataset.price);
+
+                        if (!isNaN(quantity) && !isNaN(price)) {
+                            currentTotalItems += quantity;
+                            currentTotalPrice += (quantity * price);
+                            const itemTotalElement = row.querySelector(`#item-total-${quantityInput.dataset.productId}`);
+                            if (itemTotalElement) {
+                                itemTotalElement.textContent = `€${(quantity * price).toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            if (totalItemsElement) totalItemsElement.textContent = currentTotalItems;
+            if (totalPriceElement) totalPriceElement.textContent = `€${currentTotalPrice.toFixed(2)}`;
+
+            if (modalTotalItems && modalTotalPrice) {
+                modalTotalItems.textContent = currentTotalItems;
+                modalTotalPrice.textContent = `€${currentTotalPrice.toFixed(2)}`;
+            }
+
+            // Verifica se il carrello è vuoto
+            const cartBody = document.getElementById('carrello-items-body');
+            if (cartBody && currentTotalItems === 0 && cartBody.querySelectorAll('tr').length === 0) {
+                if (totalItemsElement && totalPriceElement && checkoutBtn) {
+                    cartItemsBody.innerHTML = '<tr><td colspan="6" class="text-center">Il tuo carrello è vuoto.</td></tr>';
+                    if (checkoutBtn) checkoutBtn.disabled = true;
+                    if (totalPriceElement) totalPriceElement.textContent = '€0.00';
+                    if (totalItemsElement) totalItemsElement.textContent = '0';
+                }
+            } else if (checkoutBtn) {
+                checkoutBtn.disabled = currentTotalItems === 0;
+            }
+        }
+        
+        // Funzione per aggiornare la quantità di un prodotto nel carrello
+        window.updateCartQuantity = async function (inputElement) {
+            const productId = parseInt(inputElement.dataset.productId);
+            let newQuantity = parseInt(inputElement.value);
+            const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            
+            const row = document.getElementById(`cart-item-row-${productId}`);
+            const currentMaxQuantityInDom = parseInt(inputElement.max);
+
+            // Validazione lato client
+            if (isNaN(newQuantity) || newQuantity < 0) {
+                showCustomAlert('La quantità deve essere un numero valido e non negativo.');
+                inputElement.value = inputElement.defaultValue;
+                return;
+            }
+
+            if (!isNaN(currentMaxQuantityInDom) && newQuantity > currentMaxQuantityInDom) {
+                showCustomAlert(`La quantità massima ordinabile per questo prodotto è ${currentMaxQuantityInDom}.`);
+                newQuantity = currentMaxQuantityInDom;
+                inputElement.value = newQuantity;
+            }
+            
+            // Disabilita l'input durante l'operazione
+            inputElement.disabled = true;
+            inputElement.style.opacity = '0.5';
+
+            try {
+                const response = await fetch('/Carrello/UpdateItem', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': antiforgeryToken
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        newQuantity: newQuantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    console.log(result.messaggio || "Quantità aggiornata con successo.");
+
+                    if (result.success) {
+                        inputElement.defaultValue = result.updatedQuantity;
+
+                        if (row) {
+                            const itemTotalPriceElement = row.querySelector(`#item-total-${productId}`);
+                            
+                            if (itemTotalPriceElement && result.updatedItem) {
+                                itemTotalPriceElement.textContent = `€${(result.updatedItem.prezzoUnitario * result.updatedItem.quantita).toFixed(2)}`;
+                            }
+
+                            // Aggiorna l'attributo 'max' dell'input
+                            if (result.updatedItem && typeof result.updatedItem.quantitaOrdinabile !== 'undefined') {
+                                const newQuantitaOrdinabile = result.updatedItem.quantitaOrdinabile;
+                                inputElement.max = newQuantitaOrdinabile;
+                                
+                                const qtyOrdinabileDisplay = row.querySelector(`#quantita-ordinabile-display-${productId}`);
+                                if (qtyOrdinabileDisplay) {
+                                    qtyOrdinabileDisplay.textContent = newQuantitaOrdinabile;
+                                }
+                            }
+
+                            // Aggiorna "Quantità Prenotata da Altri"
+                            if (result.updatedItem && typeof result.updatedItem.quantitaPrenotataDaAltri !== 'undefined') {
+                                const newQuantitaPrenotataDaAltri = result.updatedItem.quantitaPrenotataDaAltri;
+                                const qtyPrenotataAltriDisplay = row.querySelector(`#quantita-prenotata-altri-${productId}`);
+                                if (qtyPrenotataAltriDisplay) {
+                                    qtyPrenotataAltriDisplay.textContent = newQuantitaPrenotataDaAltri;
+                                }
+                            }
+
+                            // Se la quantità è 0, rimuovi la riga
+                            if (result.updatedQuantity === 0) {
+                                row.remove();
+                            }
+                        }
+                        
+                        // Aggiorna i totali del carrello
+                        const cartTotalItemsElement = document.getElementById('cart-total-items');
+                        if (cartTotalItemsElement) {
+                            cartTotalItemsElement.textContent = result.newTotalItems;
+                        }
+
+                        const cartTotalPriceElement = document.getElementById('cart-total-price');
+                        if (cartTotalPriceElement) {
+                            cartTotalPriceElement.textContent = `€${result.newTotalPrice}`;
+                        }
+
+                    } else {
+                        showCustomAlert(result.messaggio || 'Errore durante l\'aggiornamento della quantità.');
+                        inputElement.value = inputElement.defaultValue;
+                    }
+                } else {
+                    showCustomAlert(result.messaggio || `Si è verificato un errore (${response.status}).`);
+                    inputElement.value = inputElement.defaultValue;
+                }
+            } catch (error) {
+                console.error('Errore di comunicazione:', error);
+                showCustomAlert('Si è verificato un errore di comunicazione con il server. Riprova più tardi.');
+                inputElement.value = inputElement.defaultValue;
+            } finally {
+                inputElement.disabled = false;
+                inputElement.style.opacity = '1';
+            }
+        };
+
+        // Funzione per rimuovere un articolo dal carrello
+        window.removeCartItem = async function (productId) {
+            if (!confirm('Sei sicuro di voler rimuovere questo articolo dal carrello?')) {
+                return;
+            }
+
+            const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const row = document.getElementById(`cart-item-row-${productId}`);
+
+            try {
+                const response = await fetch('/Carrello/Rimuovi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': antiforgeryToken
+                    },
+                    body: JSON.stringify({
+                        idProdotto: productId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (result.success) {
+                        showCustomAlert(result.messaggio || "Articolo rimosso con successo.");
+                        if (row) {
+                            row.remove();
+                            updateOrderSummaryUI();
+                        }
+                    } else {
+                        showCustomAlert(result.messaggio || 'Errore durante la rimozione dell\'articolo.');
+                    }
+                } else {
+                    showCustomAlert(result.messaggio || `Si è verificato un errore (${response.status}).`);
+                }
+            } catch (error) {
+                console.error('Errore di comunicazione:', error);
+                showCustomAlert('Si è verificato un errore di comunicazione con il server. Riprova più tardi.');
+            }
+        };
+
+        // Funzione placeholder per alert personalizzato
+        function showCustomAlert(message) {
+            console.warn("ATTENZIONE: Stai usando alert(). Implementa un modal personalizzato per una migliore UX:", message);
+            alert(message);
+        }
+
+        // Aggiungi listener per i pulsanti di rimozione
+        document.querySelectorAll('.remove-cart-item-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                const productId = parseInt(this.dataset.productId);
+                window.removeCartItem(productId);
+            });
+        });
+
+        // Gestione modal di pagamento
+        if (checkoutBtn) {
+            checkoutBtn.onclick = function() {
+                if (paymentModal) paymentModal.style.display = "block";
+                updateOrderSummaryUI();
+            };
+        }
+
+        if (closePayment) {
+            closePayment.onclick = function() {
+                if (paymentModal) paymentModal.style.display = "none";
+            };
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == paymentModal) {
+                if (paymentModal) paymentModal.style.display = "none";
+            }
+        };
+
+        // Gestione selezione metodi di pagamento
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPaymentMethod = this.dataset.method;
+
+                paymentDetails.forEach(detail => detail.classList.remove('active'));
+                const activeDetail = document.getElementById(selectedPaymentMethod + '-details');
+                if (activeDetail) activeDetail.classList.add('active');
+            });
+        });
+        
+        // Inizializza il primo metodo di pagamento come attivo
+        if (paymentMethods.length > 0 && paymentDetails.length > 0) {
+            const firstMethod = paymentMethods[0];
+            firstMethod.classList.add('selected');
+            selectedPaymentMethod = firstMethod.dataset.method;
+            const firstDetail = document.getElementById(selectedPaymentMethod + '-details');
+            if (firstDetail) firstDetail.classList.add('active');
+        }
+
+        // Logica per il pagamento con carta di credito (Stripe)
+        if (confirmCreditCardBtn) {
+            confirmCreditCardBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                const cardHolderNameInput = document.getElementById('card-name');
+                if (!cardHolderNameInput) {
+                    console.error("Card holder name input not found");
+                    if (paymentErrors) paymentErrors.textContent = "Campo nome titolare carta non trovato.";
+                    return;
+                }
+                
+                const cardHolderName = cardHolderNameInput.value;
+                if (!cardHolderName.trim()) {
+                    if (paymentErrors) paymentErrors.textContent = "Inserisci il nome del titolare della carta.";
+                    return;
+                }
+
+                confirmCreditCardBtn.disabled = true;
+                confirmCreditCardBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+                if (paymentErrors) paymentErrors.textContent = '';
+
+                const { paymentMethod, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: {
+                        name: cardHolderName,
+                    },
+                });
+
+                if (error) {
+                    if (paymentErrors) paymentErrors.textContent = error.message;
+                    confirmCreditCardBtn.disabled = false;
+                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
+                    return;
+                }
+
+                const itemsInCart = [];
+                document.querySelectorAll('#carrello-items-body tr').forEach(row => {
+                    const quantityInput = row.querySelector('.item-quantity-input');
+                    if (quantityInput) {
+                        const productId = parseInt(quantityInput.dataset.productId);
+                        const quantity = parseInt(quantityInput.value);
+                        if (quantity > 0) {
+                            itemsInCart.push({ ProdottoId: productId, Quantita: quantity });
+                        }
+                    }
+                });
+
+                if (itemsInCart.length === 0) {
+                    alert("Il carrello è vuoto. Impossibile procedere con il pagamento.");
+                    confirmCreditCardBtn.disabled = false;
+                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Carrello/ConfermaOrdine', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                        },
+                        body: JSON.stringify({
+                            ArticoliOrdine: itemsInCart,
+                            PaymentMethodId: paymentMethod.id
+                        })
+                    });
+
+                    const serverResult = await response.json();
+
+                    if (response.ok) {
+                        if (serverResult.requiresAction) {
+                            const { error: confirmError } = await stripe.confirmCardPayment(serverResult.clientSecret);
+                            if (confirmError) {
+                                if (paymentErrors) paymentErrors.textContent = confirmError.message;
+                                alert('Autenticazione 3D Secure fallita: ' + confirmError.message);
+                            } else {
+                                alert('Pagamento e ordine confermati con successo! Numero Ordine: ' + serverResult.orderNumber);
+                                if (paymentModal) paymentModal.style.display = "none";
+                                window.location.href = '/Ordini/MieiOrdini';
+                            }
+                        } else {
+                            alert('Pagamento e ordine confermati con successo! Numero Ordine: ' + serverResult.orderNumber);
+                            if (paymentModal) paymentModal.style.display = "none";
+                            window.location.href = '/Ordini/MieiOrdini';
+                        }
+                    } else {
+                        if (paymentErrors) paymentErrors.textContent = serverResult.messaggio || 'Errore sconosciuto dal server.';
+                        alert('Errore: ' + (serverResult.messaggio || 'Errore sconosciuto.'));
+                    }
+                } catch (err) {
+                    if (paymentErrors) paymentErrors.textContent = 'Errore di comunicazione con il server per il pagamento.';
+                    console.error('Errore durante la conferma dell\'ordine:', err);
+                    alert('Si è verificato un errore di comunicazione con il server.');
+                } finally {
+                    confirmCreditCardBtn.disabled = false;
+                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
+                }
+            });
+        }
+     updateOrderSummaryUI();
+    });
+</script>
+</body>
+
+</html>

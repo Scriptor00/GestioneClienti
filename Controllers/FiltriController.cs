@@ -151,9 +151,8 @@ namespace WebAppEF.Controllers
         [HttpGet]
         public IActionResult GetOrdiniCliente(int idCliente)
         {
-            // Recupera gli ordini del cliente dal database
             var ordini = _context.Ordini
-                .Where(o => o.IdCliente == idCliente)
+                .Where(o => Convert.ToInt32(o.IdCliente) == idCliente)
                 .Select(o => new
                 {
                     o.IdOrdine,

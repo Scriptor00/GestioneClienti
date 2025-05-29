@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using WebAppEF.Entities;
-using WebAppEF.Models;
-using GestioneClienti.ViewModel;
+using WebAppEF.Entities; 
+using WebAppEF.Models; 
+using GestioneClienti.ViewModel; 
 using Microsoft.EntityFrameworkCore;
+
 
 namespace WebAppEF.Controllers
 {
-    public class ProdottiController(ApplicationDbContext context) : Controller
+   
+    public class ProdottiController(ApplicationDbContext context) : Controller 
     {
         private readonly ApplicationDbContext _context = context;
 
@@ -15,7 +17,7 @@ namespace WebAppEF.Controllers
             var prodotti = _context.Prodotti.ToList();
 
             var prodottiPiuVenduti = _context.Prodotti
-                .Where(p => p.NomeProdotto == "PS5" || p.NomeProdotto == "Xbox Series X")
+                .Where(p => p.NomeProdotto == "Baldur's Gate 3" || p.NomeProdotto == "Grand Theft Auto V")
                 .ToList();
 
             var viewModel = new HomeViewModel
@@ -66,22 +68,22 @@ namespace WebAppEF.Controllers
 
             return View(prodotti);
         }
+
         public IActionResult Profilo()
         {
-
             var viewModel = new ProfiloViewModel
             {
-                Username = User.Identity.Name,
-                Email = "carlodicuonzo@yahoo.com",
-                DataRegistrazione = new DateTime(2022, 1, 15),
-                Livello = 50,
-                IsPremium = true,
-                EsperienzaPercentuale = 75,
-                Punteggio = 12450,
-                GiochiPosseduti = 47,
-                OreGiocate = 328,
-                AchievementsSbloccati = 24,
-                SfideCompletate = 8
+                Username = User.Identity?.Name, // Usa ? per evitare NullReferenceException se l'utente non è autenticato
+                Email = "carlodicuonzo@yahoo.com", // Dovrebbe essere dinamico, legato all'utente autenticato
+                DataRegistrazione = new DateTime(2022, 1, 15), // Dovrebbe essere dinamico
+                Livello = 50, // Dovrebbe essere dinamico
+                IsPremium = true, // Dovrebbe essere dinamico
+                EsperienzaPercentuale = 75, // Dovrebbe essere dinamico
+                Punteggio = 12450, // Dovrebbe essere dinamico
+                GiochiPosseduti = 47, // Dovrebbe essere dinamico
+                OreGiocate = 328, // Dovrebbe essere dinamico
+                AchievementsSbloccati = 24, // Dovrebbe essere dinamico
+                SfideCompletate = 8 // Dovrebbe essere dinamico
             };
 
             return View(viewModel);
@@ -92,21 +94,14 @@ namespace WebAppEF.Controllers
             return View();
         }
 
-
         public IActionResult Sicurezza()
         {
-            // Passa la password (in realtà dovresti recuperarla dal database)
-            ViewBag.Password = "laPasswordCorrente";
+            ViewBag.Password = "laPasswordCorrente"; // Attenzione: non passare mai password in chiaro in ViewBag!
             return View();
         }
+
         public IActionResult Spedizioni()
         {
-            return View();
-        }
-
-        public IActionResult Carrello()
-        {
-
             return View();
         }
 
@@ -151,7 +146,6 @@ namespace WebAppEF.Controllers
             return RedirectToAction(nameof(Tabella));
         }
 
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -166,7 +160,6 @@ namespace WebAppEF.Controllers
             }
             return View(prodotto);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -200,6 +193,5 @@ namespace WebAppEF.Controllers
             }
             return View(prodotto);
         }
-
     }
 }

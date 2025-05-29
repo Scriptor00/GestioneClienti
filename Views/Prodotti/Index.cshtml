@@ -5,7 +5,7 @@
     int pageSize = 8;
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
-    var pagedProducts = Model.ToList(); 
+    var pagedProducts = Model.ToList();
 }
 
 <!DOCTYPE html>
@@ -18,453 +18,455 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
-       /* Stili personalizzati */
-body {
-    background-color: #1a1a1a;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-}
+        /* Stili personalizzati */
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
 
+        .navbar {
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid #0d6efd;
+            padding: 0.8rem 1rem;
+            position: relative;
+            z-index: 1000;
+        }
 
-.navbar {
-    background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    border-bottom: 1px solid #0d6efd;
-    padding: 0.8rem 1rem;
-    position: relative;
-    z-index: 1000;
-}
+        .navbar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
+        }
 
-.navbar::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.7), transparent);
-}
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #fff !important;
+            text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
 
-.navbar-brand {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: #fff !important;
-    text-shadow: 0 0 10px rgba(13, 110, 253, 0.7);
-    letter-spacing: 1px;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-}
+        .navbar-brand:hover {
+            text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
+            transform: scale(1.02);
+        }
 
-.navbar-brand:hover {
-    text-shadow: 0 0 15px rgba(13, 110, 253, 0.9);
-    transform: scale(1.02);
-}
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #0d6efd;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
 
-.navbar-brand i {
-    margin-right: 10px;
-    color: #0d6efd;
-    font-size: 1.5rem;
-    transition: all 0.3s;
-}
+        .navbar-brand:hover i {
+            color: #ff4b2b;
+            transform: rotate(15deg);
+        }
 
-.navbar-brand:hover i {
-    color: #ff4b2b;
-    transform: rotate(15deg);
-}
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
-.nav-link {
-    color: #fff !important;
-    font-weight: 500;
-    padding: 0.6rem 1.2rem !important;
-    margin: 0 0.3rem;
-    border-radius: 6px;
-    transition: all 0.3s;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
 
-.nav-link i {
-    margin-right: 8px;
-    font-size: 1.1rem;
-    transition: all 0.3s;
-}
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #ff4b2b;
+            transition: all 0.3s;
+        }
 
-.nav-link::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 2px;
-    background: #ff4b2b;
-    transition: all 0.3s;
-}
+        .nav-link:hover::before {
+            width: 80%;
+        }
 
-.nav-link:hover::before {
-    width: 80%;
-}
+        .nav-link:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
 
-.nav-link:hover {
-    background: rgba(13, 110, 253, 0.2);
-}
+        .nav-link:hover i {
+            color: #ff4b2b;
+            transform: scale(1.2);
+        }
 
-.nav-link:hover i {
-    color: #ff4b2b;
-    transform: scale(1.2);
-}
+        .navbar-toggler {
+            border: 1px solid #0d6efd;
+            padding: 0.5rem;
+        }
 
-.navbar-toggler {
-    border: 1px solid #0d6efd;
-    padding: 0.5rem;
-}
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            transition: all 0.3s;
+        }
 
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    transition: all 0.3s;
-}
+        .navbar-toggler:hover .navbar-toggler-icon {
+            transform: scale(1.1);
+        }
 
-.navbar-toggler:hover .navbar-toggler-icon {
-    transform: scale(1.1);
-}
+        #categoria, .card-text small.text-muted {
+            color: white !important;
+        }
 
-#categoria, .card-text small.text-muted {
-    color: white !important;
-}
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            border-radius: 12px;
+            background-color: #2d2d2d;
+        }
 
-.card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: none;
-    border-radius: 12px;
-    background-color: #2d2d2d;
-}
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-.card-img-top {
-    height: 250px;
-    object-fit: cover;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
-.badge {
-    font-size: 0.9em;
-}
-.footer {
-    background-color: #0d6efd;
-    color: #fff;
-    padding: 20px 0;
-    margin-top: 40px;
-    text-align: center;
-}
-.footer a {
-    color: #fff;
-    text-decoration: none;
-}
-.footer a:hover {
-    opacity: 0.8;
-}
-.add-to-cart.added {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-.add-to-cart.added:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-}
-#cart-notification {
-    z-index: 1000;
-}
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
 
-/* Stile per il menu di ordinamento */
-.sort-menu {
-    margin-bottom: 20px;
-}
-.card-body {
-    padding: 15px;
-}
-.search-container {
-    background-color: #222;
-    padding: 15px;
-    border-radius: 10px;
-}
-.search-container input::placeholder {
-    color: white;
-}
-.search-container select {
-    background-color: #333;
-    border: 1px solid #555;
-    color: #fff;
-}
-.search-container button {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-.search-container button:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-}
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
 
-.gaming-dropdown {
-    background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
-    border: 1px solid #0d6efd;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
-    padding: 0;
-    overflow: hidden;
-    min-width: 220px;
-}
+        .badge {
+            font-size: 0.9em;
+        }
 
-.gaming-dropdown .dropdown-item {
-    color: #e0e0e0;
-    padding: 10px 15px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    background: transparent;
-}
+        .footer {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 20px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
 
-.gaming-dropdown .dropdown-item:hover {
-    background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
-    color: #fff;
-    border-left: 3px solid #0d6efd;
-    transform: translateX(5px);
-}
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
 
-.gaming-dropdown .dropdown-item i {
-    color: #0d6efd;
-    width: 20px;
-    text-align: center;
-}
+        .footer a:hover {
+            opacity: 0.8;
+        }
 
-.gaming-dropdown .dropdown-divider {
-    border-color: rgba(13, 110, 253, 0.3);
-    margin: 0;
-}
+        .add-to-cart.added {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
 
-.logout-btn {
-    color: #ff4b2b !important;
-}
+        .add-to-cart.added:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
 
-.logout-btn:hover {
-    background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
-    border-left: 3px solid #ff4b2b !important;
-}
+        #cart-notification {
+            z-index: 1000;
+        }
 
-.gaming-user-menu::after {
-    border-top-color: #0d6efd;
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
+        /* Stile per il menu di ordinamento */
+        .sort-menu {
+            margin-bottom: 20px;
+        }
 
-/* Animazione */
-@@keyframes dropdownFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+        .card-body {
+            padding: 15px;
+        }
 
-.gaming-dropdown.show {
-    animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-}
+        .search-container {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 10px;
+        }
 
-/* Stile per la paginazione */
-.pagination-container {
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
+        .search-container input::placeholder {
+            color: white;
+        }
 
-.pagination {
-    justify-content: center;
-}
+        .search-container select {
+            background-color: #333;
+            border: 1px solid #555;
+            color: #fff;
+        }
 
-.page-item .page-link {
-    background-color: #2d2d2d;
-    border: 1px solid #0d6efd;
-    color: #fff;
-    margin: 0 5px;
-    border-radius: 6px;
-    transition: all 0.3s;
-}
+        .search-container button {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
 
-.page-item.active .page-link {
-    background: linear-gradient(145deg, #0d6efd 0%, #1a6fd8 100%);
-    border-color: #0d6efd;
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
-    transform: scale(1.05);
-}
+        .search-container button:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
 
-.page-item.disabled .page-link {
-    background-color: #1a1a1a;
-    border-color: #555;
-    color: #777;
-}
+        .gaming-dropdown {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #0d6efd;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
+            padding: 0;
+            overflow: hidden;
+            min-width: 220px;
+        }
 
-.page-item .page-link:hover {
-    background: linear-gradient(145deg, #1a6fd8 0%, #0d6efd 100%);
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
-}
+        .gaming-dropdown .dropdown-item {
+            color: #e0e0e0;
+            padding: 10px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background: transparent;
+        }
 
-.page-item:first-child .page-link,
-.page-item:last-child .page-link {
-    border-radius: 6px;
-}
+        .gaming-dropdown .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.2) 0%, transparent 100%);
+            color: #fff;
+            border-left: 3px solid #0d6efd;
+            transform: translateX(5px);
+        }
 
-/* Media query per mobile */
-@@media (max-width: 768px) {
-    .navbar-collapse {
-        background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
-        border: 1px solid #0d6efd;
-        border-radius: 0 0 10px 10px;
-        padding: 1rem;
-        margin-top: 0.5rem;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    }
-    
-    .nav-link {
-        margin: 0.3rem 0;
-        padding: 0.8rem 1rem !important;
-    }
-    
-    .nav-link::before {
-        display: none;
-    }
-    
-    .pagination .page-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-    }
-}
+        .gaming-dropdown .dropdown-item i {
+            color: #0d6efd;
+            width: 20px;
+            text-align: center;
+        }
 
+        .gaming-dropdown .dropdown-divider {
+            border-color: rgba(13, 110, 253, 0.3);
+            margin: 0;
+        }
+
+        .logout-btn {
+            color: #ff4b2b !important;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
+            border-left: 3px solid #ff4b2b !important;
+        }
+
+        .gaming-user-menu::after {
+            border-top-color: #0d6efd;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        /* Animazione */
+        @@keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .gaming-dropdown.show {
+            animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        /* Stile per la paginazione */
+        .pagination-container {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .page-item .page-link {
+            background-color: #2d2d2d;
+            border: 1px solid #0d6efd;
+            color: #fff;
+            margin: 0 5px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(145deg, #0d6efd 0%, #1a6fd8 100%);
+            border-color: #0d6efd;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+            transform: scale(1.05);
+        }
+
+        .page-item.disabled .page-link {
+            background-color: #1a1a1a;
+            border-color: #555;
+            color: #777;
+        }
+
+        .page-item .page-link:hover {
+            background: linear-gradient(145deg, #1a6fd8 0%, #0d6efd 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
+        }
+
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            border-radius: 6px;
+        }
+
+        /* Media query per mobile */
+        @@media (max-width: 768px) {
+            .navbar-collapse {
+                background: linear-gradient(145deg, #0a0a1a 0%, #1a1a2e 100%);
+                border: 1px solid #0d6efd;
+                border-radius: 0 0 10px 10px;
+                padding: 1rem;
+                margin-top: 0.5rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-link {
+                margin: 0.3rem 0;
+                padding: 0.8rem 1rem !important;
+            }
+
+            .nav-link::before {
+                display: none;
+            }
+
+            .pagination .page-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
-            <i class="bi bi-controller me-2"></i>Gaming Store
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Home", "Prodotti")">
-                        <i class="bi bi-house-door me-1"></i>Home
-                    </a>
-                </li>
-                @* <li class="nav-item">
-                    <a class="nav-link" href="/Prodotti">
-                        <i class="bi bi-list-ul me-1"></i>Catalogo
-                    </a>
-                </li> *@
-                @* <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Carrello", "Prodotti")">
-                        <i class="bi bi-cart me-1"></i>Carrello
-                    </a>
-                </li> *@
-           @if (User.Identity.IsAuthenticated)
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="@Url.Action("Profilo", "Prodotti")">
-                                <i class="bi bi-person-gear me-2"></i>Profilo
-                            </a></li>
-                            <li><a class="dropdown-item" href="@Url.Action("Carrello", "Prodotti")">
-                                <i class="bi bi-collection-play me-2"></i>I miei ordini
-                            </a></li>
-                            <li><hr class="dropdown-divider my-2" /></li>
-                            <li>
-                                <form asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="dropdown-item logout-btn">
-                                        <i class="bi bi-power me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Account/Login">
-                            <i class="bi bi-person-circle me-1"></i>Account
-                        </a>
-                    </li>
-                }
-            </ul>
-        </div>
-    </div>
-</nav>
+    @Html.AntiForgeryToken()
 
-    <!-- Contenuto Principale -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Home", "Prodotti")">
+                <i class="bi bi-controller me-2"></i>Gaming Store
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="@Url.Action("Profilo", "Prodotti")">
+                                    <i class="bi bi-person-gear me-2"></i>Profilo
+                                </a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Carrello", "Carrello")">
+                                    <i class="bi bi-cart me-2"></i>Carrello
+                                </a></li>
+                                <li><hr class="dropdown-divider my-2" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item logout-btn">
+                                            <i class="bi bi-power me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">
+                                <i class="bi bi-person-circle me-1"></i>Account
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-5">
         <h1 class="text-center text-primary mb-4">Catalogo Prodotti</h1>
 
-       <div class="row mb-4 search-container">
-    <div class="col-md-4">
-        <input type="text" class="form-control" placeholder="Cerca prodotto..." id="searchInput" value="@ViewBag.Search" style="background-color: #333; border: 1px solid #555; color: #fff;">
-    </div>
-    <div class="col-md-3">
-        <select class="form-select" id="categoryFilter" style="background-color: #333; border: 1px solid #555; color: #fff;">
-            <option value="">Tutte le categorie</option>
-            <option value="Console">Console</option>
-            <option value="Accessori">Accessori</option>
-            <option value="Giochi">Giochi</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <select class="form-select" id="sortByPrice" style="background-color: #333; border: 1px solid #555; color: #fff;">
-            <option value="">Ordina per prezzo</option>
-            <option value="asc">Prezzo crescente</option>
-            <option value="desc">Prezzo decrescente</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100" id="searchButton" style="background-color: #0d6efd; border-color: #0d6efd;">
-            <i class="bi bi-search me-2"></i>Cerca
-        </button>
-    </div>
-</div>
+        <div class="row mb-4 search-container">
+            <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Cerca prodotto..." id="searchInput" value="@ViewBag.Search" style="background-color: #333; border: 1px solid #555; color: #fff;">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="categoryFilter" style="background-color: #333; border: 1px solid #555; color: #fff;">
+                    <option value="">Tutte le categorie</option>
+                    <option value="Console">Console</option>
+                    <option value="Accessori">Accessori</option>
+                    <option value="Giochi">Giochi</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="sortByPrice" style="background-color: #333; border: 1px solid #555; color: #fff;">
+                    <option value="">Ordina per prezzo</option>
+                    <option value="asc">Prezzo crescente</option>
+                    <option value="desc">Prezzo decrescente</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" id="searchButton" style="background-color: #0d6efd; border-color: #0d6efd;">
+                    <i class="bi bi-search me-2"></i>Cerca
+                </button>
+            </div>
+        </div>
 
-<script>
-    document.getElementById('searchButton').addEventListener('click', function() {
-        const search = document.getElementById('searchInput').value;
-        const category = document.getElementById('categoryFilter').value;
-        const sort = document.getElementById('sortByPrice').value;
-        window.location.href = `/Prodotti/Index?search=${search}&category=${category}&sort=${sort}`;
-    });
+        <script>
+            document.getElementById('searchButton').addEventListener('click', function() {
+                const search = document.getElementById('searchInput').value;
+                const category = document.getElementById('categoryFilter').value;
+                const sort = document.getElementById('sortByPrice').value;
+                window.location.href = `/Prodotti/Index?search=${search}&category=${category}&sort=${sort}`;
+            });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const categoryFilter = document.getElementById('categoryFilter');
-        const sortFilter = document.getElementById('sortByPrice');
+            document.addEventListener("DOMContentLoaded", function() {
+                const categoryFilter = document.getElementById('categoryFilter');
+                const sortFilter = document.getElementById('sortByPrice');
 
-        if ("@ViewBag.Category" !== "") {
-            categoryFilter.value = "@ViewBag.Category";
-        }
+                if ("@ViewBag.Category" !== "") {
+                    categoryFilter.value = "@ViewBag.Category";
+                }
 
-        if ("@ViewBag.Sort" !== "") {
-            sortFilter.value = "@ViewBag.Sort";
-        }
-    });
-</script>
+                if ("@ViewBag.Sort" !== "") {
+                    sortFilter.value = "@ViewBag.Sort";
+                }
+            });
+        </script>
 
-        <!-- Griglia dei Prodotti -->
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4" id="productGrid">
             @foreach (var prodotto in pagedProducts)
             {
@@ -496,10 +498,8 @@ body {
 
                         <div class="card-footer">
                             <button class="btn btn-primary w-100 add-to-cart"
-                                    data-product-name="@prodotto.NomeProdotto"
-                                    data-product-category="@prodotto.Categoria"
-                                    data-product-price="@prodotto.Prezzo"
-                                    data-product-image="@prodotto.ImmagineUrl">
+                                    data-product-id="@prodotto.IdProdotto"
+                                    data-product-name="@prodotto.NomeProdotto">
                                 <i class="bi bi-cart-plus me-2"></i>Aggiungi al Carrello
                             </button>
                         </div>
@@ -508,111 +508,141 @@ body {
             }
         </div>
 
-       
-    @if (totalPages > 1)
-{
-    <div class="pagination-container">
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                @if (currentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                }
+        @if (totalPages > 1)
+        {
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        @if (currentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
 
-                @for (int i = 1; i <= totalPages; i++)
-                {
-                    <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })">@i</a>
-                    </li>
-                }
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })">@i</a>
+                            </li>
+                        }
 
-                @if (currentPage < totalPages)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+                        @if (currentPage < totalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, search = ViewBag.Search, category = ViewBag.Category, sort = ViewBag.Sort })" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+
     </div>
-}
 
-        </div>
-
-    <!-- Notifica Aggiunta al Carrello -->
     <div id="cart-notification" class="alert alert-success position-fixed bottom-0 end-0 m-3 d-none" role="alert"></div>
 
-    <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
             <p>&copy; 2025 Gaming Store. Tutti i diritti riservati.</p>
             <p>
-                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a> | 
+                <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a> |
                 <a href="@Url.Action("Contatti", "Home")">Contatti</a>
             </p>
         </div>
     </footer>
 
-    
 
-    <!-- Script per Aggiunta al Carrello -->
     <script>
         document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', async function () {
+                const productId = this.getAttribute('data-product-id');
                 const productName = this.getAttribute('data-product-name');
-                const productCategory = this.getAttribute('data-product-category');
-                const productPrice = parseFloat(this.getAttribute('data-product-price'));
-                const productImage = this.getAttribute('data-product-image');
+                const quantity = 1;
 
-                // Crea un oggetto prodotto
-                const product = {
-                    nomeProdotto: productName,
-                    categoria: productCategory,
-                    prezzo: productPrice,
-                    immagineUrl: productImage,
-                    quantita: 1 
-                };
+                const notificationDiv = document.getElementById('cart-notification');
 
-                // Recupera il carrello dal localStorage
-                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                // Ottieni il token Antiforgery dal campo nascosto
+                const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                // Controlla se il prodotto è già nel carrello
-                const existingProduct = cart.find(p => p.nomeProdotto === productName);
-                if (existingProduct) {
-                    existingProduct.quantita += 1; 
-                } else {
-                    cart.push(product); 
+                // Mostra una notifica di "Caricamento..."
+                notificationDiv.className = 'alert alert-info position-fixed bottom-0 end-0 m-3';
+                notificationDiv.textContent = `Aggiungendo "${productName}" al carrello...`;
+                notificationDiv.classList.remove('d-none');
+
+                try {
+                    const response = await fetch('/Carrello/Aggiungi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Includi il token Antiforgery nell'header
+                            'RequestVerificationToken': antiforgeryToken
+                        },
+                        body: JSON.stringify({
+                            IdProdotto: parseInt(productId),
+                            Quantita: quantity
+                        })
+                    });
+
+                    // Tenta sempre di parsare la risposta come JSON, anche in caso di errore
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch (e) {
+                        // Se la risposta non è un JSON valido (es. 400 Bad Request senza body JSON)
+                        data.messaggio = response.statusText || 'Risposta non valida dal server.';
+                    }
+
+                    if (response.ok) {
+                        console.log('Articolo aggiunto al carrello:', data.messaggio);
+                        notificationDiv.className = 'alert alert-success position-fixed bottom-0 end-0 m-3';
+                        notificationDiv.textContent = `"${productName}" aggiunto al carrello con successo!`;
+                        this.innerHTML = `<i class="bi bi-cart-check me-2"></i>Aggiunto!`;
+                        this.classList.add('added');
+                        this.disabled = true;
+
+                        setTimeout(() => {
+                            notificationDiv.classList.add('d-none');
+                        }, 3000);
+
+                    } else {
+                        console.error('Errore nell\'aggiunta al carrello:', data.messaggio || 'Errore sconosciuto');
+                        notificationDiv.className = 'alert alert-danger position-fixed bottom-0 end-0 m-3';
+                        notificationDiv.textContent = `Errore: ${data.messaggio || 'Impossibile aggiungere al carrello.'}`;
+                        notificationDiv.classList.remove('d-none');
+                        setTimeout(() => {
+                            notificationDiv.classList.add('d-none');
+                        }, 5000);
+                    }
+                } catch (error) {
+                    console.error('Errore di rete o durante la richiesta Fetch:', error);
+                    notificationDiv.className = 'alert alert-danger position-fixed bottom-0 end-0 m-3';
+                    notificationDiv.textContent = 'Errore di connessione. Riprova.';
+                    notificationDiv.classList.remove('d-none');
+                    setTimeout(() => {
+                        notificationDiv.classList.add('d-none');
+                    }, 5000);
                 }
-
-                // Salva il carrello aggiornato nel localStorage
-                localStorage.setItem('cart', JSON.stringify(cart));
-
-                // Cambia il testo del pulsante
-                this.innerHTML = `<i class="bi bi-cart-check me-2"></i>Aggiunto al carrello`;
-                this.classList.add('added');
-                this.disabled = true;
             });
         });
     </script>

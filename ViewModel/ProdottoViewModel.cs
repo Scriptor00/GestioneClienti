@@ -4,6 +4,9 @@ namespace GestioneClienti.ViewModel
 {
     public class ProdottoViewModel
     {
+        [Required]
+        public int IdProdotto { get; set; }
+
         [Required(ErrorMessage = "Il nome del prodotto è obbligatorio")]
         [StringLength(100, ErrorMessage = "Il nome non può superare i 100 caratteri")]
         public string NomeProdotto { get; set; }

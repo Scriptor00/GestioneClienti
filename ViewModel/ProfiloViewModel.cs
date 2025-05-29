@@ -2,6 +2,7 @@ namespace GestioneClienti.ViewModel
 {
     public class ProfiloViewModel
     {
+        
         public string Username { get; set; }
         public string Email { get; set; }
         public DateTime DataRegistrazione { get; set; }

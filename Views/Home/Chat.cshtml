@@ -167,10 +167,8 @@
         li.innerHTML = `<span class="user-name" style="color: #00fffc; font-weight: bold;">${user}:</span> ${message}`;
         messagesList.appendChild(li);
         
-        // Scroll to bottom
         messagesList.parentElement.scrollTop = messagesList.parentElement.scrollHeight;
         
-        // Play sound with slight delay for better UX
         setTimeout(() => {
             notificationSound.play().catch(e => console.log("Audio play failed:", e));
         }, 300);
@@ -196,7 +194,6 @@
         event.preventDefault();
     });
     
-    // Allow sending message with Enter key
     document.getElementById("messageInput").addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
             document.getElementById("sendButton").click();

@@ -2,21 +2,24 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using WebAppEF.Models;
-using WebAppEF.Repositories;
+using WebAppEF.Models; // Assicurati che questo sia il namespace corretto per ApplicationDbContext e OrdiniFaker
+using WebAppEF.Repositories; // Assicurati che questo sia il namespace corretto per IOrdiniRepository
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using GestioneClienti.Repositories;
-using GestioneClienti.Services;
+using GestioneClienti.Repositories; // Assicurati che questo sia il namespace corretto per ICustomerRepository
+using GestioneClienti.Services; // Assicurati che questo sia il namespace corretto per RecaptchaService, IEmailSender, EmailSender, IGeocodingService, GoogleMapsGeocodingService
 using Microsoft.AspNetCore.Identity;
-using GestioneClienti.Hubs;
+using GestioneClienti.Hubs; // Assicurati che questo sia il namespace corretto per ChatHub
+using ProgettoStage.Hubs; // Assicurati che questo sia il namespace corretto per DisponibilitaHub
+using WebAppEF.Utilities; // Assicurati che questo sia il namespace corretto per DataSeeder
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(80); 
-});
+// comando da usare per esporre l'applicazione su porta 80 con Docker
+// builder.WebHost.ConfigureKestrel(options =>
+// {
+//     options.ListenAnyIP(80); 
+// });   
 
 
 // Configurazione Serilog per logging
@@ -28,9 +31,12 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog();
+builder.Services.AddSession();
+builder.Services.AddDistributedMemoryCache(); 
 
 // Configurazione DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// *** CAMBIATO DA AddDbContext A AddDbContextFactory PER RISOLVERE L'ERRORE SINGLETON/SCOPED ***
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configurazione lockout (tentativi errati di login)
@@ -63,7 +69,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.Cookie.Name = "CookieProgramma";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Cambia a .Always in produzione con HTTPS
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
@@ -83,11 +89,11 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrdiniRepository, OrdiniRepository>();
 builder.Services.AddScoped<RecaptchaService>();
 builder.Services.AddHttpClient<IGeocodingService, GoogleMapsGeocodingService>();
+// builder.Services.AddScoped<ProgettoStage.Services.StripePaymentService>();
 
 // Configurazione EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
-// Registrazione EmailSender con interfaccia corretta e logging
 builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
 {
     var emailSettings = provider.GetRequiredService<IOptions<EmailSettings>>();
@@ -95,6 +101,10 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
     var configuration = provider.GetRequiredService<IConfiguration>(); 
     return new EmailSender(emailSettings, logger, configuration); 
 });
+
+// Registrazione del servizio GestoreDisponibilitaProdotto come Singleton
+// Questo assicura che ci sia un'unica istanza del servizio, essenziale per la gestione della disponibilità globale.
+builder.Services.AddSingleton<ProgettoStage.Services.GestoreDisponibilitaProdotto>();
 
 // Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -124,29 +134,37 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Applica le migrazioni e seeding del database
+
+// Seeding del database (da eseguire solo una volta all'avvio dell'applicazione o in fase di sviluppo)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        context.Database.Migrate(); // Applica le migrazioni pendenti
 
-        // Cancella tutti i clienti esistenti
+        // Esempio di seeding: rimuove i clienti esistenti e ne aggiunge di nuovi
         if (context.Clienti.Any())
         {
             context.Clienti.RemoveRange(context.Clienti);
             context.SaveChanges();
         }
-
-        // Riempie la tabella Clienti e Ordini con dati fake
         context.Clienti.AddRange(DataSeeder.GeneraClienti(50));
 
+        // Seeding degli ordini (solo se non ci sono ordini esistenti)
         if (!context.Ordini.Any())
         {
             context.Ordini.AddRange(new OrdiniFaker().GenerateOrders(100));
         }
+        
+        // Seeding dei prodotti (aggiungi la tua logica di seeding per i prodotti se non l'hai già)
+        // Esempio:
+        // if (!context.Prodotti.Any())
+        // {
+        //     context.Prodotti.AddRange(DataSeeder.GeneraProdotti(20)); // Assumi che GeneraProdotti esista
+        // }
+
 
         context.SaveChanges();
     }
@@ -160,6 +178,7 @@ using (var scope = app.Services.CreateScope())
 // Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage(); // Mostra i dettagli degli errori in sviluppo
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -173,15 +192,19 @@ else
     app.UseHsts();
 }
 
+app.UseHttpsRedirection(); // Aggiungi questo per forzare HTTPS in produzione
 app.UseCors("AllowWithCredentials");
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 
+// Mapping degli Hub SignalR
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<DisponibilitaHub>("/disponibilitaHub");
 
-// Logging delle richieste
+// Middleware di logging delle richieste (opzionale, per debug)
 app.Use(async (context, next) =>
 {
     Log.Information($"Request: {context.Request.Method} {context.Request.Path}");

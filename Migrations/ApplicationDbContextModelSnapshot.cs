@@ -47,7 +47,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("ProdottoId");
 
-                    b.ToTable("Carrello");
+                    b.ToTable("Carrello", (string)null);
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.Utente", b =>
@@ -89,7 +89,7 @@ namespace WebAppEF.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Utenti");
+                    b.ToTable("Utenti", (string)null);
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Cliente", b =>
@@ -122,7 +122,7 @@ namespace WebAppEF.Migrations
 
                     b.HasKey("IdCliente");
 
-                    b.ToTable("Clienti");
+                    b.ToTable("Clienti", (string)null);
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.DettagliOrdine", b =>
@@ -151,7 +151,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("IdProdotto");
 
-                    b.ToTable("DettagliOrdini");
+                    b.ToTable("DettagliOrdini", (string)null);
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Ordine", b =>
@@ -178,7 +178,7 @@ namespace WebAppEF.Migrations
 
                     b.HasIndex("IdCliente");
 
-                    b.ToTable("Ordini");
+                    b.ToTable("Ordini", (string)null);
                 });
 
             modelBuilder.Entity("WebAppEF.Entities.Prodotto", b =>
@@ -217,7 +217,7 @@ namespace WebAppEF.Migrations
 
                     b.HasKey("IdProdotto");
 
-                    b.ToTable("Prodotti");
+                    b.ToTable("Prodotti", (string)null);
                 });
 
             modelBuilder.Entity("GestioneClienti.Entities.CarrelloItem", b =>
