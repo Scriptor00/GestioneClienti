@@ -267,8 +267,6 @@ namespace ProgettoStage.Controllers
             }
         }
 
-        
-
         /// <summary>
         /// Aggiorna la quantità di un articolo nel carrello (utilizzando il GestoreDisponibilitaProdotto).
         /// </summary>
