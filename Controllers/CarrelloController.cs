@@ -159,8 +159,7 @@ namespace ProgettoStage.Controllers
 
             try
             {
-                // The AggiungiOAggiornaArticoloCarrello method in GestoreDisponibilitaProdotto should handle
-                // whether to add a new item or update an existing one based on idUtente and IdProdotto.
+                
                 await _availabilityManager.AggiungiOAggiornaArticoloCarrello(idUtente, request.IdProdotto, request.Quantita);
                 return Ok(new { messaggio = "Articolo aggiunto/aggiornato al carrello con successo!" });
             }
@@ -176,6 +175,7 @@ namespace ProgettoStage.Controllers
                 return StatusCode(500, new { messaggio = "Si è verificato un errore interno durante l'aggiornamento del carrello." });
             }
         }
+        
 
         /// <summary>
         /// Rimuove un articolo dal carrello.
@@ -195,7 +195,6 @@ namespace ProgettoStage.Controllers
             int idUtente;
             try
             {
-                // **CHIAMA IL METODO HELPER PER OTTENERE L'ID UTENTE NUMERICO**
                 idUtente = await GetCurrentUserIdFromDb();
             }
             catch (InvalidOperationException ex)
@@ -236,7 +235,6 @@ namespace ProgettoStage.Controllers
             int idUtente;
             try
             {
-                // **CHIAMA IL METODO HELPER PER OTTENERE L'ID UTENTE NUMERICO**
                 idUtente = await GetCurrentUserIdFromDb();
             }
             catch (InvalidOperationException ex)
@@ -268,6 +266,8 @@ namespace ProgettoStage.Controllers
                 return StatusCode(500, new { messaggio = $"Si è verificato un errore interno durante la conferma dell'ordine: {ex.Message}" });
             }
         }
+
+        
 
         /// <summary>
         /// Aggiorna la quantità di un articolo nel carrello (utilizzando il GestoreDisponibilitaProdotto).

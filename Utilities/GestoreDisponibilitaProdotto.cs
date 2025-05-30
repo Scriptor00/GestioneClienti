@@ -69,15 +69,31 @@ namespace ProgettoStage.Services
         /// </summary>
         /// <param name="idProdotto">L'ID del prodotto da aggiornare.</param>
         public async Task AggiornaENotificaDisponibilitaProdotto(int idProdotto)
-        {
-            // Qui OttieniInfoDisponibilitaProdotto restituirà (giacenzaTotale, quantitaTotalePrenotataInTuttiICarrelli, giacenzaTotale)
-            var (disponibilitaComplessiva, quantitaTotalePrenotata, giacenzaReale) = await OttieniInfoDisponibilitaProdotto(idProdotto);
-            _logger.LogInformation($"Notifica SignalR per Prodotto {idProdotto}: Disponibile Complessivo (Giacenza): {disponibilitaComplessiva}, Totale Prenotato in Carrelli: {quantitaTotalePrenotata}, Giacenza Reale (usato per calcoli): {giacenzaReale}");
-            
-            // Invia l'aggiornamento a tutti i client connessi al SignalR Hub
-            // I valori inviati sono la giacenza totale, la quantità totale prenotata in carrelli e la giacenza reale (che è la stessa della giacenza totale)
-            await _contestoHub.Clients.All.SendAsync("ReceiveProductAvailabilityUpdate", idProdotto, disponibilitaComplessiva, quantitaTotalePrenotata, giacenzaReale);
-        }
+{
+    try
+    {
+        // Ottieni la disponibilità del prodotto (giacenza totale, quantità prenotata nei carrelli, giacenza effettiva)
+        var (disponibilitaComplessiva, quantitaTotalePrenotata, giacenzaReale) =
+            await OttieniInfoDisponibilitaProdotto(idProdotto);
+
+        _logger.LogInformation(
+            $"[SignalR] Prodotto {idProdotto}: Giacenza Totale = {disponibilitaComplessiva}, Prenotata nei Carrelli = {quantitaTotalePrenotata}, Giacenza Reale = {giacenzaReale}");
+
+        // Invia l'aggiornamento a tutti i client connessi
+        await _contestoHub.Clients.All.SendAsync(
+            "ReceiveProductAvailabilityUpdate",
+            idProdotto,
+            disponibilitaComplessiva,
+            quantitaTotalePrenotata,
+            giacenzaReale
+        );
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Errore durante la notifica SignalR per il prodotto {idProdotto}.");
+        // Opzionale: potresti voler rilanciare o gestire silenziosamente l’errore
+    }
+}
 
         /// <summary>
         /// Aggiunge o aggiorna un articolo nel carrello di un utente, con validazione della disponibilità.
@@ -86,103 +102,110 @@ namespace ProgettoStage.Services
         /// <param name="idUtente">L'ID dell'utente.</param>
         /// <param name="idProdotto">L'ID del prodotto.</param>
         /// <param name="quantita">La quantità desiderata (0 per rimuovere).</param>
-        public async Task AggiungiOAggiornaArticoloCarrello(int idUtente, int idProdotto, int quantita)
+    public async Task AggiungiOAggiornaArticoloCarrello(int idUtente, int idProdotto, int quantita)
+{
+    bool modificaEffettuata = false;
+
+    // Primo blocco: aggiorna il carrello e committa le modifiche
+    using (var contestoDB = await _dbContextFactory.CreateDbContextAsync())
+    using (var transaction = await contestoDB.Database.BeginTransactionAsync())
+    {
+        try
         {
-            using (var contestoDB = await _dbContextFactory.CreateDbContextAsync())
+            // Recupera il prodotto
+            var prodotto = await contestoDB.Prodotti
+                .FirstOrDefaultAsync(p => p.IdProdotto == idProdotto);
+
+            if (prodotto == null)
             {
-                using (var transaction = await contestoDB.Database.BeginTransactionAsync())
-                {
-                    try
-                    {
-                        var prodotto = await contestoDB.Prodotti
-                            .FirstOrDefaultAsync(p => p.IdProdotto == idProdotto);
-
-                        if (prodotto == null)
-                        {
-                            _logger.LogWarning($"Tentativo di aggiungere/aggiornare un prodotto inesistente (ID: {idProdotto}) al carrello dell'utente {idUtente}.");
-                            throw new InvalidOperationException($"Prodotto con ID {idProdotto} non trovato.");
-                        }
-
-                        var articoloCarrello = await contestoDB.Carrelli
-                            .FirstOrDefaultAsync(c => c.IdUtente == idUtente && c.IdProdotto == idProdotto); 
-                        
-                        int oldQuantityInCart = articoloCarrello?.Quantita ?? 0;
-                        int newQuantity = quantita; 
-
-                        // Caso: La quantità richiesta è zero o negativa, quindi rimuovi l'articolo dal carrello
-                        if (newQuantity <= 0)
-                        {
-                            if (oldQuantityInCart > 0)
-                            {
-                                contestoDB.Carrelli.Remove(articoloCarrello);
-                                _logger.LogInformation($"Rimosso prodotto {idProdotto} dal carrello dell'utente {idUtente} a causa di un aggiornamento a quantità zero o negativa.");
-                            }
-                            else
-                            {
-                                _logger.LogInformation($"Saltata l'aggiunta al carrello per il prodotto {idProdotto} con quantità zero o negativa per l'utente {idUtente}. Non era presente.");
-                            }
-                            await contestoDB.SaveChangesAsync();
-                            await transaction.CommitAsync();
-                            await AggiornaENotificaDisponibilitaProdotto(idProdotto);
-                            return; // Terminata l'operazione
-                        }
-                        
-                        // Ottieni le informazioni di disponibilità aggiornate
-                        // giacenzaReale: stock fisico
-                        // totalBookedQuantity: quantità in TUTTI i carrelli
-                        var (overallAvailableQuantity, totalBookedQuantity, giacenzaReale) = await OttieniInfoDisponibilitaProdotto(idProdotto);
-                        
-                        // Calcola la quantità già prenotata da *altri* utenti (escludendo la mia vecchia quantità)
-                        int bookedByOthers = Math.Max(0, totalBookedQuantity - oldQuantityInCart);
-                        
-                        // Calcola la quantità massima che questo utente può aggiungere/avere nel carrello
-                        int maxQuantityThisUserCanHave = giacenzaReale - bookedByOthers;
-
-                        // Validazione: la nuova quantità richiesta non deve superare la massima disponibile per l'utente
-                        if (newQuantity > maxQuantityThisUserCanHave)
-                        {
-                            throw new InvalidOperationException($"Quantità richiesta ({newQuantity}) per '{prodotto.NomeProdotto}' supera la disponibilità massima che puoi avere nel carrello ({maxQuantityThisUserCanHave}).");
-                        }
-
-                        // Aggiorna o aggiungi l'articolo nel carrello
-                        if (articoloCarrello == null)
-                        {
-                            contestoDB.Carrelli.Add(new Carrello
-                            {
-                                IdUtente = idUtente, 
-                                IdProdotto = idProdotto,
-                                Quantita = newQuantity,
-                                DataUltimoAggiornamento = DateTime.Now
-                            });
-                            _logger.LogInformation($"Aggiunto prodotto {idProdotto} con quantità {newQuantity} al carrello dell'utente {idUtente}.");
-                        }
-                        else
-                        {
-                            articoloCarrello.Quantita = newQuantity;
-                            articoloCarrello.DataUltimoAggiornamento = DateTime.Now; 
-                            contestoDB.Carrelli.Update(articoloCarrello);
-                            _logger.LogInformation($"Aggiornata la quantità del prodotto {idProdotto} a {newQuantity} nel carrello dell'utente {idUtente}.");
-                        }
-
-                        await contestoDB.SaveChangesAsync(); 
-                        await transaction.CommitAsync(); 
-                        await AggiornaENotificaDisponibilitaProdotto(idProdotto); // Notifica i client SignalR dell'aggiornamento
-                    }
-                    catch (DbUpdateConcurrencyException ex)
-                    {
-                        await transaction.RollbackAsync(); 
-                        _logger.LogError(ex, $"Errore di concorrenza durante l'aggiornamento del carrello per utente {idUtente}, prodotto {idProdotto}. Un altro utente ha modificato il prodotto.");
-                        throw new InvalidOperationException("Il prodotto che stai cercando di modificare è stato aggiornato da un altro utente. Si prega di ricaricare la pagina e riprovare.", ex);
-                    }
-                    catch (Exception ex)
-                    {
-                        await transaction.RollbackAsync(); 
-                        _logger.LogError(ex, $"Errore durante l'aggiunta/aggiornamento dell'articolo nel carrello per utente {idUtente}, prodotto {idProdotto}.");
-                        throw; 
-                    }
-                }
+                _logger.LogWarning($"Tentativo di usare un prodotto inesistente (ID: {idProdotto}) per l'utente {idUtente}.");
+                throw new InvalidOperationException($"Prodotto con ID {idProdotto} non trovato.");
             }
+
+            // Recupera l'articolo nel carrello se esiste
+            var articoloCarrello = await contestoDB.Carrelli
+                .FirstOrDefaultAsync(c => c.IdUtente == idUtente && c.IdProdotto == idProdotto);
+
+            int oldQuantityInCart = articoloCarrello?.Quantita ?? 0;
+            int newQuantity = quantita;
+
+            if (newQuantity <= 0)
+            {
+                if (articoloCarrello != null)
+                {
+                    contestoDB.Carrelli.Remove(articoloCarrello);
+                    _logger.LogInformation($"Rimosso prodotto {idProdotto} dal carrello dell'utente {idUtente} (quantità <= 0).");
+                    modificaEffettuata = true;
+                }
+                else
+                {
+                    _logger.LogInformation($"Quantità <= 0 per prodotto {idProdotto}, ma non era presente nel carrello dell'utente {idUtente}.");
+                }
+
+                await contestoDB.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return; // Nessuna notifica se non è stato modificato nulla
+            }
+
+            // Calcolo disponibilità effettiva
+            var (overallAvailableQuantity, totalBookedQuantity, giacenzaReale) =
+                await OttieniInfoDisponibilitaProdotto(idProdotto);
+
+            int bookedByOthers = Math.Max(0, totalBookedQuantity - oldQuantityInCart);
+            int maxQuantityThisUserCanHave = giacenzaReale - bookedByOthers;
+
+            if (newQuantity > maxQuantityThisUserCanHave)
+            {
+                throw new InvalidOperationException(
+                    $"Quantità richiesta ({newQuantity}) per '{prodotto.NomeProdotto}' eccede la disponibilità massima consentita ({maxQuantityThisUserCanHave}).");
+            }
+
+            if (articoloCarrello == null)
+            {
+                contestoDB.Carrelli.Add(new Carrello
+                {
+                    IdUtente = idUtente,
+                    IdProdotto = idProdotto,
+                    Quantita = newQuantity,
+                    DataUltimoAggiornamento = DateTime.Now
+                });
+                _logger.LogInformation($"Aggiunto prodotto {idProdotto} con quantità {newQuantity} al carrello utente {idUtente}.");
+            }
+            else
+            {
+                articoloCarrello.Quantita = newQuantity;
+                articoloCarrello.DataUltimoAggiornamento = DateTime.Now;
+                contestoDB.Carrelli.Update(articoloCarrello);
+                _logger.LogInformation($"Aggiornata quantità del prodotto {idProdotto} a {newQuantity} per l'utente {idUtente}.");
+            }
+
+            await contestoDB.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            modificaEffettuata = true;
         }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, $"Errore di concorrenza per utente {idUtente}, prodotto {idProdotto}.");
+            throw new InvalidOperationException("Modifica concorrente rilevata. Ricarica la pagina e riprova.", ex);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, $"Errore generico nell'aggiunta/aggiornamento articolo carrello per utente {idUtente}, prodotto {idProdotto}.");
+            throw;
+        }
+    }
+
+    // ✅ Chiamata fatta SOLO se c'è stata una modifica, e SOLO dopo che il contesto è stato chiuso
+    if (modificaEffettuata)
+    {
+        await AggiornaENotificaDisponibilitaProdotto(idProdotto);
+    }
+}
+
+
 
         /// <summary>
         /// Rimuove un articolo dal carrello di un utente.
