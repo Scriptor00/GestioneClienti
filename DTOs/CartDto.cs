@@ -47,6 +47,5 @@ namespace ProgettoStage.DTOs
     public class OrdineRequestDto
     {
         public List<ArticoloOrdineRichiesta> ArticoliOrdine { get; set; } = new List<ArticoloOrdineRichiesta>();
-        // Puoi aggiungere qui altre proprietà relative all'ordine, es. indirizzo di spedizione, metodo di pagamento
     }
 }

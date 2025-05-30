@@ -72,20 +72,25 @@ namespace ProgettoStage.Services
 {
     try
     {
-        // Ottieni la disponibilità del prodotto (giacenza totale, quantità prenotata nei carrelli, giacenza effettiva)
-        var (disponibilitaComplessiva, quantitaTotalePrenotata, giacenzaReale) =
+        // Ottieni la disponibilità del prodotto (overallAvailableQuantity, totalBookedQuantity, giacenzaReale)
+        // overallAvailableQuantity: Giacenza reale - Quantità totale in *tutti* i carrelli
+        // totalBookedQuantity: Quantità totale in *tutti* i carrelli
+        // giacenzaReale: La quantità fisica in magazzino
+        var (overallAvailableQuantity, totalBookedQuantity, giacenzaReale) =
             await OttieniInfoDisponibilitaProdotto(idProdotto);
 
         _logger.LogInformation(
-            $"[SignalR] Prodotto {idProdotto}: Giacenza Totale = {disponibilitaComplessiva}, Prenotata nei Carrelli = {quantitaTotalePrenotata}, Giacenza Reale = {giacenzaReale}");
+            $"[SignalR] Prodotto {idProdotto}: Disponibilità Complessiva (Giacenza - Tutti Carrelli) = {overallAvailableQuantity}, Totale Prenotata nei Carrelli = {totalBookedQuantity}, Giacenza Reale = {giacenzaReale}");
 
         // Invia l'aggiornamento a tutti i client connessi
+        // I parametri inviati devono essere i dati "grezzi" globali,
+        // che il client userà per calcolare i valori specifici dell'utente.
         await _contestoHub.Clients.All.SendAsync(
-            "ReceiveProductAvailabilityUpdate",
+            "ReceiveProductAvailabilityUpdate", // <-- NOME DELL'EVENTO UNIFICATO
             idProdotto,
-            disponibilitaComplessiva,
-            quantitaTotalePrenotata,
-            giacenzaReale
+            overallAvailableQuantity,           
+            totalBookedQuantity,                
+            giacenzaReale                       
         );
     }
     catch (Exception ex)

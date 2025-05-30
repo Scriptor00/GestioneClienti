@@ -155,6 +155,7 @@
             border: 1px solid #0d6efd;
             border-radius: 5px;
         }
+
         .quantity-input-small:focus {
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
@@ -233,7 +234,7 @@
         }
 
         .gaming-dropdown .dropdown-item:hover {
-            background: linear-gradient(90deg, rgba(13,110,253,0.2) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.2) 0%, transparent 100%);
             color: #fff;
             border-left: 3px solid #0d6efd;
             transform: translateX(5px);
@@ -255,7 +256,7 @@
         }
 
         .logout-btn:hover {
-            background: linear-gradient(90deg, rgba(255,75,43,0.2) 0%, transparent 100%) !important;
+            background: linear-gradient(90deg, rgba(255, 75, 43, 0.2) 0%, transparent 100%) !important;
             border-left: 3px solid #ff4b2b !important;
         }
 
@@ -270,6 +271,7 @@
                 opacity: 0;
                 transform: translateY(-10px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -290,12 +292,12 @@
                 margin-top: 0.5rem;
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             }
-            
+
             .nav-link {
                 margin: 0.3rem 0;
                 padding: 0.8rem 1rem !important;
             }
-            
+
             .nav-link::before {
                 display: none;
             }
@@ -331,6 +333,7 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -395,8 +398,13 @@
         }
 
         @@keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .payment-summary {
@@ -452,9 +460,27 @@
             display: inline-block;
         }
 
+        table tbody tr:hover td {
+            color: #fff !important;
+        }
+
+        .table-hover tbody tr:hover td {
+            color: #fff !important;
+        }
+
+        table tbody tr:hover td a,
+        table tbody tr:hover td button {
+            color: #fff !important;
+        }
+
         @@keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -466,13 +492,14 @@
                 <i class="bi bi-controller me-2"></i>Gaming Store
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")"><i class="bi bi-house-door me-1"></i>Home</a>
+                        <a class="nav-link" href="@Url.Action("Home", "Prodotti")"><i
+                                class="bi bi-house-door me-1"></i>Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/Prodotti"><i class="bi bi-list-ul me-1"></i>Catalogo</a>
@@ -480,7 +507,8 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle gaming-user-menu" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle me-1"></i>@User.Identity.Name
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end gaming-dropdown" aria-labelledby="navbarDropdown">
@@ -490,7 +518,9 @@
                                 <li><a class="dropdown-item" href="@Url.Action("MieiOrdini", "Ordini")"> @* Assumendo un controller Ordini per gli ordini, modifica se diverso *@
                                         <i class="bi bi-collection-play me-2"></i>I miei ordini
                                     </a></li>
-                                <li><hr class="dropdown-divider my-2" /></li>
+                                <li>
+                                    <hr class="dropdown-divider my-2" />
+                                </li>
                                 <li>
                                     <form asp-controller="Account" asp-action="Logout" method="post">
                                         <button type="submit" class="dropdown-item logout-btn">
@@ -570,30 +600,35 @@
                                             @item.NomeProdotto
                                             @if (!string.IsNullOrEmpty(item.ImmagineUrl))
                                             {
-                                                <img src="@item.ImmagineUrl" alt="@item.NomeProdotto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-left: 10px;">
+                                                <img src="@item.ImmagineUrl" alt="@item.NomeProdotto"
+                                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-left: 10px;">
                                             }
-                                        </td>
-                                        <td class="item-price" data-price="@item.PrezzoUnitario">@item.PrezzoUnitario.ToString("C")</td>
-                                        <td>
-                                            <input type="number" 
-                                                   value="@item.Quantita" 
-                                                   min="0"
-                                                   max="@item.QuantitaOrdinabile"
-                                                   data-product-id="@item.IdProdotto" 
-                                                   class="form-control item-quantity-input quantity-input-small"
-                                                   onchange="updateCartQuantity(this)">
-                                        </td>
-                                        <td><span id="giacenza-reale-@item.IdProdotto">@item.DisponibilitaMagazzino</span></td>
-                                        <td><span id="quantita-prenotata-altri-@item.IdProdotto">@item.QuantitaPrenotataDaAltri</span></td>
-                                        <td><span id="quantita-ordinabile-display-@item.IdProdotto">@item.QuantitaOrdinabile</span></td>
-                                        <td><span id="item-total-@item.IdProdotto">@( (item.Quantita * item.PrezzoUnitario).ToString("C") )</span></td>
-                                        <td>
-                                            <button class="btn btn-danger btn-sm remove-cart-item-btn" data-product-id="@item.IdProdotto">
-                                                <i class="bi bi-trash"></i> Rimuovi
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
+                                     </td>
+                                     <td class="item-price" data-price="@item.PrezzoUnitario">
+                                         @item.PrezzoUnitario.ToString("C")</td>
+                                     <td>
+                                         <input type="number" value="@item.Quantita" min="0" max="@item.QuantitaOrdinabile"
+                                             data-product-id="@item.IdProdotto"
+                                             class="form-control item-quantity-input quantity-input-small"
+                                             onchange="updateCartQuantity(this)">
+                                     </td>
+                                     <td><span id="giacenza-reale-@item.IdProdotto">@item.DisponibilitaMagazzino</span></td>
+                                     <td><span
+                                             id="quantita-prenotata-altri-@item.IdProdotto">@item.QuantitaPrenotataDaAltri</span>
+                                     </td>
+                                     <td><span
+                                             id="quantita-ordinabile-display-@item.IdProdotto">@item.QuantitaOrdinabile</span>
+                                     </td>
+                                     <td><span id="item-total-@item.IdProdotto">@( (item.Quantita *
+                                                                                    item.PrezzoUnitario).ToString("C") )</span></td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm remove-cart-item-btn"
+                                        data-product-id="@item.IdProdotto">
+                                        <i class="bi bi-trash"></i> Rimuovi
+                                    </button>
+                                </td>
+                            </tr>
+                                                        }
                             </tbody>
                         </table>
                     </div>
@@ -608,7 +643,8 @@
                                 <strong>Totale Prodotti:</strong> <span id="total-items">@Model.TotaleArticoli</span>
                             </p>
                             <p class="card-text">
-                                <strong>Totale:</strong> <span id="total-price">@Model.TotaleComplessivo.ToString("C")</span>
+                                <strong>Totale:</strong> <span
+                                    id="total-price">@Model.TotaleComplessivo.ToString("C")</span>
                             </p>
                             <button class="btn btn-primary w-100" id="checkout-btn">
                                 <i class="bi bi-credit-card me-2"></i>Procedi al Pagamento
@@ -682,7 +718,8 @@
 
             <div class="payment-details" id="paypal-details">
                 <div class="alert alert-info mt-3">
-                    <i class="bi bi-info-circle me-2"></i>Sarai reindirizzato al sito PayPal per completare il pagamento.
+                    <i class="bi bi-info-circle me-2"></i>Sarai reindirizzato al sito PayPal per completare il
+                    pagamento.
                 </div>
                 <button class="btn btn-primary confirm-btn" id="confirm-paypal" style="background-color: #003087;">
                     <i class="bi bi-paypal me-2"></i>Paga con PayPal
@@ -717,478 +754,478 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script src="https://unpkg.com/@@microsoft/signalr@6.0.10/dist/browser/signalr.js"></script>
-   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Inizializza Stripe con la tua chiave pubblica
-        const stripe = Stripe('pk_test_51RDkKhC6u6ziHmcrOSfUvmUDvSGqynwsNqy4GlCuSoBb92v1tIuEBPfFsPh8h1eT2gbBr8jnSGKhVN8mwCS8WSa800t6GU63zI');
-        const elements = stripe.elements();
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Inizializza Stripe con la tua chiave pubblica
+            const stripe = Stripe('pk_test_51RDkKhC6u6ziHmcrOSfUvmUDvSGqynwsNqy4GlCuSoBb92v1tIuEBPfFsPh8h1eT2gbBr8jnSGKhVN8mwCS8WSa800t6GU63zI');
+            const elements = stripe.elements();
 
-        // Crea e monta l'elemento della carta di credito
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    color: '#fff',
-                    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-                    fontSmoothing: 'antialiased',
-                    fontSize: '16px',
-                    '::placeholder': {
-                        color: '#aab7c4'
+            // Crea e monta l'elemento della carta di credito
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        color: '#fff',
+                        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                        fontSmoothing: 'antialiased',
+                        fontSize: '16px',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#dc3545',
+                        iconColor: '#dc3545'
                     }
-                },
-                invalid: {
-                    color: '#dc3545',
-                    iconColor: '#dc3545'
                 }
+            });
+
+            if (document.getElementById('card-element')) {
+                cardElement.mount('#card-element');
             }
-        });
-        
-        if (document.getElementById('card-element')) {
-            cardElement.mount('#card-element');
-        }
 
-        const cartItemsBody = document.getElementById("carrello-items-body");
-        const totalItemsElement = document.getElementById("total-items");
-        const totalPriceElement = document.getElementById("total-price");
-        const checkoutBtn = document.getElementById("checkout-btn");
+            const cartItemsBody = document.getElementById("carrello-items-body");
+            const totalItemsElement = document.getElementById("total-items");
+            const totalPriceElement = document.getElementById("total-price");
+            const checkoutBtn = document.getElementById("checkout-btn");
 
-        const paymentModal = document.getElementById("payment-modal");
-        const closePayment = document.querySelector(".close-payment");
-        const modalTotalItems = document.getElementById("modal-total-items");
-        const modalTotalPrice = document.getElementById("modal-total-price");
-        const paymentMethods = document.querySelectorAll(".payment-method");
-        const paymentDetails = document.querySelectorAll(".payment-details");
-        const paymentErrors = document.getElementById('payment-errors');
-        const confirmCreditCardBtn = document.getElementById("confirm-credit-card");
+            const paymentModal = document.getElementById("payment-modal");
+            const closePayment = document.querySelector(".close-payment");
+            const modalTotalItems = document.getElementById("modal-total-items");
+            const modalTotalPrice = document.getElementById("modal-total-price");
+            const paymentMethods = document.querySelectorAll(".payment-method");
+            const paymentDetails = document.querySelectorAll(".payment-details");
+            const paymentErrors = document.getElementById('payment-errors');
+            const confirmCreditCardBtn = document.getElementById("confirm-credit-card");
 
-        let selectedPaymentMethod = 'credit-card';
+            let selectedPaymentMethod = 'credit-card';
 
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl(window.location.protocol + "//" + window.location.host + "/disponibilitaHub")
-            .withAutomaticReconnect()
-            .build();
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(window.location.protocol + "//" + window.location.host + "/disponibilitaHub")
+                .withAutomaticReconnect()
+                .build();
 
-        connection.on("ReceiveProductAvailabilityUpdate", (prodottoId, overallAvailableQuantity, totalBookedQuantity, realStockQuantity) => {
-    console.log(`SignalR: Aggiornamento per Prodotto ${prodottoId}: Disponibile Complessivo: ${overallAvailableQuantity}, Totale Prenotato: ${totalBookedQuantity}, Giacenza Reale: ${realStockQuantity}`);
+            connection.on("ReceiveProductAvailabilityUpdate", (prodottoId, overallAvailableQuantity, totalBookedQuantity, realStockQuantity) => {
+                console.log(`SignalR: Aggiornamento per Prodotto ${prodottoId}: Disponibile Complessivo: ${overallAvailableQuantity}, Totale Prenotato: ${totalBookedQuantity}, Giacenza Reale: ${realStockQuantity}`);
 
-    const elemDisponibile = document.getElementById(`giacenza-reale-${prodottoId}`);
-    if (elemDisponibile) {
-        elemDisponibile.innerText = realStockQuantity; 
-        elemDisponibile.classList.toggle('text-danger', realStockQuantity <= 0);
-        elemDisponibile.classList.toggle('font-weight-bold', realStockQuantity <= 0);
-    }
+                const elemDisponibile = document.getElementById(`giacenza-reale-${prodottoId}`);
+                if (elemDisponibile) {
+                    elemDisponibile.innerText = realStockQuantity;
+                    elemDisponibile.classList.toggle('text-danger', realStockQuantity <= 0);
+                    elemDisponibile.classList.toggle('font-weight-bold', realStockQuantity <= 0);
+                }
 
-    const currentQuantityInCartInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
-    const currentQuantityInCart = currentQuantityInCartInput ? parseInt(currentQuantityInCartInput.value || '0') : 0;
+                const currentQuantityInCartInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
+                const currentQuantityInCart = currentQuantityInCartInput ? parseInt(currentQuantityInCartInput.value || '0') : 0;
 
-    // Calcolo di "Prenotata da Altri": totale prenotato meno la quantità nel carrello dell'utente corrente
-    const bookedByOthers = Math.max(0, totalBookedQuantity - currentQuantityInCart);
-    const elemPrenotata = document.getElementById(`quantita-prenotata-altri-${prodottoId}`);
-    if (elemPrenotata) {
-        elemPrenotata.innerText = bookedByOthers;
-    }
+                // Calcolo di "Prenotata da Altri": totale prenotato meno la quantità nel carrello dell'utente corrente
+                const bookedByOthers = Math.max(0, totalBookedQuantity - currentQuantityInCart);
+                const elemPrenotata = document.getElementById(`quantita-prenotata-altri-${prodottoId}`);
+                if (elemPrenotata) {
+                    elemPrenotata.innerText = bookedByOthers;
+                }
 
-    // Calcolo di "Ordinabile (Tuo)": giacenza reale meno la quantità prenotata da altri
-    const personalOrderable = Math.max(0, realStockQuantity - bookedByOthers);
-    const elemOrdinabile = document.getElementById(`quantita-ordinabile-display-${prodottoId}`);
-    if (elemOrdinabile) {
-        elemOrdinabile.innerText = personalOrderable;
+                // Calcolo di "Ordinabile (Tuo)": giacenza reale meno la quantità prenotata da altri
+                const personalOrderable = Math.max(0, realStockQuantity - bookedByOthers);
+                const elemOrdinabile = document.getElementById(`quantita-ordinabile-display-${prodottoId}`);
+                if (elemOrdinabile) {
+                    elemOrdinabile.innerText = personalOrderable;
 
-        const quantityInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
-        if (quantityInput) {
-            // Il max deve essere la somma della sua attuale quantità nel carrello più la nuova ordinabile
-            // altrimenti se ha 2 nel carrello e può ordinare 10, il max è 12
-            quantityInput.max = currentQuantityInCart + personalOrderable;
-        }
-    }
+                    const quantityInput = document.querySelector(`#cart-item-row-${prodottoId} .item-quantity-input`);
+                    if (quantityInput) {
+                        // Il max deve essere la somma della sua attuale quantità nel carrello più la nuova ordinabile
+                        // altrimenti se ha 2 nel carrello e può ordinare 10, il max è 12
+                        quantityInput.max = currentQuantityInCart + personalOrderable;
+                    }
+                }
 
-    updateOrderSummaryUI();
-});
+                updateOrderSummaryUI();
+            });
 
 
-        connection.start().then(() => {
-            console.log("Connessione SignalR avviata con successo.");
-        }).catch(err => console.error("Errore durante l'avvio della connessione SignalR: ", err));
+            connection.start().then(() => {
+                console.log("Connessione SignalR avviata con successo.");
+            }).catch(err => console.error("Errore durante l'avvio della connessione SignalR: ", err));
 
-        function updateOrderSummaryUI() {
-            let currentTotalItems = 0;
-            let currentTotalPrice = 0;
+            function updateOrderSummaryUI() {
+                let currentTotalItems = 0;
+                let currentTotalPrice = 0;
 
-            document.querySelectorAll('#carrello-items-body tr').forEach(row => {
-                if (row.querySelectorAll('td').length > 1 && row.parentNode) { 
-                    const quantityInput = row.querySelector('.item-quantity-input');
-                    const priceElement = row.querySelector('.item-price');
+                document.querySelectorAll('#carrello-items-body tr').forEach(row => {
+                    if (row.querySelectorAll('td').length > 1 && row.parentNode) {
+                        const quantityInput = row.querySelector('.item-quantity-input');
+                        const priceElement = row.querySelector('.item-price');
 
-                    if (quantityInput && priceElement) {
-                        const quantity = parseInt(quantityInput.value);
-                        const price = parseFloat(priceElement.dataset.price);
+                        if (quantityInput && priceElement) {
+                            const quantity = parseInt(quantityInput.value);
+                            const price = parseFloat(priceElement.dataset.price);
 
-                        if (!isNaN(quantity) && !isNaN(price) && quantity > 0) {
-                            currentTotalItems += quantity;
-                            currentTotalPrice += (quantity * price);
-                            const itemTotalElement = row.querySelector(`#item-total-${quantityInput.dataset.productId}`);
-                            if (itemTotalElement) {
-                                itemTotalElement.textContent = `€${(quantity * price).toFixed(2)}`;
+                            if (!isNaN(quantity) && !isNaN(price) && quantity > 0) {
+                                currentTotalItems += quantity;
+                                currentTotalPrice += (quantity * price);
+                                const itemTotalElement = row.querySelector(`#item-total-${quantityInput.dataset.productId}`);
+                                if (itemTotalElement) {
+                                    itemTotalElement.textContent = `€${(quantity * price).toFixed(2)}`;
+                                }
                             }
                         }
                     }
-                }
-            });
-            
-            if (totalItemsElement) totalItemsElement.textContent = currentTotalItems;
-            if (totalPriceElement) totalPriceElement.textContent = `€${currentTotalPrice.toFixed(2)}`;
-
-            if (modalTotalItems && modalTotalPrice) {
-                modalTotalItems.textContent = currentTotalItems;
-                modalTotalPrice.textContent = `€${currentTotalPrice.toFixed(2)}`;
-            }
-
-            const cartBody = document.getElementById('carrello-items-body');
-            if (cartBody) {
-                const hasContentRows = Array.from(cartBody.querySelectorAll('tr')).some(row => row.querySelector('.item-quantity-input'));
-                if (!hasContentRows || currentTotalItems === 0) {
-                    cartItemsBody.innerHTML = '<tr><td colspan="6" class="text-center">Il tuo carrello è vuoto.</td></tr>';
-                    if (checkoutBtn) checkoutBtn.disabled = true;
-                    if (totalItemsElement) totalItemsElement.textContent = '0';
-                    if (totalPriceElement) totalPriceElement.textContent = '€0.00';
-                    if (modalTotalItems) modalTotalItems.textContent = '0';
-                    if (modalTotalPrice) modalTotalPrice.textContent = '€0.00';
-                } else if (checkoutBtn) {
-                    checkoutBtn.disabled = false;
-                }
-            }
-        }
-        
-        window.updateCartQuantity = async function (inputElement) {
-            const productId = parseInt(inputElement.dataset.productId);
-            let newQuantity = parseInt(inputElement.value);
-            const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-            
-            const row = document.getElementById(`cart-item-row-${productId}`);
-            const currentMaxQuantityInDom = parseInt(inputElement.max);
-            const previousValue = inputElement.defaultValue; 
-
-            if (isNaN(newQuantity) || newQuantity < 0) {
-                showCustomAlert('La quantità deve essere un numero valido e non negativo.');
-                inputElement.value = previousValue; 
-                return;
-            }
-
-            if (!isNaN(currentMaxQuantityInDom) && newQuantity > currentMaxQuantityInDom) {
-                showCustomAlert(`La quantità massima ordinabile per questo prodotto è ${currentMaxQuantityInDom}.`);
-                newQuantity = currentMaxQuantityInDom;
-                inputElement.value = newQuantity;
-            }
-            
-            inputElement.disabled = true;
-            inputElement.style.opacity = '0.5';
-
-            try {
-                const response = await fetch('/Carrello/UpdateItem', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': antiforgeryToken
-                    },
-                    body: JSON.stringify({
-                        productId: productId, 
-                        newQuantity: newQuantity
-                    })
                 });
 
-                const result = await response.json();
+                if (totalItemsElement) totalItemsElement.textContent = currentTotalItems;
+                if (totalPriceElement) totalPriceElement.textContent = `€${currentTotalPrice.toFixed(2)}`;
 
-            if (response.ok) { 
-    inputElement.defaultValue = result.updatedQuantity;
-    inputElement.value = result.updatedQuantity;
+                if (modalTotalItems && modalTotalPrice) {
+                    modalTotalItems.textContent = currentTotalItems;
+                    modalTotalPrice.textContent = `€${currentTotalPrice.toFixed(2)}`;
+                }
 
-    if (row && result.updatedItem) {
-        const itemTotalPriceElement = document.querySelector(`#item-total-${productId}`);
-        if (itemTotalPriceElement) {
-            itemTotalPriceElement.textContent = `€${(result.updatedItem.prezzoUnitario * result.updatedItem.quantita).toFixed(2)}`;
-        }
-
-        if (typeof result.updatedItem.quantitaOrdinabile !== 'undefined') {
-            inputElement.max = result.updatedItem.quantitaOrdinabile;
-
-            const qtyOrdinabileDisplay = document.querySelector(`#quantita-ordinabile-display-${productId}`);
-            if (qtyOrdinabileDisplay) {
-                qtyOrdinabileDisplay.textContent = result.updatedItem.quantitaOrdinabile;
-            }
-        }
-
-        if (typeof result.updatedItem.quantitaPrenotataDaAltri !== 'undefined') {
-            const qtyPrenotataAltriDisplay = document.querySelector(`#quantita-prenotata-altri-${productId}`);
-            if (qtyPrenotataAltriDisplay) {
-                qtyPrenotataAltriDisplay.textContent = result.updatedItem.quantitaPrenotataDaAltri;
-            }
-        }
-
-        const giacenzaRealeDisplay = document.querySelector(`#giacenza-reale-${productId}`);
-        if (giacenzaRealeDisplay) {
-            giacenzaRealeDisplay.textContent = result.updatedItem.disponibilitaMagazzino;
-        }
-
-        if (result.updatedQuantity === 0 && row) {
-            row.remove();
-        }
-    }
-} else {
-    showCustomAlert(result.messaggio || `Errore durante l'aggiornamento: ${response.statusText}`);
-    inputElement.value = previousValue;
-}
-            } catch (error) {
-                console.error('Errore di comunicazione durante l\'aggiornamento della quantità:', error);
-                showCustomAlert('Si è verificato un errore di comunicazione con il server durante l\'aggiornamento della quantità. Riprova più tardi.');
-                inputElement.value = previousValue;
-            } finally {
-                inputElement.disabled = false;
-                inputElement.style.opacity = '1';
-                updateOrderSummaryUI(); 
-            }
-        };
-
-        // Funzione per rimuovere un articolo dal carrello
-        window.removeCartItem = async function (productId) {
-            console.log("Attempting to remove product ID:", productId);
-            if (!confirm('Sei sicuro di voler rimuovere questo articolo dal carrello?')) {
-                return;
-            }
-
-            const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-            const row = document.getElementById(`cart-item-row-${productId}`);
-            const removeButton = row ? row.querySelector(`.remove-cart-item-btn[data-product-id="${productId}"]`) : null;
-
-            if (row) {
-                row.style.opacity = '0.5';
-            }
-            if (removeButton) {
-                removeButton.disabled = true;
-            }
-
-            try {
-                const response = await fetch('/Carrello/Rimuovi', { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json', 
-                        'RequestVerificationToken': antiforgeryToken
-                    },
-                    body: JSON.stringify({
-                        IdProdotto: productId 
-                    })
-                });
-
-                let result = {}; // Inizializza result come oggetto vuoto
-                try {
-                    // Tenta di parsare il JSON solo se la risposta non è vuota
-                    const responseText = await response.text();
-                    if (responseText) {
-                        result = JSON.parse(responseText);
-                        console.log("Parsed JSON response from /Carrello/Rimuovi:", result);
-                    } else {
-                        console.log("Empty response from /Carrello/Rimuovi, but response.ok might be true.");
+                const cartBody = document.getElementById('carrello-items-body');
+                if (cartBody) {
+                    const hasContentRows = Array.from(cartBody.querySelectorAll('tr')).some(row => row.querySelector('.item-quantity-input'));
+                    if (!hasContentRows || currentTotalItems === 0) {
+                        cartItemsBody.innerHTML = '<tr><td colspan="6" class="text-center">Il tuo carrello è vuoto.</td></tr>';
+                        if (checkoutBtn) checkoutBtn.disabled = true;
+                        if (totalItemsElement) totalItemsElement.textContent = '0';
+                        if (totalPriceElement) totalPriceElement.textContent = '€0.00';
+                        if (modalTotalItems) modalTotalItems.textContent = '0';
+                        if (modalTotalPrice) modalTotalPrice.textContent = '€0.00';
+                    } else if (checkoutBtn) {
+                        checkoutBtn.disabled = false;
                     }
-                } catch (e) {
-                    console.error("Error parsing JSON from /Carrello/Rimuovi:", e, "Response text:", await response.text());
-                    showCustomAlert('Si è verificato un errore durante la rimozione dell\'articolo. Riprova più tardi.');
                 }
-                
-                console.log("Response from /Carrello/Rimuovi:", response.status, response.statusText);
-
-                if (response.ok) {
-                    showCustomAlert(result.messaggio || "Articolo rimosso con successo.");
-                    if (row) {
-                        console.log("Row found, removing from DOM:", row);
-                        row.remove();
-                    } else {
-                        console.warn("Row not found in DOM for productId:", productId, "after successful removal call.");
-                    }
-                } else {
-                    // Errore HTTP (es. 400, 401, 403, 500)
-                    const errorMsg = result.messaggio || `Errore server (${response.status}): ${response.statusText}.`;
-                    showCustomAlert(errorMsg);
-                    console.error("Error response from /Carrello/Rimuovi:", errorMsg, result);
-                    if (row) row.style.opacity = '1'; 
-                    if (removeButton) removeButton.disabled = false;
-                }
-            } catch (error) {
-                console.error('Errore di comunicazione durante la rimozione:', error);
-                showCustomAlert('Si è verificato un errore di comunicazione con il server durante la rimozione. Riprova più tardi.');
-                if (row) row.style.opacity = '1';
-                if (removeButton) removeButton.disabled = false;
-            } finally {
-                 if (removeButton) removeButton.disabled = false;
-                 if (row && document.body.contains(row)) { 
-                    row.style.opacity = '1';
-                 }
-                console.log("Calling updateOrderSummaryUI() in finally block of removeCartItem.");
-                updateOrderSummaryUI(); 
             }
-        };
-      
-      function showCustomAlert(message) {
-            alert(message);
-        }
 
-        document.querySelectorAll('.remove-cart-item-btn').forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const productId = parseInt(this.dataset.productId);
-                window.removeCartItem(productId);
-            });
-        });
-         if (cartItemsBody) {
-            cartItemsBody.addEventListener('click', function(event) {
-               if (event.target.matches('.remove-cart-item-btn')) {
-                   event.preventDefault();
-                    const productId = parseInt(event.target.dataset.productId);
-                   window.removeCartItem(productId);
-               }
-            });
-     } 
+            window.updateCartQuantity = async function (inputElement) {
+                const productId = parseInt(inputElement.dataset.productId);
+                let newQuantity = parseInt(inputElement.value);
+                const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
 
-        if (checkoutBtn) {
-            checkoutBtn.onclick = function() {
-                updateOrderSummaryUI(); 
-                if (totalItemsElement && parseInt(totalItemsElement.textContent) <= 0) {
-                     showCustomAlert("Il carrello è vuoto. Aggiungi articoli prima di procedere al pagamento.");
-                     return;
-                }
-                if (paymentModal) paymentModal.style.display = "block";
-            };
-        }
+                const row = document.getElementById(`cart-item-row-${productId}`);
+                const currentMaxQuantityInDom = parseInt(inputElement.max);
+                const previousValue = inputElement.defaultValue;
 
-        if (closePayment) {
-            closePayment.onclick = function() {
-                if (paymentModal) paymentModal.style.display = "none";
-            };
-        }
-        
-        window.onclick = function(event) {
-            if (event.target == paymentModal) {
-                if (paymentModal) paymentModal.style.display = "none";
-            }
-        };
-
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', function() {
-                paymentMethods.forEach(m => m.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedPaymentMethod = this.dataset.method;
-
-                paymentDetails.forEach(detail => detail.classList.remove('active'));
-                const activeDetail = document.getElementById(selectedPaymentMethod + '-details');
-                if (activeDetail) activeDetail.classList.add('active');
-                if (paymentErrors) paymentErrors.textContent = '';
-            });
-        });
-        
-        if (paymentMethods.length > 0) {
-            const firstMethod = paymentMethods[0];
-            if (firstMethod) {
-                 firstMethod.classList.add('selected');
-                 selectedPaymentMethod = firstMethod.dataset.method;
-                 const firstDetail = document.getElementById(selectedPaymentMethod + '-details');
-                 if (firstDetail) firstDetail.classList.add('active');
-            }
-        }
-
-        if (confirmCreditCardBtn && document.getElementById('card-element')) {
-            confirmCreditCardBtn.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const cardHolderNameInput = document.getElementById('card-name');
-                if (!cardHolderNameInput) {
-                    if (paymentErrors) paymentErrors.textContent = "Campo nome titolare carta non trovato.";
-                    return;
-                }
-                const cardHolderName = cardHolderNameInput.value;
-                if (!cardHolderName.trim()) {
-                    if (paymentErrors) paymentErrors.textContent = "Inserisci il nome del titolare della carta.";
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                    showCustomAlert('La quantità deve essere un numero valido e non negativo.');
+                    inputElement.value = previousValue;
                     return;
                 }
 
-                confirmCreditCardBtn.disabled = true;
-                confirmCreditCardBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
-                if (paymentErrors) paymentErrors.textContent = '';
-
-                const { paymentMethod, error } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    card: cardElement,
-                    billing_details: { name: cardHolderName },
-                });
-
-                if (error) {
-                    if (paymentErrors) paymentErrors.textContent = error.message;
-                    confirmCreditCardBtn.disabled = false;
-                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
-                    return;
+                if (!isNaN(currentMaxQuantityInDom) && newQuantity > currentMaxQuantityInDom) {
+                    showCustomAlert(`La quantità massima ordinabile per questo prodotto è ${currentMaxQuantityInDom}.`);
+                    newQuantity = currentMaxQuantityInDom;
+                    inputElement.value = newQuantity;
                 }
 
-                const itemsInCart = [];
-                document.querySelectorAll('#carrello-items-body tr .item-quantity-input').forEach(quantityInput => {
-                    const productId = parseInt(quantityInput.dataset.productId);
-                    const quantity = parseInt(quantityInput.value);
-                    if (quantity > 0) {
-                        itemsInCart.push({ ProdottoId: productId, Quantita: quantity });
-                    }
-                });
-
-                if (itemsInCart.length === 0) {
-                    showCustomAlert("Il carrello è vuoto. Impossibile procedere.");
-                    confirmCreditCardBtn.disabled = false;
-                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
-                    if (paymentModal) paymentModal.style.display = "none";
-                    return;
-                }
+                inputElement.disabled = true;
+                inputElement.style.opacity = '0.5';
 
                 try {
-                    const response = await fetch('/Carrello/ConfermaOrdine', {
+                    const response = await fetch('/Carrello/UpdateItem', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                            'RequestVerificationToken': antiforgeryToken
                         },
                         body: JSON.stringify({
-                            ArticoliOrdine: itemsInCart,
-                            PaymentMethodId: paymentMethod.id,
-                            MetodoPagamentoScelto: selectedPaymentMethod
+                            productId: productId,
+                            newQuantity: newQuantity
                         })
                     });
 
-                    const serverResult = await response.json();
+                    const result = await response.json();
 
-                    if (response.ok && serverResult.success) { 
-                        if (serverResult.requiresAction) {
-                            const { error: confirmError } = await stripe.confirmCardPayment(serverResult.clientSecret);
-                            if (confirmError) {
-                                if (paymentErrors) paymentErrors.textContent = confirmError.message;
-                                showCustomAlert('Autenticazione 3D Secure fallita: ' + confirmError.message);
+                    if (response.ok) {
+                        inputElement.defaultValue = result.updatedQuantity;
+                        inputElement.value = result.updatedQuantity;
+
+                        if (row && result.updatedItem) {
+                            const itemTotalPriceElement = document.querySelector(`#item-total-${productId}`);
+                            if (itemTotalPriceElement) {
+                                itemTotalPriceElement.textContent = `€${(result.updatedItem.prezzoUnitario * result.updatedItem.quantita).toFixed(2)}`;
+                            }
+
+                            if (typeof result.updatedItem.quantitaOrdinabile !== 'undefined') {
+                                inputElement.max = result.updatedItem.quantitaOrdinabile;
+
+                                const qtyOrdinabileDisplay = document.querySelector(`#quantita-ordinabile-display-${productId}`);
+                                if (qtyOrdinabileDisplay) {
+                                    qtyOrdinabileDisplay.textContent = result.updatedItem.quantitaOrdinabile;
+                                }
+                            }
+
+                            if (typeof result.updatedItem.quantitaPrenotataDaAltri !== 'undefined') {
+                                const qtyPrenotataAltriDisplay = document.querySelector(`#quantita-prenotata-altri-${productId}`);
+                                if (qtyPrenotataAltriDisplay) {
+                                    qtyPrenotataAltriDisplay.textContent = result.updatedItem.quantitaPrenotataDaAltri;
+                                }
+                            }
+
+                            const giacenzaRealeDisplay = document.querySelector(`#giacenza-reale-${productId}`);
+                            if (giacenzaRealeDisplay) {
+                                giacenzaRealeDisplay.textContent = result.updatedItem.disponibilitaMagazzino;
+                            }
+
+                            if (result.updatedQuantity === 0 && row) {
+                                row.remove();
+                            }
+                        }
+                    } else {
+                        showCustomAlert(result.messaggio || `Errore durante l'aggiornamento: ${response.statusText}`);
+                        inputElement.value = previousValue;
+                    }
+                } catch (error) {
+                    console.error('Errore di comunicazione durante l\'aggiornamento della quantità:', error);
+                    showCustomAlert('Si è verificato un errore di comunicazione con il server durante l\'aggiornamento della quantità. Riprova più tardi.');
+                    inputElement.value = previousValue;
+                } finally {
+                    inputElement.disabled = false;
+                    inputElement.style.opacity = '1';
+                    updateOrderSummaryUI();
+                }
+            };
+
+            // Funzione per rimuovere un articolo dal carrello
+            window.removeCartItem = async function (productId) {
+                console.log("Attempting to remove product ID:", productId);
+                if (!confirm('Sei sicuro di voler rimuovere questo articolo dal carrello?')) {
+                    return;
+                }
+
+                const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const row = document.getElementById(`cart-item-row-${productId}`);
+                const removeButton = row ? row.querySelector(`.remove-cart-item-btn[data-product-id="${productId}"]`) : null;
+
+                if (row) {
+                    row.style.opacity = '0.5';
+                }
+                if (removeButton) {
+                    removeButton.disabled = true;
+                }
+
+                try {
+                    const response = await fetch('/Carrello/Rimuovi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': antiforgeryToken
+                        },
+                        body: JSON.stringify({
+                            IdProdotto: productId
+                        })
+                    });
+
+                    let result = {}; // Inizializza result come oggetto vuoto
+                    try {
+                        // Tenta di parsare il JSON solo se la risposta non è vuota
+                        const responseText = await response.text();
+                        if (responseText) {
+                            result = JSON.parse(responseText);
+                            console.log("Parsed JSON response from /Carrello/Rimuovi:", result);
+                        } else {
+                            console.log("Empty response from /Carrello/Rimuovi, but response.ok might be true.");
+                        }
+                    } catch (e) {
+                        console.error("Error parsing JSON from /Carrello/Rimuovi:", e, "Response text:", await response.text());
+                        showCustomAlert('Si è verificato un errore durante la rimozione dell\'articolo. Riprova più tardi.');
+                    }
+
+                    console.log("Response from /Carrello/Rimuovi:", response.status, response.statusText);
+
+                    if (response.ok) {
+                        showCustomAlert(result.messaggio || "Articolo rimosso con successo.");
+                        if (row) {
+                            console.log("Row found, removing from DOM:", row);
+                            row.remove();
+                        } else {
+                            console.warn("Row not found in DOM for productId:", productId, "after successful removal call.");
+                        }
+                    } else {
+                        // Errore HTTP (es. 400, 401, 403, 500)
+                        const errorMsg = result.messaggio || `Errore server (${response.status}): ${response.statusText}.`;
+                        showCustomAlert(errorMsg);
+                        console.error("Error response from /Carrello/Rimuovi:", errorMsg, result);
+                        if (row) row.style.opacity = '1';
+                        if (removeButton) removeButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Errore di comunicazione durante la rimozione:', error);
+                    showCustomAlert('Si è verificato un errore di comunicazione con il server durante la rimozione. Riprova più tardi.');
+                    if (row) row.style.opacity = '1';
+                    if (removeButton) removeButton.disabled = false;
+                } finally {
+                    if (removeButton) removeButton.disabled = false;
+                    if (row && document.body.contains(row)) {
+                        row.style.opacity = '1';
+                    }
+                    console.log("Calling updateOrderSummaryUI() in finally block of removeCartItem.");
+                    updateOrderSummaryUI();
+                }
+            };
+
+            function showCustomAlert(message) {
+                alert(message);
+            }
+
+            document.querySelectorAll('.remove-cart-item-btn').forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const productId = parseInt(this.dataset.productId);
+                    window.removeCartItem(productId);
+                });
+            });
+            if (cartItemsBody) {
+                cartItemsBody.addEventListener('click', function (event) {
+                    if (event.target.matches('.remove-cart-item-btn')) {
+                        event.preventDefault();
+                        const productId = parseInt(event.target.dataset.productId);
+                        window.removeCartItem(productId);
+                    }
+                });
+            }
+
+            if (checkoutBtn) {
+                checkoutBtn.onclick = function () {
+                    updateOrderSummaryUI();
+                    if (totalItemsElement && parseInt(totalItemsElement.textContent) <= 0) {
+                        showCustomAlert("Il carrello è vuoto. Aggiungi articoli prima di procedere al pagamento.");
+                        return;
+                    }
+                    if (paymentModal) paymentModal.style.display = "block";
+                };
+            }
+
+            if (closePayment) {
+                closePayment.onclick = function () {
+                    if (paymentModal) paymentModal.style.display = "none";
+                };
+            }
+
+            window.onclick = function (event) {
+                if (event.target == paymentModal) {
+                    if (paymentModal) paymentModal.style.display = "none";
+                }
+            };
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function () {
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedPaymentMethod = this.dataset.method;
+
+                    paymentDetails.forEach(detail => detail.classList.remove('active'));
+                    const activeDetail = document.getElementById(selectedPaymentMethod + '-details');
+                    if (activeDetail) activeDetail.classList.add('active');
+                    if (paymentErrors) paymentErrors.textContent = '';
+                });
+            });
+
+            if (paymentMethods.length > 0) {
+                const firstMethod = paymentMethods[0];
+                if (firstMethod) {
+                    firstMethod.classList.add('selected');
+                    selectedPaymentMethod = firstMethod.dataset.method;
+                    const firstDetail = document.getElementById(selectedPaymentMethod + '-details');
+                    if (firstDetail) firstDetail.classList.add('active');
+                }
+            }
+
+            if (confirmCreditCardBtn && document.getElementById('card-element')) {
+                confirmCreditCardBtn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    const cardHolderNameInput = document.getElementById('card-name');
+                    if (!cardHolderNameInput) {
+                        if (paymentErrors) paymentErrors.textContent = "Campo nome titolare carta non trovato.";
+                        return;
+                    }
+                    const cardHolderName = cardHolderNameInput.value;
+                    if (!cardHolderName.trim()) {
+                        if (paymentErrors) paymentErrors.textContent = "Inserisci il nome del titolare della carta.";
+                        return;
+                    }
+
+                    confirmCreditCardBtn.disabled = true;
+                    confirmCreditCardBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+                    if (paymentErrors) paymentErrors.textContent = '';
+
+                    const { paymentMethod, error } = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement,
+                        billing_details: { name: cardHolderName },
+                    });
+
+                    if (error) {
+                        if (paymentErrors) paymentErrors.textContent = error.message;
+                        confirmCreditCardBtn.disabled = false;
+                        confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
+                        return;
+                    }
+
+                    const itemsInCart = [];
+                    document.querySelectorAll('#carrello-items-body tr .item-quantity-input').forEach(quantityInput => {
+                        const productId = parseInt(quantityInput.dataset.productId);
+                        const quantity = parseInt(quantityInput.value);
+                        if (quantity > 0) {
+                            itemsInCart.push({ ProdottoId: productId, Quantita: quantity });
+                        }
+                    });
+
+                    if (itemsInCart.length === 0) {
+                        showCustomAlert("Il carrello è vuoto. Impossibile procedere.");
+                        confirmCreditCardBtn.disabled = false;
+                        confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
+                        if (paymentModal) paymentModal.style.display = "none";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/Carrello/ConfermaOrdine', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                            },
+                            body: JSON.stringify({
+                                ArticoliOrdine: itemsInCart,
+                                PaymentMethodId: paymentMethod.id,
+                                MetodoPagamentoScelto: selectedPaymentMethod
+                            })
+                        });
+
+                        const serverResult = await response.json();
+
+                        if (response.ok && serverResult.success) {
+                            if (serverResult.requiresAction) {
+                                const { error: confirmError } = await stripe.confirmCardPayment(serverResult.clientSecret);
+                                if (confirmError) {
+                                    if (paymentErrors) paymentErrors.textContent = confirmError.message;
+                                    showCustomAlert('Autenticazione 3D Secure fallita: ' + confirmError.message);
+                                } else {
+                                    showCustomAlert('Pagamento e ordine confermati! Numero Ordine: ' + serverResult.orderNumber);
+                                    if (paymentModal) paymentModal.style.display = "none";
+                                    window.location.href = serverResult.redirectUrl || '/Ordini/MieiOrdini';
+                                }
                             } else {
                                 showCustomAlert('Pagamento e ordine confermati! Numero Ordine: ' + serverResult.orderNumber);
                                 if (paymentModal) paymentModal.style.display = "none";
                                 window.location.href = serverResult.redirectUrl || '/Ordini/MieiOrdini';
                             }
                         } else {
-                            showCustomAlert('Pagamento e ordine confermati! Numero Ordine: ' + serverResult.orderNumber);
-                            if (paymentModal) paymentModal.style.display = "none";
-                            window.location.href = serverResult.redirectUrl || '/Ordini/MieiOrdini';
+                            if (paymentErrors) paymentErrors.textContent = serverResult.messaggio || 'Errore sconosciuto dal server.';
+                            showCustomAlert('Errore: ' + (serverResult.messaggio || `Errore server ${response.status}`));
                         }
-                    } else {
-                        if (paymentErrors) paymentErrors.textContent = serverResult.messaggio || 'Errore sconosciuto dal server.';
-                        showCustomAlert('Errore: ' + (serverResult.messaggio || `Errore server ${response.status}`));
+                    } catch (err) {
+                        if (paymentErrors) paymentErrors.textContent = 'Errore di comunicazione con il server.';
+                        console.error('Errore durante la conferma dell\'ordine:', err);
+                        showCustomAlert('Si è verificato un errore di comunicazione con il server.');
+                    } finally {
+                        confirmCreditCardBtn.disabled = false;
+                        confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
                     }
-                } catch (err) {
-                    if (paymentErrors) paymentErrors.textContent = 'Errore di comunicazione con il server.';
-                    console.error('Errore durante la conferma dell\'ordine:', err);
-                    showCustomAlert('Si è verificato un errore di comunicazione con il server.');
-                } finally {
-                    confirmCreditCardBtn.disabled = false;
-                    confirmCreditCardBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Conferma Pagamento';
-                }
-            });
-        }
-        updateOrderSummaryUI(); 
-    });
-</script>
+                });
+            }
+            updateOrderSummaryUI();
+        });
+    </script>
 </body>
 
 </html>
