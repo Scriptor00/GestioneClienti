@@ -35,7 +35,7 @@ namespace ProgettoStage.Controllers
                 _logger.LogWarning("Tentativo di accedere al carrello da parte di un utente non autenticato. Reindirizzamento al login o errore.");
                 // For API-like calls, throwing an exception is fine to be caught by the caller
                 // For MVC views, you might want to redirect.
-                throw new InvalidOperationException("Utente non autenticato."); 
+                throw new InvalidOperationException("Utente non autenticato.");
             }
 
             // Questo recupera l'identificativo dall'Identity, che può essere stringa (es. email, username, GUID)
@@ -159,7 +159,7 @@ namespace ProgettoStage.Controllers
 
             try
             {
-                
+
                 await _availabilityManager.AggiungiOAggiornaArticoloCarrello(idUtente, request.IdProdotto, request.Quantita);
                 return Ok(new { messaggio = "Articolo aggiunto/aggiornato al carrello con successo!" });
             }
@@ -175,7 +175,7 @@ namespace ProgettoStage.Controllers
                 return StatusCode(500, new { messaggio = "Si è verificato un errore interno durante l'aggiornamento del carrello." });
             }
         }
-        
+
 
         /// <summary>
         /// Rimuove un articolo dal carrello.
@@ -321,15 +321,15 @@ namespace ProgettoStage.Controllers
                         QuantitaOrdinabile = quantitaOrdinabilePersonale
                     };
                 }
-                
+
                 var currentCartItems = await _context.Carrelli
                                                      .Where(c => c.IdUtente == idUtente)
                                                      .ToListAsync();
                 decimal newTotalPrice = 0;
-                foreach(var item in currentCartItems)
+                foreach (var item in currentCartItems)
                 {
                     var product = await _context.Prodotti.AsNoTracking().FirstOrDefaultAsync(p => p.IdProdotto == item.IdProdotto);
-                    if(product != null)
+                    if (product != null)
                     {
                         newTotalPrice += product.Prezzo * item.Quantita;
                     }
@@ -342,10 +342,10 @@ namespace ProgettoStage.Controllers
                 return Json(new
                 {
                     success = true,
-                    newTotalItems, 
-                    newTotalPrice = newTotalPrice.ToString("N2"), 
-                    updatedQuantity = request.NewQuantity, 
-                    updatedItem = updatedItemViewModel 
+                    newTotalItems,
+                    newTotalPrice = newTotalPrice.ToString("N2"),
+                    updatedQuantity = request.NewQuantity,
+                    updatedItem = updatedItemViewModel
                 });
             }
             catch (InvalidOperationException ex)
@@ -364,6 +364,6 @@ namespace ProgettoStage.Controllers
     public class UpdateCartItemRequest
     {
         public int ProductId { get; set; }
-        public int NewQuantity { get; set; } 
+        public int NewQuantity { get; set; }
     }
 }
