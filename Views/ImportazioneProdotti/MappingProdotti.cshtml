@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Mapping Campi Prodotti";
+    var colonneExcel = ViewBag.ColonneExcel as List<string>;
+
+    // Nomi delle proprietà del modello Prodotto per il dropdown di destinazione
+    var colonneModelloProdotto = new Dictionary<string, string>
+    {
+        { "NomeProdotto", "Nome Prodotto" },
+        { "Categoria", "Categoria" },
+        { "Prezzo", "Prezzo" },
+        { "Giacenza", "Giacenza" },
+        { "DataInserimento", "Data Inserimento" },
+        { "ImmagineUrl", "URL Immagine" },
+        { "TrailerUrl", "URL Trailer" }
+        // Aggiungi qui tutte le proprietà del tuo modello Prodotto
+    };
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h3 class="mb-0"><i class="bi bi-arrows-fullscreen me-2"></i> Mapping Campi Prodotti</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text">Associa le colonne del tuo file Excel ai campi del modello 'Prodotto'.</p>
+
+        @if (TempData["Errore"] != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Errore"]
+            </div>
+        }
+
+        <form asp-action="SalvaMapping" asp-controller="ImportazioneProdotti" method="post">
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Colonna Excel</th>
+                        <th>Mappa a Campo Prodotto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (colonneExcel != null)
+                    {
+                        @foreach (var colonna in colonneExcel)
+                        {
+                            <tr>
+                                <td>@colonna</td>
+                                <td>
+                                    <select name="mappings[@colonna]" class="form-select">
+                                        <option value="">Non mappare</option>
+                                        @foreach (var modelProp in colonneModelloProdotto)
+                                        {
+                                            // Pre-seleziona l'opzione se i nomi sono simili
+                                            var isSelected = colonna.Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase) ||
+                                                             colonna.Replace(" ", "").Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase);
+                                            <option value="@modelProp.Key" selected="@(isSelected)">
+                                                @modelProp.Value
+                                            </option>
+                                        }
+                                    </select>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2">Nessuna colonna Excel trovata per il mapping.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Annulla e Torna Indietro
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-upload me-2"></i> Avvia Importazione Prodotti
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</script>

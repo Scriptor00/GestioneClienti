@@ -27,7 +27,7 @@ namespace WebAppEF.Entities
 
         public string? TrailerUrl { get; set; }
         
-        [Timestamp] // AGGIUNGI QUESTA LINEA
+        [Timestamp] 
         public byte[] RowVersion { get; set; }
     }
 }

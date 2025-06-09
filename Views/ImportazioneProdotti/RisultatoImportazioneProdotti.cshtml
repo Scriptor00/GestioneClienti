@@ -1,0 +1,97 @@
+@using System.Globalization
+@using WebAppEF.Entities
+@{
+    ViewData["Title"] = "Risultato Importazione Prodotti";
+    var importedProducts = ViewBag.ImportedProducts as List<Prodotto>;
+    var errorCount = ViewBag.ErrorCount as int? ?? 0;
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h3 class="mb-0"><i class="bi bi-info-circle me-2"></i> Riepilogo Importazione Prodotti</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text">Dettagli sull'esito dell'operazione di importazione dei prodotti.</p>
+
+        @if (importedProducts != null && importedProducts.Any())
+        {
+            <div class="alert alert-success mt-3" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-check-circle-fill me-2"></i> Importazione Completata con Successo!</h4>
+                <p>Sono stati importati con successo **@importedProducts.Count()** prodotti.</p>
+                <hr>
+                <p class="mb-0">Di seguito trovi la lista dei prodotti importati:</p>
+            </div>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome Prodotto</th>
+                            <th>Categoria</th>
+                            <th>Prezzo</th>
+                            <th>Giacenza</th>
+                            <th>Data Inserimento</th>
+                            <th>Immagine URL</th>
+                            <th>Trailer URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var prodotto in importedProducts) 
+                        {
+                            <tr>
+                                <td>@prodotto.IdProdotto</td>
+                                <td>@prodotto.NomeProdotto</td>
+                                <td>@prodotto.Categoria</td>
+                                <td>@prodotto.Prezzo.ToString("C2", CultureInfo.CurrentCulture)</td> 
+                                <td>@prodotto.Giacenza</td>
+                                <td>@prodotto.DataInserimento.ToShortDateString()</td>
+                                <td>@prodotto.ImmagineUrl</td>
+                                <td>@prodotto.TrailerUrl</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else // Questo blocco è per il caso in cui NESSUN prodotto è stato importato
+        {
+            <div class="alert alert-warning mt-3" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-info-square-fill me-2"></i> Nessun Prodotto Importato</h4>
+                <p class="mb-0">Non è stato importato alcun prodotto.</p>
+            </div>
+        }
+
+        @* Sezione per visualizzare il link agli errori, se presenti. *@
+        @if (errorCount > 0)
+        {
+            <div class="alert alert-danger mt-4" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-bug-fill me-2"></i> Errori Rilevati Durante l'Importazione (@errorCount)</h4>
+                <p>Alcuni record non sono stati importati a causa di errori. Per visualizzare i dettagli:</p>
+                <hr>
+                <div class="text-center">
+                    <a asp-action="ImportazioneErrori" asp-controller="ImportazioneProdotti" class="btn btn-danger btn-lg">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Visualizza Dettagli Errori
+                    </a>
+                </div>
+            </div>
+        }
+        else if (importedProducts != null && importedProducts.Any())
+        {
+             <div class="alert alert-success mt-4" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-check-all me-2"></i> Importazione Completata Senza Errori!</h4>
+                <p class="mb-0">Tutti i record sono stati elaborati e importati correttamente.</p>
+            </div>
+        }
+
+        <div class="mt-4 text-center">
+            <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-secondary btn-lg">
+                <i class="bi bi-arrow-left-circle me-2"></i> Torna all'Importazione Prodotti
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</script>

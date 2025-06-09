@@ -1,0 +1,34 @@
+@{
+    ViewData["Title"] = "Carica File per Importazione Clienti";
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3 class="mb-0"><i class="bi bi-upload me-2"></i> Carica File Excel per l'Importazione Clienti</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text">Seleziona un file Excel (.xlsx) contenente i dati dei clienti da importare nel sistema.</p>
+        
+        <form asp-controller="Importazione" asp-action="Mapping" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="file" class="form-label fw-bold">File Excel (.xlsx):</label>
+                <input type="file" name="file" id="file" class="form-control" accept=".xlsx" required />
+                <div class="form-text text-muted">Formati supportati: solo .xlsx. Assicurati che il file sia valido.</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-arrow-right-circle me-2"></i> Avanti</button>
+        </form>
+    </div>
+</div>
+
+@if (TempData["Errore"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Errore di Caricamento!</h4>
+        <p>@TempData["Errore"]</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<script> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</script>

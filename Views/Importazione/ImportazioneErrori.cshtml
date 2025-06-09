@@ -1,0 +1,43 @@
+@using WebAppEF.Entities
+@{
+    ViewData["Title"] = "Errori Importazione Clienti";
+    var importErrors = ViewBag.ImportErrors as List<string>;
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-danger text-white">
+        <h3 class="mb-0"><i class="bi bi-bug-fill me-2"></i> Errori Durante l'Importazione</h3>
+    </div>
+    <div class="card-body">
+        @if (importErrors != null && importErrors.Any())
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Problemi rilevati (@importErrors.Count())</h4>
+                <p>Si sono verificati i seguenti errori durante l'elaborazione del file Excel:</p>
+                <hr>
+                <ul class="list-unstyled">
+                    @foreach (var error in importErrors)
+                    {
+                        <li><i class="bi bi-x-circle-fill text-danger me-2"></i> @error</li>
+                    }
+                </ul>
+            </div>
+            <p class="card-text">Si prega di correggere gli errori nel file Excel e riprovare l'importazione.</p>
+        }
+        else
+        {
+            <div class="alert alert-success mt-3" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-check-all me-2"></i> Nessun Errore Rilevato!</h4>
+                <p class="mb-0">Non sono stati riscontrati errori nell'ultima operazione di importazione. Potrebbe essere che nessun dato sia stato importato o che l'operazione sia stata completata senza problemi.</p>
+            </div>
+        }
+
+        <div class="mt-4 text-center">
+            <a asp-action="Index" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left-circle me-2"></i> Torna all'Importazione</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</script>

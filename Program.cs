@@ -11,7 +11,7 @@ using GestioneClienti.Services; // Assicurati che questo sia il namespace corret
 using Microsoft.AspNetCore.Identity;
 using GestioneClienti.Hubs; // Assicurati che questo sia il namespace corretto per ChatHub
 using ProgettoStage.Hubs; // Assicurati che questo sia il namespace corretto per DisponibilitaHub
-using WebAppEF.Utilities; // Assicurati che questo sia il namespace corretto per DataSeeder
+using Microsoft.AspNetCore.Mvc.ViewFeatures; // Aggiungi questo using per ITempDataProvider e SessionStateTempDataProvider
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +31,22 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog();
-builder.Services.AddSession();
-builder.Services.AddDistributedMemoryCache(); 
+
+// Configurazione Sessione (già presente, ma l'ordine è importante, e aggiungiamo il TempData provider)
+builder.Services.AddDistributedMemoryCache(); // Necessario per la sessione basata sulla memoria
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Puoi regolare il timeout
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// ********************************************************************************
+// SOLUZIONE DELL'ERRORE: Forza TempData a usare la sessione anziché i cookie per la serializzazione
+// Questo permette di salvare oggetti complessi come byte[] in TempData.
+builder.Services.AddSingleton<ITempDataProvider, SessionStateTempDataProvider>();
+// ********************************************************************************
+
 
 // Configurazione DbContext
 // *** CAMBIATO DA AddDbContext A AddDbContextFactory PER RISOLVERE L'ERRORE SINGLETON/SCOPED ***
@@ -162,7 +176,7 @@ using (var scope = app.Services.CreateScope())
         // Esempio:
         // if (!context.Prodotti.Any())
         // {
-        //     context.Prodotti.AddRange(DataSeeder.GeneraProdotti(20)); // Assumi che GeneraProdotti esista
+        //     context.Prodotti.AddRange(DataSeeder.GeneraProdotti(20)); // Assumi che GeneraProdotti esista
         // }
 
 
@@ -195,7 +209,7 @@ else
 app.UseHttpsRedirection(); // Aggiungi questo per forzare HTTPS in produzione
 app.UseCors("AllowWithCredentials");
 app.UseRouting();
-app.UseSession();
+app.UseSession(); // Deve essere posizionato prima di UseAuthentication e UseAuthorization
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();

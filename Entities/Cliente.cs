@@ -40,6 +40,9 @@ namespace WebAppEF.Entities
         [StringLength(255)]
         public string? Cap { get; set; }
 
+         [System.ComponentModel.DataAnnotations.Schema.NotMapped] 
+        public string? ImportazioneErrore { get; set; }
+
         public ICollection<Ordine>? Ordini { get; set; }
     }
 }

@@ -1,0 +1,99 @@
+@using WebAppEF.Entities
+@{
+    ViewData["Title"] = "Mapping Campi Clienti";
+    var colonneExcel = ViewBag.ColonneExcel as List<string>;
+    var colonneModel = new List<string> {
+        "Nome", "Cognome", "Email", "DataIscrizione", "Attivo",
+        "Indirizzo", "Civico", "Citta", "Paese", "Cap"
+    };
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<style>
+    /* Applica una larghezza fissa o percentuale per i campi Select2 */
+    .select2-container {
+        width: 95% !important; /* Forza la larghezza al 95% della colonna */
+        /* Oppure, se preferisci una larghezza fissa: */
+        /* width: 200px !important; */
+    }
+</style>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <h3 class="mb-0"><i class="bi bi-diagram-3 me-2"></i> Associa Colonne Excel a Campi Modello Cliente</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text">Completa il mapping tra le intestazioni trovate nel tuo file Excel e le proprietà del modello <code>Cliente</code> nel sistema.</p>
+        
+        <form method="post" asp-action="SalvaMapping">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 50%;">Colonna Excel</th>
+                            <th style="width: 50%;">Campo del Modello Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (colonneExcel != null && colonneExcel.Any()) 
+                        {
+                            @for (int i = 0; i < colonneExcel.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" name="ColonneExcel[@i]" value="@colonneExcel[i]" />
+                                        <span class="fw-bold">@colonneExcel[i]</span>
+                                    </td>
+                                    <td>
+                                        <div id="select2-parent-@i"> 
+                                            <select name="Mappings[@colonneExcel[i]]" class="form-select select2-enable" data-placeholder="Seleziona o cerca un campo...">
+                                                <option value=""></option> 
+                                                @foreach (var campo in colonneModel)
+                                                {
+                                                    <option value="@campo">@campo</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center text-danger py-4">
+                                    <i class="bi bi-exclamation-octagon-fill me-2"></i> Nessuna colonna trovata nel file Excel o file non elaborato correttamente.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg mt-3"><i class="bi bi-check-circle me-2"></i> Procedi con l'Importazione</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/it.js"></script> 
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2-enable').each(function(index) {
+            var $this = $(this);
+            $this.select2({
+                theme: 'bootstrap-5', 
+                // Rimuovi 'width: 'resolve'' o lascialo, ma il CSS con !important avrà la precedenza
+                // width: 'resolve', 
+                placeholder: $this.data('placeholder'),
+                allowClear: true,
+                language: "it",
+                dropdownParent: $('#select2-parent-' + index) 
+            });
+        });
+    });
+</script>
