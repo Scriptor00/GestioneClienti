@@ -1,20 +1,30 @@
+@using WebAppEF.Entities 
 @{
     ViewData["Title"] = "Mapping Campi Prodotti";
     var colonneExcel = ViewBag.ColonneExcel as List<string>;
 
-    // Nomi delle proprietà del modello Prodotto per il dropdown di destinazione
-    var colonneModelloProdotto = new Dictionary<string, string>
+   var colonneModelloProdotto = new Dictionary<string, string>
     {
         { "NomeProdotto", "Nome Prodotto" },
         { "Categoria", "Categoria" },
-        { "Prezzo", "Prezzo" },
-        { "Giacenza", "Giacenza" },
-        { "DataInserimento", "Data Inserimento" },
+        { "Prezzo", "Prezzo (Numero Decimale)" },
+        { "Giacenza", "Giacenza (Numero Intero)" },
+        { "DataInserimento", "Data Inserimento (Data)" },
         { "ImmagineUrl", "URL Immagine" },
         { "TrailerUrl", "URL Trailer" }
-        // Aggiungi qui tutte le proprietà del tuo modello Prodotto
+        
     };
 }
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<style>
+    .select2-container {
+        width: 95% !important; 
+    }
+</style>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-warning text-dark">
@@ -31,57 +41,92 @@
         }
 
         <form asp-action="SalvaMapping" asp-controller="ImportazioneProdotti" method="post">
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="bg-light">
-                    <tr>
-                        <th>Colonna Excel</th>
-                        <th>Mappa a Campo Prodotto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (colonneExcel != null)
-                    {
-                        @foreach (var colonna in colonneExcel)
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 50%;">Colonna Excel</th>
+                            <th style="width: 50%;">Campo del Modello Prodotto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (colonneExcel != null && colonneExcel.Any())
+                        {
+                            @for (int i = 0; i < colonneExcel.Count; i++)
+                            {
+                                var currentExcelColumn = colonneExcel[i]; 
+
+                                <tr>
+                                    <td>
+                                        <input type="hidden" name="ColonneExcel[@i]" value="@currentExcelColumn" />
+                                        <span class="fw-bold">@currentExcelColumn</span>
+                                    </td>
+                                    <td>
+                                        <div id="select2-parent-@i">
+                                            <select name="mappings[@currentExcelColumn]" class="form-select select2-enable" data-placeholder="Seleziona o cerca un campo...">
+                                                <option value=""></option> 
+                                                @foreach (var modelProp in colonneModelloProdotto)
+                                                {
+                                                    var isSelected = currentExcelColumn.Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase) ||
+                                                                     currentExcelColumn.Replace(" ", "").Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase) ||
+                                                                     currentExcelColumn.Equals(modelProp.Value, StringComparison.OrdinalIgnoreCase) ||
+                                                                     currentExcelColumn.Replace(" ", "").Equals(modelProp.Value.Replace(" ", ""), StringComparison.OrdinalIgnoreCase);
+
+                                                    <option value="@modelProp.Key" selected="@isSelected">
+                                                        @modelProp.Value (@modelProp.Key)
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td>@colonna</td>
-                                <td>
-                                    <select name="mappings[@colonna]" class="form-select">
-                                        <option value="">Non mappare</option>
-                                        @foreach (var modelProp in colonneModelloProdotto)
-                                        {
-                                            // Pre-seleziona l'opzione se i nomi sono simili
-                                            var isSelected = colonna.Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase) ||
-                                                             colonna.Replace(" ", "").Equals(modelProp.Key, StringComparison.OrdinalIgnoreCase);
-                                            <option value="@modelProp.Key" selected="@(isSelected)">
-                                                @modelProp.Value
-                                            </option>
-                                        }
-                                    </select>
+                                <td colspan="2" class="text-center text-danger py-4">
+                                    <i class="bi bi-exclamation-octagon-fill me-2"></i> Nessuna colonna trovata nel file Excel o file non elaborato correttamente.
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="2">Nessuna colonna Excel trovata per il mapping.</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
             <div class="d-flex justify-content-between mt-4">
-                <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-secondary">
+                 <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-secondary">
                     <i class="bi bi-arrow-left-circle me-2"></i> Annulla e Torna Indietro
                 </a>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-upload me-2"></i> Avvia Importazione Prodotti
-                </button>
+                <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-check-circle me-2"></i> Procedi con l'Importazione</button>
             </div>
         </form>
     </div>
 </div>
 
-<script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</script>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/it.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Inizializza Select2 per tutti i dropdown con la classe 'select2-enable'
+            $('.select2-enable').each(function(index) {
+                var $this = $(this);
+                $this.select2({
+                    theme: 'bootstrap-5', 
+                    placeholder: $this.data('placeholder'), 
+                    allowClear: true, 
+                    language: "it", 
+                    dropdownParent: $('#select2-parent-' + index)
+                });
+
+                // Imposta il valore selezionato se esiste
+                var selectedValue = $this.find('option:selected').val();
+                if (selectedValue !== "") {
+                    $this.val(selectedValue).trigger('change');
+                }
+            });
+        });
+    </script>
+}

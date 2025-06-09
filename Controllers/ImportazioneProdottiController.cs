@@ -1,14 +1,13 @@
-using System.Globalization; 
-using System.Text.Json; 
-using ClosedXML.Excel; 
+using System.Globalization;
+using System.Text.Json;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
-using WebAppEF.Entities; 
+using WebAppEF.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebAppEF.Models; 
 
 namespace ProgettoStage.Controllers
 {
-    
     public class ImportazioneProdottiController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -32,7 +31,7 @@ namespace ProgettoStage.Controllers
             HttpContext.Session.Remove(ExcelDataSessionKey);
             HttpContext.Session.Remove(FileNameSessionKey);
             HttpContext.Session.Remove(ImportErrorsSessionKey);
-            return View("UploadExcelProdotti"); 
+            return View("UploadExcelProdotti");
         }
 
         // POST: ImportazioneProdotti/Mapping
@@ -68,9 +67,9 @@ namespace ProgettoStage.Controllers
 
                 // Legge le intestazioni dalla prima riga del foglio Excel, filtrando quelle vuote
                 var intestazioniExcel = ws.Row(1).CellsUsed()
-                                            .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
-                                            .Select(c => c.Value.ToString().Trim())
-                                            .ToList();
+                                                .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
+                                                .Select(c => c.Value.ToString().Trim())
+                                                .ToList();
 
                 // Se non vengono trovate intestazioni, reindirizza con un errore
                 if (!intestazioniExcel.Any())
@@ -100,7 +99,7 @@ namespace ProgettoStage.Controllers
         // POST: ImportazioneProdotti/SalvaMapping
         // Riceve il mapping delle colonne dalla form, lo salva in TempData e reindirizza all'azione Importa.
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public IActionResult SalvaMapping([FromForm] Dictionary<string, string> mappings)
         {
             // Verifica che siano stati selezionati dei mapping
@@ -114,7 +113,7 @@ namespace ProgettoStage.Controllers
             // TempData è usato perché i dati devono persistere per il successivo RedirectToAction.
             TempData[MappingTempDataKey] = JsonSerializer.Serialize(mappings);
 
-           return RedirectToAction("Importa");
+            return RedirectToAction("Importa");
         }
 
         // GET: ImportazioneProdotti/Importa
@@ -139,7 +138,7 @@ namespace ProgettoStage.Controllers
             var mappings = JsonSerializer.Deserialize<Dictionary<string, string>>(mappingJson);
 
             var importedProducts = new List<Prodotto>(); // Lista per i prodotti importati con successo
-            var importErrorsLog = new List<string>();   // Lista per i messaggi di errore
+            var importErrorsLog = new List<string>();    // Lista per i messaggi di errore
 
             try
             {
@@ -181,7 +180,9 @@ namespace ProgettoStage.Controllers
                         var excelColumnCell = headerRow.CellsUsed().FirstOrDefault(c => c.Value.ToString().Trim().Equals(excelColumnName, StringComparison.OrdinalIgnoreCase));
                         if (excelColumnCell == null)
                         {
-                            currentRowErrors.Add($"Colonna Excel '{excelColumnName}' non trovata per il mapping '{modelPropertyName}'.");
+                            // Questo non dovrebbe succedere se il mapping è stato creato correttamente,
+                            // ma è una sicurezza.
+                            currentRowErrors.Add($"Colonna Excel '{excelColumnName}' non trovata nel file per il mapping '{modelPropertyName}'.");
                             recordSuccessfullyParsed = false;
                             continue;
                         }
@@ -212,7 +213,7 @@ namespace ProgettoStage.Controllers
                                     property.SetValue(prodotto, null);
                                 }
                                 // Se è un tipo non-nullable e non è una stringa, è un errore di valore obbligatorio mancante
-                                else if (property.PropertyType.IsValueType)
+                                else if (property.PropertyType.IsValueType && Nullable.GetUnderlyingType(property.PropertyType) == null)
                                 {
                                     currentRowErrors.Add($"Valore obbligatorio mancante per il campo '{modelPropertyName}' (riga {row.RowNumber()}).");
                                     recordSuccessfullyParsed = false;
@@ -229,7 +230,15 @@ namespace ProgettoStage.Controllers
                             {
                                 if (int.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out int intValue))
                                 {
-                                    property.SetValue(prodotto, intValue);
+                                    if (modelPropertyName == "Giacenza" && intValue < 0)
+                                    {
+                                        currentRowErrors.Add($"Valore '{cellValue}' non valido per il campo '{modelPropertyName}' (atteso numero intero non negativo).");
+                                        recordSuccessfullyParsed = false;
+                                    }
+                                    else
+                                    {
+                                        property.SetValue(prodotto, intValue);
+                                    }
                                 }
                                 else
                                 {
@@ -241,7 +250,15 @@ namespace ProgettoStage.Controllers
                             {
                                 if (decimal.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal decimalValue))
                                 {
-                                    property.SetValue(prodotto, decimalValue);
+                                    if (modelPropertyName == "Prezzo" && decimalValue <= 0) // FIX: Prezzo deve essere > 0
+                                    {
+                                        currentRowErrors.Add($"Valore '{cellValue}' non valido per il campo '{modelPropertyName}' (atteso numero decimale maggiore di zero).");
+                                        recordSuccessfullyParsed = false;
+                                    }
+                                    else
+                                    {
+                                        property.SetValue(prodotto, decimalValue);
+                                    }
                                 }
                                 else
                                 {
@@ -251,12 +268,10 @@ namespace ProgettoStage.Controllers
                             }
                             else if (property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?))
                             {
-                                // ClosedXML può restituire DateTime direttamente se il formato della cella è riconosciuto
                                 if (cell.DataType == XLDataType.DateTime)
                                 {
                                     property.SetValue(prodotto, cell.GetDateTime());
                                 }
-                                // Tenta di parsare la data in diversi formati comuni se ClosedXML non la riconosce
                                 else if (DateTime.TryParse(cellValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue))
                                 {
                                     property.SetValue(prodotto, dateValue);
@@ -275,7 +290,7 @@ namespace ProgettoStage.Controllers
                                     recordSuccessfullyParsed = false;
                                 }
                             }
-                            
+                            // Puoi aggiungere altre conversioni di tipo qui (es. bool, Guid, ecc.)
                         }
                         catch (Exception ex)
                         {
@@ -284,22 +299,28 @@ namespace ProgettoStage.Controllers
                         }
                     }
 
-                   
-                    // Questo controllo viene eseguito solo se il record è stato parsato correttamente finora.
-                    // Assicurati che 'NomeProdotto' sia uno dei campi mappati e valorizzati per il prodotto.
-                    if (recordSuccessfullyParsed && !string.IsNullOrEmpty(prodotto.NomeProdotto))
+                    // Validazione aggiuntiva dopo aver processato tutti i campi mappati per il prodotto
+                    if (recordSuccessfullyParsed)
                     {
-                        // Controlla se un prodotto con lo stesso NomeProdotto esiste già nel database
-                        var existingProduct = await _dbContext.Prodotti.FirstOrDefaultAsync(p => p.NomeProdotto == prodotto.NomeProdotto);
-
-                        if (existingProduct != null)
+                        // Controllo di obbligatorietà per NomeProdotto
+                        if (string.IsNullOrEmpty(prodotto.NomeProdotto))
                         {
+                            currentRowErrors.Add("Il campo 'Nome Prodotto' è obbligatorio e non può essere vuoto.");
                             recordSuccessfullyParsed = false;
-                            currentRowErrors.Add($"Nome prodotto '{prodotto.NomeProdotto}' già presente nel database. Il record non verrà importato.");
+                        }
+                        else
+                        {
+                            // Controllo duplicato per NomeProdotto
+                            var existingProduct = await _dbContext.Prodotti.FirstOrDefaultAsync(p => p.NomeProdotto == prodotto.NomeProdotto);
+                            if (existingProduct != null)
+                            {
+                                currentRowErrors.Add($"Nome prodotto '{prodotto.NomeProdotto}' già presente nel database. Il record non verrà importato.");
+                                recordSuccessfullyParsed = false;
+                            }
                         }
                     }
 
-                    // Se il record è stato processato con successo E non ci sono stati errori (parsing o logica di business)
+                    // Se il record è stato processato con successo E non ci sono stati errori (parsing, validazione o logica di business)
                     if (recordSuccessfullyParsed && !currentRowErrors.Any())
                     {
                         importedProducts.Add(prodotto); // Aggiungi il prodotto alla lista dei prodotti da importare
@@ -343,13 +364,13 @@ namespace ProgettoStage.Controllers
                 HttpContext.Session.Remove(FileNameSessionKey);
                 HttpContext.Session.Remove(ImportErrorsSessionKey);
                 TempData.Remove(MappingTempDataKey);
-                return RedirectToAction("Index"); 
+                return RedirectToAction("Index");
             }
 
             // Prepara i dati per la view di riepilogo dell'importazione
             ViewBag.ImportedProducts = importedProducts; // Passa la lista dei prodotti importati
             ViewBag.ErrorCount = importErrorsLog.Count;  // Passa il conteggio degli errori per la visualizzazione condizionale
-            return View("RisultatoImportazioneProdotti"); 
+            return View("RisultatoImportazioneProdotti");
         }
 
         // GET: ImportazioneProdotti/ImportazioneErrori
@@ -364,8 +385,8 @@ namespace ProgettoStage.Controllers
             {
                 errors = JsonSerializer.Deserialize<List<string>>(errorsJson);
             }
-            ViewBag.ImportErrors = errors; // Passa la lista degli errori alla view
-            return View("ImportazioneErroriProdotti"); 
+            ViewBag.ImportErrors = errors;
+            return View("ImportazioneErroriProdotti");
         }
     }
 }
