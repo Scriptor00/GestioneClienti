@@ -1,28 +1,29 @@
-using System.Globalization; // Necessario per CultureInfo e NumberStyles
-using System.Text.Json; // Per JsonSerializer
-using ClosedXML.Excel; // Per ClosedXML
+using System.Globalization; 
+using System.Text.Json; 
+using ClosedXML.Excel; 
 using Microsoft.AspNetCore.Mvc;
-using WebAppEF.Entities; // Assicurati che questo sia il namespace corretto per Cliente
+using WebAppEF.Entities; 
 using Microsoft.EntityFrameworkCore;
-using WebAppEF.Models; // Necessario per FirstOrDefaultAsync
+using WebAppEF.Models; 
 
 namespace ProgettoStage.Controllers
 {
-    // Questo controller gestisce l'importazione di clienti da file Excel.
     public class ImportazioneController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
-
-        // Chiavi per la sessione e TempData specifiche per l'importazione dei clienti
+        private readonly string _logDirectory; // Percorso della directory dei log
         private const string ExcelDataSessionKey = "ExcelData";
         private const string FileNameSessionKey = "FileName";
         private const string MappingTempDataKey = "Mapping";
-        private const string ImportErrorsSessionKey = "ImportErrors";
+        private const string ImportErrorsSessionKey = "ImportErrors"; // mantiene gli errori di importazione nella sessione
 
-        // Costruttore: Inietta il DbContext per l'interazione con il database
-        public ImportazioneController(ApplicationDbContext dbContext)
+        public ImportazioneController(ApplicationDbContext dbContext, IWebHostEnvironment env)
         {
             _dbContext = dbContext;
+            // Imposta il percorso della directory dei log per l'importazione dei clienti
+            _logDirectory = Path.Combine(env.ContentRootPath, "Logs", "ImportazioneClienti");
+            // Crea la directory dei log se non esiste
+            Directory.CreateDirectory(_logDirectory);
         }
 
         // GET: Importazione/Index
@@ -33,8 +34,8 @@ namespace ProgettoStage.Controllers
             // Pulisce eventuali dati di sessione relativi a importazioni precedenti all'inizio di una nuova.
             HttpContext.Session.Remove(ExcelDataSessionKey);
             HttpContext.Session.Remove(FileNameSessionKey);
-            HttpContext.Session.Remove(ImportErrorsSessionKey); // Pulisci eventuali errori precedenti
-            return View("UploadExcel"); // Restituisce la view specifica per l'upload dei clienti
+            HttpContext.Session.Remove(ImportErrorsSessionKey); // Pulisci eventuali errori precedenti dalla sessione
+            return View("UploadExcel");
         }
 
         // POST: Importazione/Mapping
@@ -72,9 +73,9 @@ namespace ProgettoStage.Controllers
 
                 // Legge le intestazioni dalla prima riga del foglio Excel, filtrando quelle vuote
                 var intestazioniExcel = ws.Row(1).CellsUsed()
-                                            .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
-                                            .Select(c => c.Value.ToString().Trim())
-                                            .ToList();
+                                                .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
+                                                .Select(c => c.Value.ToString().Trim())
+                                                .ToList();
 
                 // Se non vengono trovate intestazioni, reindirizza con un errore
                 if (!intestazioniExcel.Any())
@@ -120,8 +121,6 @@ namespace ProgettoStage.Controllers
             // TempData è usato perché i dati devono persistere per il successivo RedirectToAction.
             TempData[MappingTempDataKey] = JsonSerializer.Serialize(mappings);
 
-            // Reindirizza all'azione "Importa" per l'elaborazione effettiva del file.
-            // Questo segue il pattern Post/Redirect/Get (PRG) per evitare risottomissioni del form.
             return RedirectToAction("Importa");
         }
 
@@ -167,7 +166,7 @@ namespace ProgettoStage.Controllers
                     var currentRowErrors = new List<string>(); // Lista per gli errori specifici di questa riga
                     bool recordSuccessfullyParsed = true;
 
-                    // Ignora righe che sono completamente vuote (nessuna cella utilizzata contiene testo)
+                    // righe vuote vengono ignorate
                     if (row.CellsUsed().All(c => string.IsNullOrWhiteSpace(c.Value.ToString())))
                     {
                         continue;
@@ -176,8 +175,8 @@ namespace ProgettoStage.Controllers
                     // Itera su tutti i mapping definiti dall'utente per popolare l'oggetto Cliente
                     foreach (var mappingEntry in mappings)
                     {
-                        var excelColumnName = mappingEntry.Key;     // Nome della colonna in Excel (es. "Nome Cliente")
-                        var modelPropertyName = mappingEntry.Value; // Nome della proprietà nel modello Cliente (es. "Nome")
+                        var excelColumnName = mappingEntry.Key;     // Nome della colonna Excel
+                        var modelPropertyName = mappingEntry.Value; // Nome della proprietà nel modello Cliente
 
                         // Se l'utente non ha mappato un campo specifico, lo saltiamo
                         if (string.IsNullOrWhiteSpace(modelPropertyName))
@@ -196,13 +195,11 @@ namespace ProgettoStage.Controllers
 
                         var excelColumnIndex = excelColumnCell.Address.ColumnNumber;
                         var cell = row.Cell(excelColumnIndex);
-                        var cellValue = cell.GetValue<string>()?.Trim(); // Ottieni il valore come stringa e trimma, gestendo null
+                        var cellValue = cell.GetValue<string>()?.Trim();
 
-                        // Ottieni la proprietà del modello Cliente tramite Reflection per impostarne il valore
                         var property = typeof(Cliente).GetProperty(modelPropertyName);
                         if (property == null)
                         {
-                            // Questo caso indica un mapping a una proprietà inesistente nel modello
                             currentRowErrors.Add($"Proprietà '{modelPropertyName}' non trovata nel modello Cliente.");
                             recordSuccessfullyParsed = false;
                             continue;
@@ -213,31 +210,27 @@ namespace ProgettoStage.Controllers
                             // Gestisce i casi in cui il valore della cella è nullo o vuoto
                             if (string.IsNullOrWhiteSpace(cellValue))
                             {
-                                // Se la proprietà è di tipo stringa o nullable (es. int?, DateTime?, bool?), impostala a null
                                 if (Nullable.GetUnderlyingType(property.PropertyType) != null || property.PropertyType == typeof(string))
                                 {
                                     property.SetValue(cliente, null);
                                 }
-                                // Se è un tipo non-nullable e non è una stringa, è un errore di valore obbligatorio mancante
                                 else if (property.PropertyType.IsValueType)
                                 {
                                     currentRowErrors.Add($"Valore obbligatorio mancante per il campo '{modelPropertyName}' (riga {row.RowNumber()}).");
                                     recordSuccessfullyParsed = false;
                                 }
-                                continue; // Passa al prossimo mapping per questa riga
+                                continue;
                             }
 
                             // Logica di conversione specifica per ogni tipo di dato del modello Cliente
                             if (property.PropertyType == typeof(string))
                             {
-                                // *** INIZIO NUOVA VALIDAZIONE PER NOME/COGNOME NUMERICI ***
                                 if ((modelPropertyName == "Nome" || modelPropertyName == "Cognome") &&
-                                    double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
+                                        double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
                                 {
                                     currentRowErrors.Add($"Valore '{cellValue}' non valido per il campo '{modelPropertyName}' (non può essere un numero).");
                                     recordSuccessfullyParsed = false;
                                 }
-                                // *** FINE NUOVA VALIDAZIONE ***
                                 else
                                 {
                                     property.SetValue(cliente, cellValue);
@@ -314,20 +307,15 @@ namespace ProgettoStage.Controllers
                                     recordSuccessfullyParsed = false;
                                 }
                             }
-                            // Aggiungi qui altre conversioni di tipo se hai proprietà diverse nel modello (es. Guid, enum)
                         }
                         catch (Exception ex)
                         {
-                            // Cattura errori specifici di conversione per questa cella/proprietà
                             currentRowErrors.Add($"Errore di conversione per '{modelPropertyName}' con valore '{cellValue}': {ex.Message}");
                             recordSuccessfullyParsed = false;
                         }
                     }
 
-
-                    // Logica per la gestione delle email duplicate
-                    // Questo controllo viene eseguito solo se il record è stato parsato correttamente finora.
-                    // Assicurati che 'Email' sia uno dei campi mappati e valorizzati per il cliente.
+                    // Dopo aver processato tutti i campi, controlla se l'email è stata fornita e se è valida
                     if (recordSuccessfullyParsed && !string.IsNullOrEmpty(cliente.Email))
                     {
                         // Controlla se l'email esiste già nel database
@@ -343,7 +331,7 @@ namespace ProgettoStage.Controllers
                     // Se il record è stato processato con successo E non ci sono stati errori (parsing o logica di business)
                     if (recordSuccessfullyParsed && !currentRowErrors.Any())
                     {
-                        importedClients.Add(cliente); // Aggiungi il cliente alla lista dei clienti da importare
+                        importedClients.Add(cliente);
                     }
                     else // Se ci sono stati errori (parsing, logica di business come email duplicata, o nome/cognome numerico)
                     {
@@ -361,44 +349,45 @@ namespace ProgettoStage.Controllers
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // Pulisci i dati della sessione e TempData che non sono più necessari dopo l'importazione
+                // Pulisci i dati di sessione usati per l'importazione una volta completata
                 HttpContext.Session.Remove(ExcelDataSessionKey);
                 HttpContext.Session.Remove(FileNameSessionKey);
-                TempData.Remove(MappingTempDataKey); // TempData viene rimosso automaticamente dopo la lettura, ma per chiarezza lo mettiamo qui
+                TempData.Remove(MappingTempDataKey);
 
-                // Salva gli errori di importazione nella sessione, se presenti, per visualizzarli in una pagina dedicata
+                // Salva gli errori nel file di log e nella sessione per la visualizzazione temporanea
                 if (importErrorsLog.Any())
                 {
+                    LogErrorsToFile(importErrorsLog, fileName);
                     HttpContext.Session.SetString(ImportErrorsSessionKey, JsonSerializer.Serialize(importErrorsLog));
                 }
                 else
                 {
-                    // Se non ci sono errori, assicurati che la sessione sia pulita anche per gli errori
                     HttpContext.Session.Remove(ImportErrorsSessionKey);
                 }
             }
             catch (Exception ex)
             {
-                // Gestione di errori critici che si verificano durante l'intero processo di importazione (es. file corrotto, problemi DB)
                 TempData["Errore"] = $"Si è verificato un errore critico durante l'importazione: {ex.Message}";
+                // Log dell'errore critico
+                LogErrorsToFile(new List<string> { $"Errore critico durante l'importazione del file '{fileName}': {ex.Message}" }, fileName, isCritical: true);
 
                 // In caso di errore critico, pulisci comunque la sessione per evitare dati orfani o stato inconsistente
                 HttpContext.Session.Remove(ExcelDataSessionKey);
                 HttpContext.Session.Remove(FileNameSessionKey);
                 HttpContext.Session.Remove(ImportErrorsSessionKey);
                 TempData.Remove(MappingTempDataKey);
-                return RedirectToAction("Index"); 
+                return RedirectToAction("Index");
             }
 
-            // Mostra sempre la pagina di riepilogo "RisultatoImportazione"
+            // Mostra sempre la pagina di riepilogo "Importa" (rinominata per chiarezza nel tuo commento, ma la view è "Importa")
             ViewBag.ImportedClients = importedClients;
             // Passa il conteggio degli errori alla view per decidere se mostrare il link
             ViewBag.ErrorCount = importErrorsLog.Count;
-            return View("Importa"); 
+            return View("Importa");
         }
 
         // GET: Importazione/ImportazioneErrori
-        // Mostra i dettagli degli errori riscontrati durante l'ultima importazione di clienti.
+        // Mostra i dettagli degli errori riscontrati durante l'ultima importazione di clienti (dalla sessione).
         [HttpGet]
         public IActionResult ImportazioneErrori()
         {
@@ -409,8 +398,42 @@ namespace ProgettoStage.Controllers
             {
                 errors = JsonSerializer.Deserialize<List<string>>(errorsJson);
             }
-            ViewBag.ImportErrors = errors; 
+            ViewBag.ImportErrors = errors;
             return View();
+        }
+
+        /// <summary>
+        /// Scrive i messaggi di errore su un file di log nella directory configurata.
+        /// </summary>
+        /// <param name="errors">La lista dei messaggi di errore da loggare.</param>
+        /// <param name="originalFileName">Il nome originale del file Excel da cui provengono gli errori.</param>
+        /// <param name="isCritical">Indica se si tratta di un errore critico che interrompe l'intero processo.</param>
+        private void LogErrorsToFile(List<string> errors, string originalFileName, bool isCritical = false)
+        {
+            if (!errors.Any())
+            {
+                return;
+            }
+
+            // Crea un nome di file di log unico per ogni importazione
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string logFileName = Path.GetFileNameWithoutExtension(originalFileName) + $"_ImportErrors_{timestamp}.log";
+            string logFilePath = Path.Combine(_logDirectory, logFileName);
+
+            using (StreamWriter sw = new StreamWriter(logFilePath, true)) // 'true' per appendere al file se esiste
+            {
+                sw.WriteLine($"--- Log di Importazione Clienti: {DateTime.Now} ---");
+                sw.WriteLine($"File processato: {originalFileName}");
+                if (isCritical)
+                {
+                    sw.WriteLine("ERRORE CRITICO: L'importazione è stata interrotta a causa di un errore grave.");
+                }
+                foreach (var error in errors)
+                {
+                    sw.WriteLine($"- {error}");
+                }
+                sw.WriteLine("-------------------------------------------\n");
+            }
         }
     }
 }

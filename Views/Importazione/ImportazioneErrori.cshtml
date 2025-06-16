@@ -1,43 +1,228 @@
 @using WebAppEF.Entities
 @{
-    ViewData["Title"] = "Errori Importazione Clienti";
+    ViewData["Title"] = "Report Errori Importazione Clienti";
     var importErrors = ViewBag.ImportErrors as List<string>;
 }
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-danger text-white">
-        <h3 class="mb-0"><i class="bi bi-bug-fill me-2"></i> Errori Durante l'Importazione</h3>
-    </div>
-    <div class="card-body">
-        @if (importErrors != null && importErrors.Any())
-        {
-            <div class="alert alert-danger mt-3" role="alert">
-                <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Problemi rilevati (@importErrors.Count())</h4>
-                <p>Si sono verificati i seguenti errori durante l'elaborazione del file Excel:</p>
-                <hr>
-                <ul class="list-unstyled">
-                    @foreach (var error in importErrors)
-                    {
-                        <li><i class="bi bi-x-circle-fill text-danger me-2"></i> @error</li>
-                    }
-                </ul>
+<div class="container-fluid mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+            <div>
+                <i class="fas fa-file-excel me-2"></i>
+                <h3 class="mb-0 d-inline-block">Dettaglio Errori Importazione Clienti</h3>
             </div>
-            <p class="card-text">Si prega di correggere gli errori nel file Excel e riprovare l'importazione.</p>
-        }
-        else
-        {
-            <div class="alert alert-success mt-3" role="alert">
-                <h4 class="alert-heading"><i class="bi bi-check-all me-2"></i> Nessun Errore Rilevato!</h4>
-                <p class="mb-0">Non sono stati riscontrati errori nell'ultima operazione di importazione. Potrebbe essere che nessun dato sia stato importato o che l'operazione sia stata completata senza problemi.</p>
+            <div>
+                <span class="badge bg-white text-danger fs-6">
+                    <i class="fas fa-history me-1"></i> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </span>
             </div>
-        }
+        </div>
 
-        <div class="mt-4 text-center">
-            <a asp-action="Index" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left-circle me-2"></i> Torna all'Importazione</a>
+        <div class="card-body">
+            @if (importErrors != null && importErrors.Any())
+            {
+                <!-- Riepilogo errori -->
+                <div class="alert alert-danger mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                        <div>
+                            <h4 class="alert-heading mb-1">Importazione parziale riuscita</h4>
+                            <p class="mb-0">Trovati <strong>@importErrors.Count anomalie</strong> durante l'elaborazione del file</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabella errori dettagliata -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="100px">Posizione</th>
+                                <th width="150px">Tipo Problema</th>
+                                <th>Descrizione</th>
+                                <th width="120px">Riferimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int errorNumber = 1;
+                                foreach (var error in importErrors)
+                                {
+                                    // Analisi automatica del messaggio d'errore
+                                    var isRowError = error.Contains("Riga");
+                                    var errorLocation = isRowError ? 
+                                        error.Substring(0, error.IndexOf(":")).Trim() : 
+                                        "Generico";
+                                    
+                                    var errorDescription = isRowError ? 
+                                        error.Substring(error.IndexOf(":") + 1).Trim() : 
+                                        error;
+                                    
+                                    var errorType = error.Contains("obbligatorio") ? "Dato mancante" :
+                                                  error.Contains("formato") ? "Formato errato" :
+                                                  error.Contains("esistente") ? "Duplicato" :
+                                                  "Validazione";
+
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-map-marker-alt me-1"></i> @errorLocation
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetErrorTypeBadge(errorType)">
+                                                @errorType
+                                            </span>
+                                        </td>
+                                        <td>@errorDescription</td>
+                                        <td class="text-muted small">
+                                            @if (error.Contains("Campo"))
+                                            {
+                                                <i class="fas fa-tag me-1"></i> 
+                                                @error.Split(new[] {"Campo"}, StringSplitOptions.None)[1].Trim()
+                                            }
+                                            else
+                                            {
+                                                <text>N/D</text>
+                                            }
+                                        </td>
+                                    </tr>
+                                    errorNumber++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Guida correzione -->
+                <div class="card border-primary mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-tools me-2"></i> Istruzioni per la correzione
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-file-csv text-success me-2"></i> Nel file originale:</h5>
+                                <ol>
+                                    <li>Individua le righe segnalate in "Posizione"</li>
+                                    <li>Verifica i campi indicati in "Riferimento"</li>
+                                    <li>Correggi secondo la "Descrizione" errore</li>
+                                </ol>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-clipboard-check text-warning me-2"></i> Controlla:</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Formati dati corretti</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Campi obbligatori compilati</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Assenza di duplicati</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni -->
+                <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
+                    <div>
+                        <a asp-action="Index" class="btn btn-danger">
+                            <i class="fas fa-sync-alt me-2"></i> Riprova Importazione
+                        </a>
+                    </div>
+                    <div class="text-end">
+                        <small class="d-block text-muted mb-2">Scarica il file corretto e ripeti l'operazione</small>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-file-download me-2"></i> Modello
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-question me-2"></i> Aiuto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Messaggio successo -->
+                <div class="alert alert-success text-center py-5">
+                    <div class="icon-container mb-4">
+                        <i class="fas fa-check-circle fa-4x text-success"></i>
+                    </div>
+                    <h2 class="alert-heading mb-3">Importazione completata!</h2>
+                    <p class="lead mb-4">Tutti i clienti sono stati importati correttamente.</p>
+                    <hr>
+                    <div class="d-grid gap-2 col-md-6 mx-auto">
+                        <a asp-action="Index" class="btn btn-success btn-lg">
+                            <i class="fas fa-file-import me-2"></i> Nuova Importazione
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i> Importazione Clienti - @DateTime.Today.Year
+                    </small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        Processato: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</script>
+@functions {
+    string GetErrorTypeBadge(string errorType)
+    {
+        switch(errorType)
+        {
+            case "Dato mancante":
+                return "bg-danger";
+            case "Formato errato":
+                return "bg-warning text-dark";
+            case "Duplicato":
+                return "bg-info";
+            default:
+                return "bg-secondary";
+        }
+    }
+}
+
+<!-- Stili personalizzati -->
+<style>
+    .table th {
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        background-color: #343a40 !important;
+    }
+    
+    .table-responsive {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 5px 8px;
+    }
+    
+    tr:hover {
+        background-color: rgba(0, 123, 255, 0.05) !important;
+    }
+    
+    .card-header {
+        font-weight: 600;
+    }
+</style>
+
+<!-- Icone Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

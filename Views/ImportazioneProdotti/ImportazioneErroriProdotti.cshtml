@@ -1,47 +1,261 @@
 @{
-    ViewData["Title"] = "Log Errori Importazione Prodotti";
+    ViewData["Title"] = "Report Errori Importazione Prodotti";
     var importErrors = ViewBag.ImportErrors as List<string>;
 }
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-danger text-white">
-        <h3 class="mb-0"><i class="bi bi-exclamation-octagon-fill me-2"></i> Log Errori Importazione Prodotti</h3>
-    </div>
-    <div class="card-body">
-        <p class="card-text">Di seguito sono elencati i dettagli degli errori riscontrati durante l'importazione dei prodotti.</p>
-
-        @if (importErrors != null && importErrors.Any())
-        {
-            <div class="alert alert-warning mt-3" role="alert">
-                <h4 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i> Elenco Errori</h4>
-                <p>Sono stati trovati errori in **@importErrors.Count()** record. Correggi i dati nel file Excel e riprova.</p>
+<div class="container-fluid mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+            <div>
+                <i class="fas fa-boxes me-2"></i>
+                <h3 class="mb-0 d-inline-block">Dettaglio Errori Importazione Prodotti</h3>
             </div>
+            <div>
+                <span class="badge bg-white text-danger fs-6">
+                    <i class="fas fa-history me-1"></i> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+        </div>
 
-            <div class="list-group">
-                @foreach (var error in importErrors)
-                {
-                    <div class="list-group-item list-group-item-danger">
-                        <i class="bi bi-bug me-2"></i> @error
+        <div class="card-body">
+            @if (importErrors != null && importErrors.Any())
+            {
+                <!-- Riepilogo errori -->
+                <div class="alert alert-danger mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-box-open fa-2x me-3"></i>
+                        <div>
+                            <h4 class="alert-heading mb-1">Importazione prodotti parziale</h4>
+                            <p class="mb-0">Rilevati <strong>@importErrors.Count anomalie</strong> durante l'elaborazione del file</p>
+                        </div>
                     </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-success mt-3" role="alert">
-                <h4 class="alert-heading"><i class="bi bi-check-circle-fill me-2"></i> Nessun Errore Rilevato!</h4>
-                <p class="mb-0">L'ultima importazione di prodotti è stata completata senza errori.</p>
-            </div>
-        }
+                </div>
 
-        <div class="mt-4 text-center">
-            <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-secondary btn-lg">
-                <i class="bi bi-arrow-left-circle me-2"></i> Torna all'Importazione Prodotti
-            </a>
+                <!-- Tabella errori dettagliata -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="60px">#</th>
+                                <th width="100px">Posizione</th>
+                                <th width="150px">Tipo Problema</th>
+                                <th>Descrizione</th>
+                                <th width="120px">Riferimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int errorNumber = 1;
+                                foreach (var error in importErrors)
+                                {
+                                    // Analisi automatica del messaggio d'errore
+                                    var isRowError = error.Contains("Riga");
+                                    var errorLocation = isRowError ?
+                                        error.Substring(0, error.IndexOf(":")).Trim() :
+                                        "Generico";
+
+                                    var errorDescription = isRowError ?
+                                        error.Substring(error.IndexOf(":") + 1).Trim() :
+                                        error;
+
+                                    var errorType = error.Contains("obbligatorio") ? "Dato mancante" :
+                                                  error.Contains("formato") ? "Formato errato" :
+                                                  error.Contains("esistente") ? "Duplicato" :
+                                                  error.Contains("codice") ? "Codice prodotto" :
+                                                  error.Contains("prezzo") ? "Prezzo non valido" :
+                                                  "Validazione";
+
+                                    <tr>
+                                        <td>@errorNumber</td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-map-marker-alt me-1"></i> @errorLocation
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetProductErrorTypeBadge(errorType)">
+                                                @errorType
+                                            </span>
+                                        </td>
+                                        <td>@errorDescription</td>
+                                        <td class="text-muted small">
+                                            @if (error.Contains("Campo"))
+                                            {
+                                                var parts = error.Split(new[] { "Campo" }, StringSplitOptions.None);
+                                                if (parts.Length > 1)
+                                                {
+                                                    <i class="fas fa-tag me-1"></i> @parts[1].Trim()
+                                                }
+                                                else
+                                                {
+                                                    <text>N/D</text>
+                                                }
+                                            }
+                                            else if (error.Contains("codice"))
+                                            {
+                                                <i class="fas fa-barcode me-1"></i> <text>Codice</text>
+                                            }
+                                            else if (error.Contains("prezzo"))
+                                            {
+                                                <i class="fas fa-tag me-1"></i> <text>PrezzoUnitario</text>
+                                            }
+                                            else
+                                            {
+                                                <text>N/D</text>
+                                            }
+                                        </td>
+                                    </tr>
+                                    errorNumber++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Guida correzione specifica -->
+                <div class="card border-primary mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Istruzioni per la correzione
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-file-csv text-success me-2"></i> Verificare nel file:</h5>
+                                <ol>
+                                    <li>Codici prodotto univoci</li>
+                                    <li>Formato prezzi (es. 10.50)</li>
+                                    <li>Quantità numeriche positive</li>
+                                    <li>Categorie esistenti</li>
+                                    <li>Date di scadenza valide</li>
+                                </ol>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-clipboard-check text-warning me-2"></i> Controllare:</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Unicità codici</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Prezzi ≥ 0</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Campi obbligatori</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> Formati corretti</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni specifiche -->
+                <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
+                    <div>
+                        <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-danger">
+                            <i class="fas fa-sync-alt me-2"></i> Riprova Importazione
+                        </a>
+                    </div>
+                    <div class="text-end">
+                        <small class="d-block text-muted mb-2">Scarica il modello aggiornato</small>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-file-download me-2"></i> Modello
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-book me-2"></i> Guida
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Messaggio successo -->
+                <div class="alert alert-success text-center py-5">
+                    <div class="icon-container mb-4">
+                        <i class="fas fa-check-circle fa-4x text-success"></i>
+                    </div>
+                    <h2 class="alert-heading mb-3">Importazione completata!</h2>
+                    <p class="lead mb-4">Tutti i prodotti sono stati importati correttamente.</p>
+                    <hr>
+                    <div class="d-grid gap-2 col-md-6 mx-auto">
+                        <a asp-action="Index" asp-controller="ImportazioneProdotti" class="btn btn-success btn-lg">
+                            <i class="fas fa-file-import me-2"></i> Nuova Importazione
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Importazione - @DateTime.Today.Year
+                    </small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        Processato: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</script>
+@functions {
+    string GetProductErrorTypeBadge(string errorType)
+    {
+        switch (errorType)
+        {
+            case "Dato mancante":
+                return "bg-danger";
+            case "Formato errato":
+                return "bg-warning text-dark";
+            case "Duplicato":
+                return "bg-info";
+            case "Codice prodotto":
+                return "bg-purple text-white";
+            case "Prezzo non valido":
+                return "bg-orange text-white";
+            default:
+                return "bg-secondary";
+        }
+    }
+}
+
+<!-- Stili personalizzati -->
+<style>
+    .table th {
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        background-color: #343a40 !important;
+    }
+
+    .table-responsive {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 5px 8px;
+    }
+
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    .bg-orange {
+        background-color: #fd7e14 !important;
+    }
+
+    tr:hover {
+        background-color: rgba(220, 53, 69, 0.05) !important;
+    }
+
+    .card-header {
+        font-weight: 600;
+    }
+</style>
+
+<!-- Icone Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
