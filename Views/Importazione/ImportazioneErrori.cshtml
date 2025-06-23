@@ -21,7 +21,6 @@
         <div class="card-body">
             @if (importErrors != null && importErrors.Any())
             {
-                <!-- Riepilogo errori -->
                 <div class="alert alert-danger mb-4">
                     <div class="d-flex align-items-center">
                         <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
@@ -32,15 +31,14 @@
                     </div>
                 </div>
 
-                <!-- Tabella errori dettagliata -->
                 <div class="table-responsive mb-4">
                     <table class="table table-bordered table-hover table-sm">
-                        <thead class="table-dark">
+                        <thead class="table-light custom-table-header"> @* Changed from table-dark to table-light and added custom-table-header *@
                             <tr>
                                 <th width="100px">Posizione</th>
                                 <th width="150px">Tipo Problema</th>
                                 <th>Descrizione</th>
-                                <th width="120px">Riferimento</th>
+                                @* <th width="120px">Riferimento</th> *@
                             </tr>
                         </thead>
                         <tbody>
@@ -59,9 +57,10 @@
                                         error;
                                     
                                     var errorType = error.Contains("obbligatorio") ? "Dato mancante" :
-                                                  error.Contains("formato") ? "Formato errato" :
-                                                  error.Contains("esistente") ? "Duplicato" :
-                                                  "Validazione";
+                                                    error.Contains("formato") ? "Formato errato" :
+                                                    error.Contains("Duplicata nel file") ? "Duplicato nel file" : // Specific for in-file duplicates
+                                                    error.Contains("già presente nel database") ? "Duplicato nel DB" : // Specific for DB duplicates
+                                                    "Validazione";
 
                                     <tr>
                                         <td>
@@ -76,7 +75,7 @@
                                         </td>
                                         <td>@errorDescription</td>
                                         <td class="text-muted small">
-                                            @if (error.Contains("Campo"))
+                                            @* @if (error.Contains("Campo"))
                                             {
                                                 <i class="fas fa-tag me-1"></i> 
                                                 @error.Split(new[] {"Campo"}, StringSplitOptions.None)[1].Trim()
@@ -84,7 +83,7 @@
                                             else
                                             {
                                                 <text>N/D</text>
-                                            }
+                                            } *@
                                         </td>
                                     </tr>
                                     errorNumber++;
@@ -94,7 +93,6 @@
                     </table>
                 </div>
 
-                <!-- Guida correzione -->
                 <div class="card border-primary mb-4">
                     <div class="card-header bg-primary text-white">
                         <i class="fas fa-tools me-2"></i> Istruzioni per la correzione
@@ -121,7 +119,6 @@
                     </div>
                 </div>
 
-                <!-- Azioni -->
                 <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
                     <div>
                         <a asp-action="Index" class="btn btn-danger">
@@ -130,20 +127,19 @@
                     </div>
                     <div class="text-end">
                         <small class="d-block text-muted mb-2">Scarica il file corretto e ripeti l'operazione</small>
-                        <div class="btn-group">
+                        @* <div class="btn-group">
                             <button class="btn btn-outline-secondary">
                                 <i class="fas fa-file-download me-2"></i> Modello
                             </button>
                             <button class="btn btn-outline-primary">
                                 <i class="fas fa-question me-2"></i> Aiuto
                             </button>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
             }
             else
             {
-                <!-- Messaggio successo -->
                 <div class="alert alert-success text-center py-5">
                     <div class="icon-container mb-4">
                         <i class="fas fa-check-circle fa-4x text-success"></i>
@@ -186,21 +182,24 @@
                 return "bg-danger";
             case "Formato errato":
                 return "bg-warning text-dark";
-            case "Duplicato":
+            case "Duplicato nel file": // New case for in-file duplicates
                 return "bg-info";
+            case "Duplicato nel DB": // New case for DB duplicates
+                return "bg-primary"; // Changed to primary for DB duplicates to differentiate
             default:
                 return "bg-secondary";
         }
     }
 }
 
-<!-- Stili personalizzati -->
 <style>
     .table th {
         white-space: nowrap;
         position: sticky;
         top: 0;
-        background-color: #343a40 !important;
+        background-color: white !important; 
+        color: black !important;
+        border-bottom: 2px solid #dee2e6; 
     }
     
     .table-responsive {
@@ -224,5 +223,4 @@
     }
 </style>
 
-<!-- Icone Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

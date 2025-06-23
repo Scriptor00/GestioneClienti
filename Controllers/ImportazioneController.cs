@@ -1,10 +1,10 @@
-using System.Globalization; 
-using System.Text.Json; 
-using ClosedXML.Excel; 
+using System.Globalization;
+using System.Text.Json;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
-using WebAppEF.Entities; 
+using WebAppEF.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAppEF.Models; 
+using WebAppEF.Models;
 
 namespace ProgettoStage.Controllers
 {
@@ -73,9 +73,9 @@ namespace ProgettoStage.Controllers
 
                 // Legge le intestazioni dalla prima riga del foglio Excel, filtrando quelle vuote
                 var intestazioniExcel = ws.Row(1).CellsUsed()
-                                                .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
-                                                .Select(c => c.Value.ToString().Trim())
-                                                .ToList();
+                                            .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
+                                            .Select(c => c.Value.ToString().Trim())
+                                            .ToList();
 
                 // Se non vengono trovate intestazioni, reindirizza con un errore
                 if (!intestazioniExcel.Any())
@@ -146,7 +146,8 @@ namespace ProgettoStage.Controllers
             var mappings = JsonSerializer.Deserialize<Dictionary<string, string>>(mappingJson);
 
             var importedClients = new List<Cliente>(); // Lista per i clienti importati con successo
-            var importErrorsLog = new List<string>();   // Lista per i messaggi di errore
+            var importErrorsLog = new List<string>();    // Lista per i messaggi di errore
+            var processedEmailsInCurrentFile = new HashSet<string>(); // Per tenere traccia delle email già processate nel *file corrente*
 
             try
             {
@@ -226,7 +227,7 @@ namespace ProgettoStage.Controllers
                             if (property.PropertyType == typeof(string))
                             {
                                 if ((modelPropertyName == "Nome" || modelPropertyName == "Cognome") &&
-                                        double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
+                                            double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
                                 {
                                     currentRowErrors.Add($"Valore '{cellValue}' non valido per il campo '{modelPropertyName}' (non può essere un numero).");
                                     recordSuccessfullyParsed = false;
@@ -318,13 +319,26 @@ namespace ProgettoStage.Controllers
                     // Dopo aver processato tutti i campi, controlla se l'email è stata fornita e se è valida
                     if (recordSuccessfullyParsed && !string.IsNullOrEmpty(cliente.Email))
                     {
-                        // Controlla se l'email esiste già nel database
-                        var existingClient = await _dbContext.Clienti.FirstOrDefaultAsync(c => c.Email == cliente.Email);
-
-                        if (existingClient != null)
+                        // Controllo email duplicata *nel database*
+                        var existingClientInDb = await _dbContext.Clienti.FirstOrDefaultAsync(c => c.Email == cliente.Email);
+                        if (existingClientInDb != null)
                         {
                             recordSuccessfullyParsed = false;
                             currentRowErrors.Add($"Email '{cliente.Email}' già presente nel database.");
+                        }
+
+                        // email duplicata *nel file di importazione corrente*
+                        if (!recordSuccessfullyParsed && processedEmailsInCurrentFile.Contains(cliente.Email))
+                        {
+                            if (recordSuccessfullyParsed) //
+                            {
+                                currentRowErrors.Add($"Email '{cliente.Email}' duplicata nel file di importazione. Sarà importata solo la prima occorrenza.");
+                                recordSuccessfullyParsed = false; 
+                            }
+                        }
+                        else if (recordSuccessfullyParsed) // Se il record è stato processato con successo e non ci sono stati errori
+                        {
+                            processedEmailsInCurrentFile.Add(cliente.Email);
                         }
                     }
 
@@ -333,9 +347,8 @@ namespace ProgettoStage.Controllers
                     {
                         importedClients.Add(cliente);
                     }
-                    else // Se ci sono stati errori (parsing, logica di business come email duplicata, o nome/cognome numerico)
+                    else // Se ci sono stati errori 
                     {
-                        // Prepara il contenuto originale della riga per il log degli errori
                         string rowContent = string.Join(", ", row.CellsUsed().Select(c => $"'{c.Value.ToString() ?? ""}'"));
                         importErrorsLog.Add($"Riga {row.RowNumber()} del file '{fileName}': Contenuto [{rowContent}] - Errori: {string.Join("; ", currentRowErrors)}");
                     }
@@ -379,7 +392,7 @@ namespace ProgettoStage.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Mostra sempre la pagina di riepilogo "Importa" (rinominata per chiarezza nel tuo commento, ma la view è "Importa")
+            // Mostra sempre la pagina di riepilogo "Importa" 
             ViewBag.ImportedClients = importedClients;
             // Passa il conteggio degli errori alla view per decidere se mostrare il link
             ViewBag.ErrorCount = importErrorsLog.Count;
