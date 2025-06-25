@@ -146,5 +146,66 @@ namespace ProgettoStage.Controllers
                 return StatusCode(500, "Errore interno del server durante la generazione del PDF.");
             }
         }
+
+        
+    [HttpGet("vendite")] 
+    public async Task<IActionResult> GeneraElencoVenditePdf(DateTime? startDate, DateTime? endDate)
+    {
+        try
+        {
+            _logger.LogInformation("Richiesta PDF Elenco Vendite. StartDate: {StartDate}, EndDate: {EndDate}", startDate, endDate);
+
+            IQueryable<Ordine> query = _context.Ordini
+                                                .Include(o => o.Cliente);
+
+            if (startDate.HasValue)
+            {
+                // Filtra gli ordini a partire dalla data di inizio (inclusa)
+                query = query.Where(o => o.DataOrdine.Date >= startDate.Value.Date);
+            }
+
+            if (endDate.HasValue)
+            {
+                // Filtra gli ordini fino alla data di fine (inclusa)
+                query = query.Where(o => o.DataOrdine.Date <= endDate.Value.Date);
+            }
+
+            var vendite = await query.OrderByDescending(o => o.DataOrdine).ToListAsync();
+
+            var pdfBytes = await _generatorePdfService.GeneraElencoVenditePdfAsync(vendite);
+
+            string fileName = "ElencoVendite";
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                fileName += $"_{startDate.Value.ToString("yyyyMMdd")}_{endDate.Value.ToString("yyyyMMdd")}";
+            }
+            else if (startDate.HasValue)
+            {
+                fileName += $"_Da_{startDate.Value.ToString("yyyyMMdd")}";
+            }
+            else if (endDate.HasValue)
+            {
+                fileName += $"_FinoAl_{endDate.Value.ToString("yyyyMMdd")}";
+            }
+            fileName += ".pdf";
+
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogError(ex, "Errore di argomenti nella generazione del PDF delle vendite: {Message}", ex.Message);
+            return BadRequest($"Errore nella richiesta: {ex.Message}");
+        }
+        catch (QuestPDF.Drawing.Exceptions.DocumentLayoutException ex)
+        {
+            _logger.LogError(ex, "Errore di layout QuestPDF durante la generazione del PDF delle vendite: {Message}", ex.Message);
+            return StatusCode(500, $"Errore durante la generazione del PDF per l'elenco vendite: {ex.Message}. Controlla i log per maggiori dettagli.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Errore generico durante la generazione del PDF delle vendite.");
+            return StatusCode(500, "Errore interno durante la generazione del PDF per l'elenco vendite.");
+        }
+    }
     }
 }

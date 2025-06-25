@@ -1,15 +1,16 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using QuestPDF.Previewer; // Per il debug, puoi rimuoverlo in produzione
+using QuestPDF.Previewer; 
 using QuestPDF.Drawing;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq; 
-using WebAppEF.Entities; 
+using System.Linq;
+using WebAppEF.Entities;
 using SkiaSharp;
-using System.Threading.Tasks; 
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging; 
 
 namespace ProgettoStage.Repositories
 {
@@ -18,12 +19,14 @@ namespace ProgettoStage.Repositories
         private readonly string _logoPath;
         private readonly string _ragioneSocialeAziendale;
         private readonly string _nomeAzienda;
+        private readonly ILogger<GeneratorePdfService> _logger; 
 
-        public GeneratorePdfService(string logoPath, string ragioneSocialeAziendale, string nomeAzienda)
+        public GeneratorePdfService(string logoPath, string ragioneSocialeAziendale, string nomeAzienda, ILogger<GeneratorePdfService> logger)
         {
             _logoPath = logoPath;
             _ragioneSocialeAziendale = ragioneSocialeAziendale;
             _nomeAzienda = nomeAzienda;
+            _logger = logger;
         }
 
         private void ApplyStandardLayout(IDocumentContainer container, Action<IContainer> contentBuilder)
@@ -43,10 +46,8 @@ namespace ProgettoStage.Repositories
                         {
                             if (!string.IsNullOrEmpty(_logoPath) && File.Exists(_logoPath))
                             {
-                                // FIX: Utilizza .FitArea() per ridimensionare l'immagine all'interno dello spazio disponibile.
-                                // Questo assicura che l'immagine si adatti ai 100 punti di larghezza della colonna
-                                // senza causare overflow e mantenendo le proporzioni.
-                                container.Image(_logoPath).FitArea(); 
+                                
+                                container.Image(_logoPath).FitArea();
                             }
                             else
                             {
@@ -269,7 +270,21 @@ namespace ProgettoStage.Repositories
         {
             if (clienti == null || !clienti.Any())
             {
-                throw new ArgumentNullException(nameof(clienti), "L'elenco dei clienti non può essere nullo o vuoto.");
+                // Se l'elenco è vuoto, genera un PDF con un messaggio appropriato
+                _logger.LogInformation("GeneraAnagraficaClientiPdfAsync: Nessun cliente trovato per la generazione del PDF.");
+                return await Task.Run(() => Document.Create(container =>
+                {
+                    ApplyStandardLayout(container, content =>
+                    {
+                        content.Column(column =>
+                        {
+                            column.Spacing(10);
+                            column.Item().Text("Anagrafica Clienti").FontSize(16).SemiBold().FontColor(Colors.Green.Darken2);
+                            column.Item().PaddingVertical(10).LineHorizontal(1);
+                            column.Item().AlignCenter().Text("Nessun cliente trovato.").FontSize(12).Italic();
+                        });
+                    });
+                }).GeneratePdf());
             }
 
             var document = Document.Create(container =>
@@ -352,7 +367,21 @@ namespace ProgettoStage.Repositories
         {
             if (prodotti == null || !prodotti.Any())
             {
-                throw new ArgumentNullException(nameof(prodotti), "L'elenco dei prodotti non può essere nullo o vuoto.");
+                // Se l'elenco è vuoto, genera un PDF con un messaggio appropriato
+                _logger.LogInformation("GeneraAnagraficaProdottiPdfAsync: Nessun prodotto trovato per la generazione del PDF.");
+                return await Task.Run(() => Document.Create(container =>
+                {
+                    ApplyStandardLayout(container, content =>
+                    {
+                        content.Column(column =>
+                        {
+                            column.Spacing(10);
+                            column.Item().Text("Anagrafica Prodotti").FontSize(16).SemiBold().FontColor(Colors.Orange.Darken2);
+                            column.Item().PaddingVertical(10).LineHorizontal(1);
+                            column.Item().AlignCenter().Text("Nessun prodotto trovato.").FontSize(12).Italic();
+                        });
+                    });
+                }).GeneratePdf());
             }
 
             var document = Document.Create(container =>
@@ -408,6 +437,99 @@ namespace ProgettoStage.Repositories
             });
 
             return await Task.Run(() => document.GeneratePdf());
+        }
+
+        /// <summary>
+        /// Genera l'elenco delle vendite in formato PDF.
+        /// </summary>
+        /// <param name="vendite">Una collezione di oggetti Ordine.</param>
+        /// <returns>Un array di byte contenente il PDF generato.</returns>
+        public async Task<byte[]> GeneraElencoVenditePdfAsync(IEnumerable<Ordine> vendite)
+        {
+            if (vendite == null)
+            {
+                _logger.LogError("GeneraElencoVenditePdfAsync: L'elenco delle vendite fornito è nullo.");
+                throw new ArgumentNullException(nameof(vendite), "L'elenco delle vendite non può essere nullo.");
+            }
+
+            // Se l'elenco è vuoto, genera un PDF con un messaggio informativo
+            if (!vendite.Any())
+            {
+                _logger.LogInformation("GeneraElencoVenditePdfAsync: Nessuna vendita trovata per la generazione del PDF.");
+                return await Task.Run(() => Document.Create(container =>
+                {
+                    ApplyStandardLayout(container, content =>
+                    {
+                        content.Column(column =>
+                        {
+                            column.Spacing(10);
+                            column.Item().Text("Elenco Vendite").FontSize(16).SemiBold().FontColor(Colors.Red.Darken2);
+                            column.Item().PaddingVertical(10).LineHorizontal(1);
+                            column.Item().AlignCenter().Text("Nessuna vendita trovata per il periodo selezionato.").FontSize(12).Italic();
+                        });
+                    });
+                }).GeneratePdf());
+            }
+
+            // Ordina le vendite per data (se non sono già ordinate)
+            var venditeOrdinate = vendite.OrderBy(o => o.DataOrdine).ToList();
+
+            // Calcola il totale complessivo per il riepilogo
+            decimal totaleComplessivo = venditeOrdinate.Sum(o => o.TotaleOrdine);
+
+            return await Task.Run(() => Document.Create(container =>
+            {
+                ApplyStandardLayout(container, content =>
+                {
+                    content.Column(column =>
+                    {
+                        column.Spacing(10);
+
+                        column.Item().Text("Elenco Vendite").FontSize(16).SemiBold().FontColor(Colors.Indigo.Darken2);
+
+                       
+                        column.Item().Text($"Numero totale di vendite: {venditeOrdinate.Count()}").FontSize(10).Italic();
+                        column.Item().Text($"Totale complessivo: {totaleComplessivo:C}").FontSize(12).SemiBold();
+
+
+                        column.Item().PaddingVertical(10).LineHorizontal(1);
+
+                        column.Item().Text("Dettagli Vendite").SemiBold();
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1); // ID Ordine
+                                columns.RelativeColumn(2); // Cliente
+                                columns.RelativeColumn(1.5f); // Data Ordine
+                                columns.RelativeColumn(1.5f); // Stato
+                                columns.RelativeColumn(1); // Totale
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().BorderBottom(1).PaddingBottom(5).Text("ID Ordine").SemiBold();
+                                header.Cell().BorderBottom(1).PaddingBottom(5).Text("Cliente").SemiBold();
+                                header.Cell().BorderBottom(1).PaddingBottom(5).Text("Data Ordine").SemiBold();
+                                header.Cell().BorderBottom(1).PaddingBottom(5).Text("Stato").SemiBold();
+                                header.Cell().BorderBottom(1).PaddingBottom(5).AlignRight().Text("Totale").SemiBold();
+                            });
+
+                            foreach (var vendita in venditeOrdinate)
+                            {
+                                table.Cell().PaddingVertical(2).Text(vendita.IdOrdine.ToString());
+                                table.Cell().PaddingVertical(2).Text($"{vendita.Cliente?.Nome} {vendita.Cliente?.Cognome}" ?? "N/A");
+                                table.Cell().PaddingVertical(2).Text(vendita.DataOrdine.ToString("dd/MM/yyyy HH:mm"));
+                                table.Cell().PaddingVertical(2).Text(vendita.Stato.ToString());
+                                table.Cell().PaddingVertical(2).AlignRight().Text($"{vendita.TotaleOrdine:C}");
+                            }
+                        });
+
+                        column.Item().PaddingVertical(10).LineHorizontal(1);
+                        column.Item().AlignCenter().Text("Fine dell'Elenco Vendite.").FontSize(10).Italic();
+                    });
+                });
+            }).GeneratePdf());
         }
     }
 }

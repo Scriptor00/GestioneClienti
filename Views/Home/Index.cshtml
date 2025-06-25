@@ -125,15 +125,15 @@
             margin-bottom: 2rem;
         }
 
-        /* Nuovi stili per i pulsanti PDF */
+        /* Stili per la sezione download PDF */
         .pdf-buttons-section {
             background-color: white;
             border-radius: 10px;
             border: 1px solid var(--admin-border);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 2rem;
-            margin-top: 3rem; /* Spazio sopra la sezione dei pulsanti */
-            text-align: center;
+            margin-top: 3rem;
+            text-align: center; /* Centra il testo e i bottoni */
         }
 
         .pdf-buttons-section h2 {
@@ -141,36 +141,95 @@
             margin-bottom: 1.5rem;
             font-weight: 600;
         }
+        
+        .pdf-buttons-section .form-section-title { /* Titolo per le sezioni interne (es. Elenco Vendite) */
+            color: var(--admin-primary);
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-align: center; /* Centra il titolo */
+        }
 
-        .pdf-buttons-section .btn-custom-pdf {
-            background-color: var(--admin-accent); /* Usa un colore coerente o personalizzato */
+        /* Stili per i pulsanti PDF */
+        .btn-custom-pdf {
+            background-color: var(--admin-accent);
             border-color: var(--admin-accent);
             color: var(--admin-text-light);
             font-weight: 600;
             padding: 0.8rem 2rem;
             border-radius: 8px;
             transition: all 0.3s ease;
-            text-decoration: none; /* Rimuove la sottolineatura per i link */
+            text-decoration: none;
+            display: inline-flex; /* Per allineare icona e testo */
+            align-items: center;
+            justify-content: center;
         }
 
-        .pdf-buttons-section .btn-custom-pdf:hover {
-            background-color: var(--admin-secondary); /* Colore leggermente più scuro all'hover */
+        .btn-custom-pdf:hover {
+            background-color: var(--admin-secondary);
             border-color: var(--admin-secondary);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: var(--admin-text-light); /* Assicura che il testo rimanga bianco */
         }
 
-        /* Stile alternativo per il secondo pulsante PDF */
-        .pdf-buttons-section .btn-custom-pdf.btn-secondary-pdf {
-            background-color: var(--admin-success); /* Colore diverso per distinzione */
+        /* Stile alternativo per alcuni pulsanti PDF */
+        .btn-custom-pdf.btn-secondary-pdf {
+            background-color: var(--admin-success);
             border-color: var(--admin-success);
         }
 
-        .pdf-buttons-section .btn-custom-pdf.btn-secondary-pdf:hover {
-            background-color: darken(var(--admin-success), 10%); /* Scurisci all'hover */
-            border-color: darken(var(--admin-success), 10%);
+        .btn-custom-pdf.btn-secondary-pdf:hover {
+            background-color: #388e3c; /* Scuro del successo */
+            border-color: #388e3c;
         }
 
+        /* Stili per il form di filtro date */
+        .date-filter-form {
+            max-width: 500px; /* Limita la larghezza del form */
+            margin: 0 auto; /* Centra il form */
+            padding: 1.5rem;
+            background-color: var(--admin-light); /* Sfondo leggermente diverso per il form */
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-top: 1.5rem; /* Spazio sopra il form */
+        }
+
+        .form-group-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centra label e input */
+            margin-bottom: 1rem;
+            flex-wrap: wrap; /* Per responsività */
+            gap: 0.5rem; /* Spazio tra label/input */
+        }
+
+        .form-group-flex label {
+            min-width: 100px; /* Larghezza fissa per le label */
+            text-align: right;
+            margin-right: 0.5rem;
+            font-weight: 500;
+            color: var(--admin-primary);
+        }
+
+        .form-group-flex input[type="date"] {
+            flex-grow: 1; /* Permette all'input di occupare lo spazio disponibile */
+            max-width: 200px; /* Limita la larghezza massima per estetica */
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--admin-border);
+            border-radius: 5px;
+            font-size: 0.95rem;
+            color: var(--admin-text);
+        }
+
+        .date-filter-form .btn-submit {
+            margin-top: 1rem;
+            width: 100%; /* Il pulsante occupa tutta la larghezza del form */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* Responsive */
         @@media (max-width: 768px) {
@@ -184,6 +243,23 @@
 
             .pdf-buttons-section .d-grid {
                 grid-template-columns: 1fr; /* Stack buttons on small screens */
+            }
+
+            .form-group-flex {
+                flex-direction: column; /* Stack input e label su schermi piccoli */
+                align-items: flex-start; /* Allinea a sinistra */
+                gap: 0.25rem;
+            }
+
+            .form-group-flex label {
+                text-align: left;
+                margin-right: 0;
+                min-width: unset;
+            }
+
+            .form-group-flex input[type="date"] {
+                width: 100%;
+                max-width: unset;
             }
         }
     </style>
@@ -257,10 +333,26 @@
             <a href="@Url.Action("GeneraAnagraficaClientiPdf", "Pdf")" class="btn-custom-pdf" target="_blank">
                 <i class="fas fa-file-pdf me-2"></i> Scarica Anagrafica Clienti PDF
             </a>
-            <a href="@Url.Action("GeneraAnagraficaProdottiPdf", "Pdf")" class="btn-custom-pdf btn-secondary-pdf mt-2" target="_blank"> @* Aggiungo classe per stile alternativo e margin-top *@
+            <a href="@Url.Action("GeneraAnagraficaProdottiPdf", "Pdf")" class="btn-custom-pdf btn-secondary-pdf mt-2" target="_blank">
                 <i class="fas fa-file-pdf me-2"></i> Scarica Anagrafica Prodotti PDF
             </a>
         </div>
+
+        <!-- Sezione per il download PDF Elenco Vendite con filtro per data -->
+        <h4 class="form-section-title">Scarica Elenco Vendite per Periodo</h4>
+        <form action="@Url.Action("GeneraElencoVenditePdf", "Pdf")" method="get" target="_blank" class="date-filter-form">
+            <div class="form-group-flex">
+                <label for="startDate">Data Inizio:</label>
+                <input type="date" id="startDate" name="startDate" class="form-control">
+            </div>
+            <div class="form-group-flex">
+                <label for="endDate">Data Fine:</label>
+                <input type="date" id="endDate" name="endDate" class="form-control">
+            </div>
+            <button type="submit" class="btn-custom-pdf btn-secondary-pdf btn-submit">
+                <i class="fas fa-file-invoice-dollar me-2"></i> Scarica Vendite PDF
+            </button>
+        </form>
     </div>
 
 </div>
