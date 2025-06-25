@@ -3,20 +3,33 @@ using GestioneClienti.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebAppEF.Entities;
-using WebAppEF.Models;
+using WebAppEF.Entities; // Il namespace delle tue entità (Cliente, Ordine, Prodotto)
+using WebAppEF.Models; // Il namespace per ErrorViewModel, ecc.
+using WebAppEF.Repositories; // Per ApplicationDbContext (e potenzialmente altri repository)
+using Microsoft.AspNetCore.Hosting; // Per IWebHostEnvironment
+using QuestPDF.Previewer; // <--- Necessario per ShowInPreviewer()
+
+// LA RIGA FONDAMENTALE PER RISOLVERE L'ERRORE:
+using ProgettoStage.Repositories; // <--- Questo è il namespace del tuo GeneratorePdfService
+
+// Se hai altri using per GestioneClienti.Repositories, mantienili:
+using GestioneClienti.Repositories;
+
 
 namespace WebAppEF.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, ApplicationDbContext context) : Controller
+    // Modifica il costruttore per includere GeneratorePdfService e IWebHostEnvironment
+    public class HomeController(ILogger<HomeController> logger, ApplicationDbContext context,
+                                 GeneratorePdfService pdfService, IWebHostEnvironment webHostEnvironment) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
         private readonly ApplicationDbContext _context = context;
+        private readonly GeneratorePdfService _pdfService = pdfService; // Iniettato il servizio PDF
+        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment; // Iniettato per i percorsi file
 
         [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
-
             return View();
         }
 
@@ -42,10 +55,10 @@ namespace WebAppEF.Controllers
             ViewBag.OrdiniAnnullati = await _context.Ordini.CountAsync(o => o.Stato == StatoOrdine.Annullato);
 
             var ordiniMensili = _context.Ordini
-       .GroupBy(o => o.DataOrdine.Month)
-       .Select(g => new { Month = g.Key, Count = g.Count() })
-       .OrderBy(o => o.Month)
-       .ToList();
+           .GroupBy(o => o.DataOrdine.Month)
+           .Select(g => new { Month = g.Key, Count = g.Count() })
+           .OrderBy(o => o.Month)
+           .ToList();
 
 
             ViewBag.OrdiniMensili = ordiniMensili.Select(o => o.Count).ToList();
@@ -71,7 +84,6 @@ namespace WebAppEF.Controllers
 
         public IActionResult Contatti()
         {
-
             return View();
         }
 
@@ -95,7 +107,7 @@ namespace WebAppEF.Controllers
                     _context.Prodotti.Add(prodotto);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("Index", "Prodotti"); 
+                    return RedirectToAction("Index", "Prodotti");
                 }
                 catch (Exception ex)
                 {
@@ -108,9 +120,10 @@ namespace WebAppEF.Controllers
         }
 
         public IActionResult Chat()
-{
-    return View();
-}
+        {
+            return View();
+        }
 
+       
     }
 }

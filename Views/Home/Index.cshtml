@@ -25,6 +25,7 @@
             --admin-danger: #f44336;
             --admin-border: #c5cae9;
             --admin-bg: #f5f7fa;
+            --admin-info: #2196f3; /* Aggiunto colore info per i pulsanti */
         }
 
         body {
@@ -124,6 +125,53 @@
             margin-bottom: 2rem;
         }
 
+        /* Nuovi stili per i pulsanti PDF */
+        .pdf-buttons-section {
+            background-color: white;
+            border-radius: 10px;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 3rem; /* Spazio sopra la sezione dei pulsanti */
+            text-align: center;
+        }
+
+        .pdf-buttons-section h2 {
+            color: var(--admin-primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .pdf-buttons-section .btn-custom-pdf {
+            background-color: var(--admin-accent); /* Usa un colore coerente o personalizzato */
+            border-color: var(--admin-accent);
+            color: var(--admin-text-light);
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none; /* Rimuove la sottolineatura per i link */
+        }
+
+        .pdf-buttons-section .btn-custom-pdf:hover {
+            background-color: var(--admin-secondary); /* Colore leggermente più scuro all'hover */
+            border-color: var(--admin-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Stile alternativo per il secondo pulsante PDF */
+        .pdf-buttons-section .btn-custom-pdf.btn-secondary-pdf {
+            background-color: var(--admin-success); /* Colore diverso per distinzione */
+            border-color: var(--admin-success);
+        }
+
+        .pdf-buttons-section .btn-custom-pdf.btn-secondary-pdf:hover {
+            background-color: darken(var(--admin-success), 10%); /* Scurisci all'hover */
+            border-color: darken(var(--admin-success), 10%);
+        }
+
+
         /* Responsive */
         @@media (max-width: 768px) {
             .admin-container {
@@ -133,12 +181,15 @@
             .admin-navbar {
                 padding: 0.8rem 1rem;
             }
+
+            .pdf-buttons-section .d-grid {
+                grid-template-columns: 1fr; /* Stack buttons on small screens */
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="admin-navbar">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
         <a href="@Url.Action("Index", "Home")" class="navbar-brand">
@@ -148,7 +199,7 @@
             <a href="@Url.Action("Dashboard", "Home")" class="nav-link">
                 <i class="fas fa-tachometer-alt me-2"></i>Dashboard
             </a>
-           
+            
         </div>
     </div>
 </nav>
@@ -159,7 +210,6 @@
         <p class="admin-subtitle">Un'interfaccia intuitiva per monitorare i tuoi clienti, gestire gli ordini e migliorare la tua esperienza.</p>
     </div>
 
-    <!-- Grafici principali -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="admin-card h-100">
@@ -200,6 +250,19 @@
             </div>
         </div>
     </div>
+
+    <div class="pdf-buttons-section">
+        <h2>Download Report PDF</h2>
+        <div class="d-grid gap-3 col-md-8 mx-auto"> 
+            <a href="@Url.Action("GeneraAnagraficaClientiPdf", "Pdf")" class="btn-custom-pdf" target="_blank">
+                <i class="fas fa-file-pdf me-2"></i> Scarica Anagrafica Clienti PDF
+            </a>
+            <a href="@Url.Action("GeneraAnagraficaProdottiPdf", "Pdf")" class="btn-custom-pdf btn-secondary-pdf mt-2" target="_blank"> @* Aggiungo classe per stile alternativo e margin-top *@
+                <i class="fas fa-file-pdf me-2"></i> Scarica Anagrafica Prodotti PDF
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>

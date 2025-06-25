@@ -2,16 +2,26 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using WebAppEF.Models; // Assicurati che questo sia il namespace corretto per ApplicationDbContext e OrdiniFaker
-using WebAppEF.Repositories; // Assicurati che questo sia il namespace corretto per IOrdiniRepository
+using WebAppEF.Models; 
+using WebAppEF.Repositories; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using GestioneClienti.Repositories; // Assicurati che questo sia il namespace corretto per ICustomerRepository
-using GestioneClienti.Services; // Assicurati che questo sia il namespace corretto per RecaptchaService, IEmailSender, EmailSender, IGeocodingService, GoogleMapsGeocodingService
+using GestioneClienti.Repositories; 
+using GestioneClienti.Services; 
 using Microsoft.AspNetCore.Identity;
-using GestioneClienti.Hubs; // Assicurati che questo sia il namespace corretto per ChatHub
-using ProgettoStage.Hubs; // Assicurati che questo sia il namespace corretto per DisponibilitaHub
-using Microsoft.AspNetCore.Mvc.ViewFeatures; // Aggiungi questo using per ITempDataProvider e SessionStateTempDataProvider
+using GestioneClienti.Hubs; 
+using ProgettoStage.Hubs; 
+using Microsoft.AspNetCore.Mvc.ViewFeatures; 
+using System.IO; 
+using Microsoft.AspNetCore.Hosting; 
+using ProgettoStage.Repositories; 
+using ProgettoStage.Services;
+using ProgettoStage.Utilities;
+using QuestPDF.Infrastructure;
+using QuestPDF.Fluent;
+
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+QuestPDF.Settings.EnableDebugging = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,17 +51,16 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// ********************************************************************************
-// SOLUZIONE DELL'ERRORE: Forza TempData a usare la sessione anziché i cookie per la serializzazione
 // Questo permette di salvare oggetti complessi come byte[] in TempData.
 builder.Services.AddSingleton<ITempDataProvider, SessionStateTempDataProvider>();
-// ********************************************************************************
 
 
 // Configurazione DbContext
-// *** CAMBIATO DA AddDbContext A AddDbContextFactory PER RISOLVERE L'ERRORE SINGLETON/SCOPED ***
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.Configure<AziendaInfoOptions>(
+    builder.Configuration.GetSection(AziendaInfoOptions.AziendaInfo));
 
 // Configurazione lockout (tentativi errati di login)
 builder.Services.Configure<IdentityOptions>(options =>
@@ -116,9 +125,35 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
     return new EmailSender(emailSettings, logger, configuration); 
 });
 
-// Registrazione del servizio GestoreDisponibilitaProdotto come Singleton
-// Questo assicura che ci sia un'unica istanza del servizio, essenziale per la gestione della disponibilità globale.
+
 builder.Services.AddSingleton<ProgettoStage.Services.GestoreDisponibilitaProdotto>();
+
+
+builder.Services.AddTransient<GeneratorePdfService>(provider => {
+    // Recupera IWebHostEnvironment per ottenere il percorso della root web (wwwroot)
+    var webHostEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
+    
+    var logoFileName = "logo.jpeg"; 
+    var logoPath = Path.Combine(webHostEnvironment.WebRootPath, "images", logoFileName);
+
+    // Dati per l'intestazione e il piè di pagina del PDF
+    var ragioneSociale = builder.Configuration["AziendaInfo:RagioneSociale"] ?? "La Tua Azienda S.r.l.";
+    var nomeAzienda = builder.Configuration["AziendaInfo:NomeAzienda"] ?? "Nome Azienda";
+
+    // Puoi aggiungere queste informazioni al tuo appsettings.json:
+    /*
+      "AziendaInfo": {
+        "RagioneSociale": "La Tua Azienda S.r.l. - P.IVA 12345678901",
+        "NomeAzienda": "La Tua Azienda"
+      }
+    */
+
+    return new GeneratorePdfService(logoPath, ragioneSociale, nomeAzienda);
+});
+// **********************************************************************************************
+// FINE CONFIGURAZIONE DEL GENERATORE PDF SERVICE
+// **********************************************************************************************
+
 
 // Configurazione Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -176,7 +211,7 @@ using (var scope = app.Services.CreateScope())
         // Esempio:
         // if (!context.Prodotti.Any())
         // {
-        //     context.Prodotti.AddRange(DataSeeder.GeneraProdotti(20)); // Assumi che GeneraProdotti esista
+        //     context.Prodotti.AddRange(DataSeeder.GeneraProdotti(20)); // Assumi che GeneraProdotti esista
         // }
 
 

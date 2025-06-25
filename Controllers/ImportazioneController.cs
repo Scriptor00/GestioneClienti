@@ -11,11 +11,11 @@ namespace ProgettoStage.Controllers
     public class ImportazioneController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _logDirectory; // Percorso della directory dei log
+        private readonly string _logDirectory; 
         private const string ExcelDataSessionKey = "ExcelData";
         private const string FileNameSessionKey = "FileName";
         private const string MappingTempDataKey = "Mapping";
-        private const string ImportErrorsSessionKey = "ImportErrors"; // mantiene gli errori di importazione nella sessione
+        private const string ImportErrorsSessionKey = "ImportErrors"; 
 
         public ImportazioneController(ApplicationDbContext dbContext, IWebHostEnvironment env)
         {
@@ -41,17 +41,17 @@ namespace ProgettoStage.Controllers
         // POST: Importazione/Mapping
         // Gestisce l'upload del file Excel, legge le intestazioni e reindirizza alla pagina di mapping.
         [HttpPost]
-        [ValidateAntiForgeryToken] // Protezione CSRF
+        [ValidateAntiForgeryToken] 
         public IActionResult Mapping(IFormFile file)
         {
-            // Verifica se un file è stato caricato e se non è vuoto
+            // Controlla se il file è nullo o vuoto.
             if (file == null || file.Length == 0)
             {
                 TempData["Errore"] = "Seleziona un file Excel valido per l'importazione dei clienti.";
                 return RedirectToAction("Index");
             }
 
-            // Validazione dell'estensione del file per assicurarsi che sia un .xlsx
+            //  file in formato .xlsx
             if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
             {
                 TempData["Errore"] = "Il file deve essere in formato .xlsx.";
@@ -60,47 +60,81 @@ namespace ProgettoStage.Controllers
 
             try
             {
+                // 3. Copia del file in memoria
+                // Crea un flusso di memoria (MemoryStream) per lavorare con il file senza salvarlo su disco.
                 using var stream = new MemoryStream();
-                // Copia il contenuto del file caricato nello stream di memoria
+                // Copia il contenuto del file caricato (IFormFile) nel MemoryStream.
                 file.CopyTo(stream);
-                // Riposiziona lo stream all'inizio per la lettura con ClosedXML
+                // Riposiziona il puntatore dello stream all'inizio (posizione 0) per consentire la lettura da ClosedXML.
                 stream.Position = 0;
 
-                // Apri il workbook dal MemoryStream usando ClosedXML
-                using var workbook = new XLWorkbook(stream);
-                // Ottieni il primo foglio di lavoro (ClosedXML usa l'indice 1 per il primo foglio)
-                var ws = workbook.Worksheet(1);
-
-                // Legge le intestazioni dalla prima riga del foglio Excel, filtrando quelle vuote
-                var intestazioniExcel = ws.Row(1).CellsUsed()
-                                            .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
-                                            .Select(c => c.Value.ToString().Trim())
-                                            .ToList();
-
-                // Se non vengono trovate intestazioni, reindirizza con un errore
-                if (!intestazioniExcel.Any())
+                // 4. Apertura del workbook (cartella di lavoro Excel)
+                using (var workbook = new XLWorkbook(stream))
                 {
-                    TempData["Errore"] = "Il file Excel non contiene intestazioni valide nella prima riga.";
-                    return RedirectToAction("Index");
-                }
+                    // 5. Ricerca del primo foglio di lavoro con dati
+                    // inizialmetne null, verrà assegnato al primo foglio valido trovato.
+                    IXLWorksheet worksheetToProcess = null;
 
-                // Passa le intestazioni delle colonne Excel alla vista tramite ViewBag per il mapping
-                ViewBag.ColonneExcel = intestazioniExcel;
+                    // Itera su tutti i fogli presenti nel workbook
+                    foreach (var ws in workbook.Worksheets)
+                    {
+                        // Controlla se il foglio corrente (ws) contiene delle celle utilizzate 
+                        if (ws.CellsUsed().Any())
+                        {
+                            worksheetToProcess = ws; // Se trovato, assegna il foglio ed esce dal ciclo.
+                            break;                  
+                        }
+                    }
 
-                // Salva l'array di byte del file Excel e il nome del file nella sessione
-                // per poterli recuperare nell'azione Importa
-                HttpContext.Session.Set(ExcelDataSessionKey, stream.ToArray());
-                HttpContext.Session.SetString(FileNameSessionKey, file.FileName);
-                HttpContext.Session.Remove(ImportErrorsSessionKey); // Pulisce eventuali errori di una sessione precedente
+                    // 6. Gestione del caso in cui nessun foglio contenga dati
+                    // Se, dopo aver controllato tutti i fogli, 'worksheetToProcess' è ancora null,
+                    // significa che il file Excel contiene solo fogli vuoti.
+                    if (worksheetToProcess == null)
+                    {
+                        TempData["Errore"] = "Il file Excel non contiene fogli di lavoro con dati validi.";
+                        return RedirectToAction("Index");
+                    }
 
-                // Restituisce la vista "Mapping" per consentire all'utente di associare le colonne
-                return View("Mapping");
+                    // 7. Lettura delle intestazioni dal foglio selezionato
+                    // Ottiene le celle utilizzate nella prima riga del foglio processato.
+                    // Filtra le celle che hanno valori nulli o solo spazi bianchi.
+                    // Seleziona il valore di ogni cella, lo converte in stringa, rimuove spazi extra.
+                    // Converte il risultato in una lista di stringhe.
+                    var intestazioniExcel = worksheetToProcess.Row(1).CellsUsed()
+                                                                  .Where(c => !string.IsNullOrWhiteSpace(c.Value.ToString()))
+                                                                  .Select(c => c.Value.ToString().Trim())
+                                                                  .ToList();
+
+                    // 8. Gestione del caso in cui non vengano trovate intestazioni valide
+                    // Se la lista delle intestazioni è vuota, significa che la prima riga del foglio valido non contiene dati utili.
+                    if (!intestazioniExcel.Any())
+                    {
+                        TempData["Errore"] = $"Il foglio '{worksheetToProcess.Name}' non contiene intestazioni valide nella prima riga.";
+                        return RedirectToAction("Index");
+                    }
+
+                    // 9. Preparazione dei dati per la vista di mapping
+                    // Passa le intestazioni delle colonne Excel alla vista tramite ViewBag.
+                    ViewBag.ColonneExcel = intestazioniExcel;
+                    // 10. Salvataggio dei dati del file Excel nella sessione
+                    // Salva l'intero contenuto del file Excel (come array di byte) nella sessione HTTP.
+                    // Questo permette di mantenere i dati in memoria tra le richieste, senza doverli risalvare su disco.
+                    HttpContext.Session.Set(ExcelDataSessionKey, stream.ToArray());
+                    // Salva anche il nome originale del file.
+                    HttpContext.Session.SetString(FileNameSessionKey, file.FileName);
+                    // Salva il nome del foglio che è stato identificato come quello da processare.
+                    // Questo è utile per l'azione di importazione successiva, per puntare direttamente al foglio giusto.
+                    HttpContext.Session.SetString("MappedWorksheetName", worksheetToProcess.Name);
+                    // Pulisce eventuali errori di importazione da sessioni precedenti.
+                    HttpContext.Session.Remove(ImportErrorsSessionKey);
+
+                   return View("Mapping");
+                } 
             }
             catch (Exception ex)
             {
-                // Gestione di errori generici durante la lettura del file Excel
-                TempData["Errore"] = $"Si è verificato un errore durante la lettura del file Excel: {ex.Message}";
-                return RedirectToAction("Index");
+               TempData["Errore"] = $"Si è verificato un errore durante la lettura del file Excel: {ex.Message}";
+               return RedirectToAction("Index");
             }
         }
 
@@ -333,7 +367,7 @@ namespace ProgettoStage.Controllers
                             if (recordSuccessfullyParsed) //
                             {
                                 currentRowErrors.Add($"Email '{cliente.Email}' duplicata nel file di importazione. Sarà importata solo la prima occorrenza.");
-                                recordSuccessfullyParsed = false; 
+                                recordSuccessfullyParsed = false;
                             }
                         }
                         else if (recordSuccessfullyParsed) // Se il record è stato processato con successo e non ci sono stati errori
