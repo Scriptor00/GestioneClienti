@@ -29,6 +29,9 @@ namespace WebAppEF.Entities
         [Required]
         public decimal TotaleOrdine { get; set; }
 
-      
+        // public static implicit operator Ordine(void v)
+        // {
+        //     throw new NotImplementedException();
+        // }
     }
 }

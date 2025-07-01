@@ -261,11 +261,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-        /// <summary>
-        /// Genera l'anagrafica dei clienti in formato PDF.
-        /// </summary>
-        /// <param name="clienti">Una collezione di oggetti Cliente.</param>
-        /// <returns>Un array di byte contenente il PDF generato.</returns>
+        
         public async Task<byte[]> GeneraAnagraficaClientiPdfAsync(IEnumerable<Cliente> clienti)
         {
             if (clienti == null || !clienti.Any())
@@ -358,11 +354,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-        /// <summary>
-        /// Genera l'anagrafica dei prodotti in formato PDF.
-        /// </summary>
-        /// <param name="prodotti">Una collezione di oggetti Prodotto.</param>
-        /// <returns>Un array di byte contenente il PDF generato.</returns>
+       
         public async Task<byte[]> GeneraAnagraficaProdottiPdfAsync(IEnumerable<Prodotto> prodotti)
         {
             if (prodotti == null || !prodotti.Any())
@@ -439,11 +431,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-        /// <summary>
-        /// Genera l'elenco delle vendite in formato PDF.
-        /// </summary>
-        /// <param name="vendite">Una collezione di oggetti Ordine.</param>
-        /// <returns>Un array di byte contenente il PDF generato.</returns>
+       
         public async Task<byte[]> GeneraElencoVenditePdfAsync(IEnumerable<Ordine> vendite)
         {
             if (vendite == null)

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic; // Per List<T>
 using System.Linq; // Per LINQ
+using System.Threading.Tasks; // Per Task
 
 namespace ProgettoStage.Services
 {
@@ -211,7 +212,6 @@ namespace ProgettoStage.Services
         }
 
 
-
         /// <summary>
         /// Rimuove un articolo dal carrello di un utente.
         /// </summary>
@@ -303,7 +303,8 @@ namespace ProgettoStage.Services
         /// </summary>
         /// <param name="idUtente">L'ID dell'utente che sta piazzando l'ordine (int).</param>
         /// <param name="articoliOrdine">La lista degli articoli dell'ordine.</param>
-        public async Task ProcessaOrdine(int idUtente, List<ArticoloOrdineRichiesta> articoliOrdine)
+        /// <returns>L'oggetto Ordine appena creato e persistito nel database.</returns>
+        public async Task<Ordine> ProcessaOrdine(int idUtente, List<ArticoloOrdineRichiesta> articoliOrdine)
         {
             using (var contestoDB = await _dbContextFactory.CreateDbContextAsync())
             {
@@ -371,6 +372,8 @@ namespace ProgettoStage.Services
                         {
                             await AggiornaENotificaDisponibilitaProdotto(idProdottoAggiornato);
                         }
+
+                        return nuovoOrdine; // **<--- QUESTA È LA MODIFICA CHIAVE!**
                     }
                     catch (DbUpdateConcurrencyException ex)
                     {

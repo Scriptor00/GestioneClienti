@@ -45,7 +45,7 @@ namespace ProgettoStage.Controllers
             try
             {
                 var ordine = await _context.Ordini
-                                           .Include(o => o.Cliente) // Include i dati del cliente associato all'ordine
+                                           .Include(o => o.Cliente) 
                                            .FirstOrDefaultAsync(o => o.IdOrdine == idOrdine);
 
                 if (ordine == null)
@@ -64,7 +64,6 @@ namespace ProgettoStage.Controllers
                     _logger.LogWarning("Nessun dettaglio ordine trovato per l'ordine con ID {IdOrdine}.", idOrdine);
                 }
 
-                // Chiamata al metodo asincrono del servizio
                 byte[] pdfBytes = await _generatorePdfService.GeneraRicevutaOrdinePdfAsync(ordine, dettagliOrdine);
 
                 _logger.LogInformation("PDF generato con successo per la ricevuta con ID: {IdOrdine}", idOrdine);
@@ -97,7 +96,6 @@ namespace ProgettoStage.Controllers
                     return NotFound("Nessun cliente trovato per generare l'anagrafica PDF.");
                 }
 
-                // Chiamata al metodo asincrono del servizio
                 byte[] pdfBytes = await _generatorePdfService.GeneraAnagraficaClientiPdfAsync(clienti);
 
                 _logger.LogInformation("PDF anagrafica clienti generato con successo.");
