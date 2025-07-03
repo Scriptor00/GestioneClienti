@@ -20,12 +20,12 @@ namespace WebAppEF.Models
         {
             base.OnModelCreating(modelBuilder);
 
-              modelBuilder.Entity<Carrello>()
-                .HasOne(c => c.Utente)           // Un carrello ha un Utente
-                .WithMany()                      // Un Utente può avere molti carrelli (senza una navigation property in Utente)
-                                                 // OPPURE .WithMany(u => u.Carrelli) se aggiungi ICollection<Carrello> Carrelli { get; set; } nell'entità Utente
-                .HasForeignKey(c => c.IdUtente); // La chiave esterna è IdUtente in Carrello
-            
+            modelBuilder.Entity<Carrello>()
+              .HasOne(c => c.Utente)           // Un carrello ha un Utente
+              .WithMany()                      // Un Utente può avere molti carrelli (senza una navigation property in Utente)
+                                               // OPPURE .WithMany(u => u.Carrelli) se aggiungi ICollection<Carrello> Carrelli { get; set; } nell'entità Utente
+              .HasForeignKey(c => c.IdUtente); // La chiave esterna è IdUtente in Carrello
+
             // Se in futuro volessi una lista di carrelli nell'entità Utente, aggiungi:
             // public ICollection<Carrello> Carrelli { get; set; } = new List<Carrello>();
             // alla tua entità Utente, e cambia .WithMany() in .WithMany(u => u.Carrelli)
@@ -35,8 +35,8 @@ namespace WebAppEF.Models
                 .HasOne(c => c.Prodotto)
                 .WithMany() // O WithMany(p => p.Carrelli) se hai la navigation property in Prodotto
                 .HasForeignKey(c => c.IdProdotto);
-        
-    
+
+
 
             modelBuilder.Entity<Prodotto>()
                 .Property(p => p.Prezzo)

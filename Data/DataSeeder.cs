@@ -23,7 +23,7 @@ public class DataSeeder
 
     public static List<Cliente> AggiornaClientiConIndirizzo(List<Cliente> clientiEsistenti)
     {
-        var faker = new Faker<Cliente>("it_IT") 
+        var faker = new Faker<Cliente>("it_IT")
             .RuleFor(c => c.Indirizzo, f => f.Address.StreetAddress())
             .RuleFor(c => c.Civico, f => f.Address.BuildingNumber())
             .RuleFor(c => c.Citta, f => f.Address.City())

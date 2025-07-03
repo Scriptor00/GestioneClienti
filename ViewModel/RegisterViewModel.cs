@@ -27,7 +27,7 @@ namespace GestioneClienti.ViewModel
         public string ConfermaPassword { get; set; }
 
         [Required(ErrorMessage = "La verifica reCAPTCHA è obbligatoria.")]
-        [BindProperty(Name = "g-recaptcha-response")] 
+        [BindProperty(Name = "g-recaptcha-response")]
         public string? RecaptchaResponse { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using QuestPDF.Previewer; 
+using QuestPDF.Previewer;
 using QuestPDF.Drawing;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Linq;
 using WebAppEF.Entities;
 using SkiaSharp;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
 
 namespace ProgettoStage.Repositories
 {
@@ -19,7 +19,7 @@ namespace ProgettoStage.Repositories
         private readonly string _logoPath;
         private readonly string _ragioneSocialeAziendale;
         private readonly string _nomeAzienda;
-        private readonly ILogger<GeneratorePdfService> _logger; 
+        private readonly ILogger<GeneratorePdfService> _logger;
 
         public GeneratorePdfService(string logoPath, string ragioneSocialeAziendale, string nomeAzienda, ILogger<GeneratorePdfService> logger)
         {
@@ -46,7 +46,7 @@ namespace ProgettoStage.Repositories
                         {
                             if (!string.IsNullOrEmpty(_logoPath) && File.Exists(_logoPath))
                             {
-                                
+
                                 container.Image(_logoPath).FitArea();
                             }
                             else
@@ -157,7 +157,7 @@ namespace ProgettoStage.Repositories
             document.ShowInPreviewer();
         }
 
-        public async Task<byte[]> GeneraRicevutaOrdinePdfAsync(Ordine ordine, IEnumerable<DettagliOrdine> dettagliOrdini)
+         public async Task<byte[]> GeneraRicevutaOrdinePdfAsync(Ordine ordine, IEnumerable<DettagliOrdine> dettagliOrdini, Cliente cliente)
         {
             if (ordine == null)
                 throw new ArgumentNullException(nameof(ordine), "L'oggetto ordine non può essere nullo.");
@@ -261,7 +261,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-        
+
         public async Task<byte[]> GeneraAnagraficaClientiPdfAsync(IEnumerable<Cliente> clienti)
         {
             if (clienti == null || !clienti.Any())
@@ -354,7 +354,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-       
+
         public async Task<byte[]> GeneraAnagraficaProdottiPdfAsync(IEnumerable<Prodotto> prodotti)
         {
             if (prodotti == null || !prodotti.Any())
@@ -431,7 +431,7 @@ namespace ProgettoStage.Repositories
             return await Task.Run(() => document.GeneratePdf());
         }
 
-       
+
         public async Task<byte[]> GeneraElencoVenditePdfAsync(IEnumerable<Ordine> vendite)
         {
             if (vendite == null)
@@ -475,7 +475,7 @@ namespace ProgettoStage.Repositories
 
                         column.Item().Text("Elenco Vendite").FontSize(16).SemiBold().FontColor(Colors.Indigo.Darken2);
 
-                       
+
                         column.Item().Text($"Numero totale di vendite: {venditeOrdinate.Count()}").FontSize(10).Italic();
                         column.Item().Text($"Totale complessivo: {totaleComplessivo:C}").FontSize(12).SemiBold();
 

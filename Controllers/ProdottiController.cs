@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using WebAppEF.Entities; 
-using WebAppEF.Models; 
-using GestioneClienti.ViewModel; 
+using WebAppEF.Entities;
+using WebAppEF.Models;
+using GestioneClienti.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace WebAppEF.Controllers
 {
-   
-    public class ProdottiController(ApplicationDbContext context) : Controller 
+
+    public class ProdottiController(ApplicationDbContext context) : Controller
     {
         private readonly ApplicationDbContext _context = context;
 

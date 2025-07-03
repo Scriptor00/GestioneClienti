@@ -7,8 +7,8 @@ namespace GestioneClienti.ViewModel
         public required string Username { get; set; }
         public required string Password { get; set; }
 
-          
+
         [Display(Name = "Ricordami")]
-        public bool RememberMe { get; set; } 
+        public bool RememberMe { get; set; }
     }
 }

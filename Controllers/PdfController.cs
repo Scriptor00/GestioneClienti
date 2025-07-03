@@ -63,8 +63,9 @@ namespace ProgettoStage.Controllers
                 {
                     _logger.LogWarning("Nessun dettaglio ordine trovato per l'ordine con ID {IdOrdine}.", idOrdine);
                 }
+                
+                byte[] pdfBytes = await _generatorePdfService.GeneraRicevutaOrdinePdfAsync(ordine, dettagliOrdine, ordine.Cliente);
 
-                byte[] pdfBytes = await _generatorePdfService.GeneraRicevutaOrdinePdfAsync(ordine, dettagliOrdine);
 
                 _logger.LogInformation("PDF generato con successo per la ricevuta con ID: {IdOrdine}", idOrdine);
                 return File(pdfBytes, "application/pdf", $"Ricevuta_Ordine_{ordine.IdOrdine}.pdf");

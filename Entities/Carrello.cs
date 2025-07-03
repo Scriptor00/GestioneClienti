@@ -10,12 +10,12 @@ namespace ProgettoStage.Entities // Assicurati che l'entità Carrello sia in un 
     public class Carrello
     {
         [Key]
-        public int IdCarrello { get; set; } 
+        public int IdCarrello { get; set; }
 
         [Required]
         // IdUtente è la chiave esterna che punta a Utente.Id
         // Abbiamo cambiato il nome della proprietà per chiarezza, da IdCliente a IdUtente
-        public int IdUtente { get; set; } 
+        public int IdUtente { get; set; }
 
         [Required]
         public int IdProdotto { get; set; }
@@ -30,7 +30,7 @@ namespace ProgettoStage.Entities // Assicurati che l'entità Carrello sia in un 
         // L'attributo ForeignKey deve puntare alla proprietà che è la chiave esterna (IdUtente in questo caso)
         // e non direttamente alla PK della tabella referenziata (Id in Utente).
         [ForeignKey("IdUtente")] // Questa chiave esterna punta a Utente.Id
-        public virtual Utente Utente { get; set; } 
+        public virtual Utente Utente { get; set; }
 
         // Navigation Property per il Prodotto
         [ForeignKey("IdProdotto")]

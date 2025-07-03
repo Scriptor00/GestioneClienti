@@ -22,7 +22,7 @@
 //                     confirmPaypalBtn.textContent = 'Conferma con PayPal';
 //                     return;
 //                 }
-                
+
 //                 let currentTotalPriceNum = 0;
 //                 if (totalPriceElement && totalPriceElement.textContent) {
 //                     currentTotalPriceNum = parseFloat(totalPriceElement.textContent.replace('€', '').replace(',', '.')) || 0;
@@ -50,7 +50,7 @@
 //                         confirmPaypalBtn.textContent = 'Conferma con PayPal';
 //                         return;
 //                     }
-                    
+
 //                     // Procedi con il pagamento PayPal
 //                     const paypalResponse = await fetch('/Carrello/ProcessPaypalPayment', {
 //                         method: 'POST',
@@ -63,7 +63,7 @@
 //                             totalAmount: currentTotalPriceNum
 //                         })
 //                     });
-                    
+
 //                     const paypalResult = await paypalResponse.json();
 //                     if (paypalResponse.ok && paypalResult.redirectUrl) {
 //                         window.location.href = paypalResult.redirectUrl;
@@ -87,7 +87,7 @@
 //                 if (!confirm('Confermi di voler procedere con un ordine con pagamento tramite bonifico bancario? Riceverai i dettagli per il pagamento dopo la conferma.')) {
 //                     return;
 //                 }
-                
+
 //                 confirmBankTransferBtn.disabled = true;
 //                 confirmBankTransferBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
 
@@ -122,7 +122,7 @@
 //                             PaymentMethodId: 'bank-transfer'
 //                         })
 //                     });
-                    
+
 //                     const result = await response.json();
 //                     if (response.ok && result.messaggio) {
 //                         if (orderNumberSpan) orderNumberSpan.textContent = result.orderNumber;

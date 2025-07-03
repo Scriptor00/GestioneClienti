@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAppEF.Controllers
 {
-    public class PrivacyController( ILogger<PrivacyController> logger) : Controller
+    public class PrivacyController(ILogger<PrivacyController> logger) : Controller
     {
-        
+
         private readonly ILogger<PrivacyController> _logger = logger;
 
         // public async Task<IActionResult> ScaricaPDF()
@@ -34,7 +34,7 @@ namespace WebAppEF.Controllers
         [HttpPost]
         public IActionResult SalvaPreferenze(string dataUsage)
         {
-            
+
             _logger.LogInformation("Preferenze salvate: {DataUsage}", dataUsage);
             TempData["SuccessMessage"] = "Le tue preferenze sono state salvate con successo!";
 

@@ -16,7 +16,7 @@ namespace GestioneClienti.Controllers
         private readonly string _stripeSecretKey;
         private readonly ILogger<PaymentController> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly EmailSettings _emailSettings; 
+        private readonly EmailSettings _emailSettings;
 
         public PaymentController(IConfiguration configuration, ILogger<PaymentController> logger, IEmailSender emailSender, IOptions<EmailSettings> emailSettings)
         {
@@ -95,8 +95,8 @@ namespace GestioneClienti.Controllers
                         message.Subject = subject;
 
                         var bodyBuilder = new BodyBuilder
-{
-    HtmlBody = $@"
+                        {
+                            HtmlBody = $@"
 <html>
     <body style=""font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f4f8; color: #1a1a1a; margin: 0; padding: 20px;"">
         <div style=""max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background-color: #ffffff;"">
@@ -135,7 +135,7 @@ namespace GestioneClienti.Controllers
         </div>
     </body>
 </html>"
-};
+                        };
 
                         message.Body = bodyBuilder.ToMessageBody();
 

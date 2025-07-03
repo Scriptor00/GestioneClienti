@@ -37,7 +37,7 @@ namespace WebAppEF.Repositories
             if (await EmailExistsAsync(cliente.Email))
                 throw new InvalidOperationException("Email già esistente");
 
-            if (ValidazioneCliente.HasSpecialCharacters(cliente.Nome) || 
+            if (ValidazioneCliente.HasSpecialCharacters(cliente.Nome) ||
                ValidazioneCliente.HasSpecialCharacters(cliente.Cognome))
                 throw new ArgumentException("Nome/Cognome contiene caratteri speciali non validi");
 
@@ -45,7 +45,7 @@ namespace WebAppEF.Repositories
             await _context.SaveChangesAsync();
         }
 
-       public async Task UpdateAsync(Cliente cliente)
+        public async Task UpdateAsync(Cliente cliente)
         {
             var existingCliente = await _context.Clienti.FindAsync(cliente.IdCliente);
             if (existingCliente == null)

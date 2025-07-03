@@ -77,7 +77,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWithCredentials", policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://localhost:5000") 
+        policyBuilder.WithOrigins("http://localhost:5000")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials();
@@ -94,7 +94,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.Cookie.Name = "CookieProgramma";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.None; 
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
@@ -130,10 +130,11 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(provider =>
 builder.Services.AddSingleton<ProgettoStage.Services.GestoreDisponibilitaProdotto>();
 
 // Registrazione di GeneratorePdfService 
-builder.Services.AddTransient<GeneratorePdfService>(provider => {
+builder.Services.AddTransient<GeneratorePdfService>(provider =>
+{
     var webHostEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
-    var logger = provider.GetRequiredService<ILogger<GeneratorePdfService>>(); 
-    var configuration = provider.GetRequiredService<IConfiguration>(); 
+    var logger = provider.GetRequiredService<ILogger<GeneratorePdfService>>();
+    var configuration = provider.GetRequiredService<IConfiguration>();
 
     var logoFileName = "logo.jpeg";
     var logoPath = Path.Combine(webHostEnvironment.WebRootPath, "images", logoFileName);
@@ -142,7 +143,7 @@ builder.Services.AddTransient<GeneratorePdfService>(provider => {
     var ragioneSociale = configuration["AziendaInfo:RagioneSociale"] ?? "La Tua Azienda S.r.l.";
     var nomeAzienda = configuration["AziendaInfo:NomeAzienda"] ?? "Nome Azienda";
 
-    return new GeneratorePdfService(logoPath, ragioneSociale, nomeAzienda, logger); 
+    return new GeneratorePdfService(logoPath, ragioneSociale, nomeAzienda, logger);
 });
 
 
@@ -226,13 +227,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAppEF API v1");
-        c.RoutePrefix = "swagger"; 
+        c.RoutePrefix = "swagger";
     });
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error"); 
-    app.UseHsts(); 
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection(); // Reindirizza le richieste HTTP a HTTPS
@@ -264,4 +265,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run(); 
+app.Run();

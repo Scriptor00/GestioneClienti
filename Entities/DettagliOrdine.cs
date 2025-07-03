@@ -12,13 +12,13 @@ namespace WebAppEF.Entities
         public int IdOrdine { get; set; }
 
         [ForeignKey("IdOrdine")]
-        public Ordine Ordine { get; set; }  
+        public Ordine Ordine { get; set; }
 
         [Required]
         public int IdProdotto { get; set; }
 
         [ForeignKey("IdProdotto")]
-        public Prodotto Prodotto { get; set; }  
+        public Prodotto Prodotto { get; set; }
 
         [Range(1, int.MaxValue)]
         public int Quantita { get; set; }

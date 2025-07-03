@@ -4,7 +4,7 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using WebAppEF.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebAppEF.Models; 
+using WebAppEF.Models;
 
 namespace ProgettoStage.Controllers
 {

@@ -11,11 +11,11 @@ namespace ProgettoStage.Controllers
     public class ImportazioneController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _logDirectory; 
+        private readonly string _logDirectory;
         private const string ExcelDataSessionKey = "ExcelData";
         private const string FileNameSessionKey = "FileName";
         private const string MappingTempDataKey = "Mapping";
-        private const string ImportErrorsSessionKey = "ImportErrors"; 
+        private const string ImportErrorsSessionKey = "ImportErrors";
 
         public ImportazioneController(ApplicationDbContext dbContext, IWebHostEnvironment env)
         {
@@ -41,7 +41,7 @@ namespace ProgettoStage.Controllers
         // POST: Importazione/Mapping
         // Gestisce l'upload del file Excel, legge le intestazioni e reindirizza alla pagina di mapping.
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public IActionResult Mapping(IFormFile file)
         {
             // Controlla se il file è nullo o vuoto.
@@ -82,7 +82,7 @@ namespace ProgettoStage.Controllers
                         if (ws.CellsUsed().Any())
                         {
                             worksheetToProcess = ws; // Se trovato, assegna il foglio ed esce dal ciclo.
-                            break;                  
+                            break;
                         }
                     }
 
@@ -128,13 +128,13 @@ namespace ProgettoStage.Controllers
                     // Pulisce eventuali errori di importazione da sessioni precedenti.
                     HttpContext.Session.Remove(ImportErrorsSessionKey);
 
-                   return View("Mapping");
-                } 
+                    return View("Mapping");
+                }
             }
             catch (Exception ex)
             {
-               TempData["Errore"] = $"Si è verificato un errore durante la lettura del file Excel: {ex.Message}";
-               return RedirectToAction("Index");
+                TempData["Errore"] = $"Si è verificato un errore durante la lettura del file Excel: {ex.Message}";
+                return RedirectToAction("Index");
             }
         }
 

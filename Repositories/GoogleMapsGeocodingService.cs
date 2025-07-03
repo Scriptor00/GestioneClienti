@@ -24,7 +24,7 @@ namespace GestioneClienti.Repositories
         public string PostalCode { get; set; }
     }
 
-   
+
 
     public class GoogleMapsGeocodingService : IGeocodingService
     {

@@ -6,7 +6,7 @@ namespace WebAppEF.Utilities
     // formato valido per email
     public class ValidazioneCliente
     {
-        
+
         public static bool IsValidEmail(string email)
         {
             try
@@ -21,10 +21,10 @@ namespace WebAppEF.Utilities
         }
 
         // caratteri speciali 
-         public static bool HasSpecialCharacters(string input)
-       {
-        // sono permesse solo lettere (a-z, A-Z), numeri (0-9), ".", "-", "_" e "@"
-        return Regex.IsMatch(input, @"[^a-zA-Z0-9.\-_@]");
+        public static bool HasSpecialCharacters(string input)
+        {
+            // sono permesse solo lettere (a-z, A-Z), numeri (0-9), ".", "-", "_" e "@"
+            return Regex.IsMatch(input, @"[^a-zA-Z0-9.\-_@]");
         }
 
         // Lunghezza dell'email

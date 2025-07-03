@@ -19,7 +19,9 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using Microsoft.Extensions.Configuration; 
-using System.ComponentModel.DataAnnotations; 
+using System.ComponentModel.DataAnnotations;
+using ProgettoStage.Repositories; 
+
 
 namespace ProgettoStage.Controllers
 {
@@ -28,8 +30,9 @@ namespace ProgettoStage.Controllers
         GestoreDisponibilitaProdotto availabilityManager,
         ILogger<CarrelloController> logger,
         IEmailSender emailSender, 
-        IConfiguration configuration 
-        IWebHostEnvironment webHostEnvironment
+        IConfiguration configuration,
+        IWebHostEnvironment webHostEnvironment,
+        GeneratorePdfService generatorePdfService
         ) : Controller
     {
         private readonly ApplicationDbContext _context = context;
@@ -37,7 +40,9 @@ namespace ProgettoStage.Controllers
         private readonly ILogger<CarrelloController> _logger = logger;
         private readonly IEmailSender _emailSender = emailSender; 
         private readonly IConfiguration _configuration = configuration; 
-        private readonly _webHostEnvironment = webHostEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment; 
+         private readonly GeneratorePdfService _generatorePdfService = generatorePdfService;
+
 
         // Metodo Helper per ottenere l'ID Utente come INT dalla tua tabella Utente
         private async Task<int> GetCurrentUserIdFromDb()
@@ -218,11 +223,7 @@ namespace ProgettoStage.Controllers
             }
         }
 
-       /// <summary>
-/// Conferma l'ordine e sposta gli articoli dal carrello agli ordini.
-/// </summary>
-/// <param name="request">DTO con la lista degli articoli dell'ordine.</param>
-[HttpPost]
+    [HttpPost]
 [Route("Carrello/ConfermaOrdine")]
 [Authorize]
 public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto request)
@@ -239,14 +240,14 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
     if (request.ArticoliOrdine == null || !request.ArticoliOrdine.Any())
         return BadRequest(new { messaggio = "Nessun articolo per l'ordine." });
 
-    // Recupera utente
     GestioneClienti.Entities.Utente utente;
     int idUtente;
+
     try
     {
         string userIdentifier = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue(ClaimTypes.Name)
-            ?? User.FindFirstValue(ClaimTypes.Email);
+                                    ?? User.FindFirstValue(ClaimTypes.Name)
+                                    ?? User.FindFirstValue(ClaimTypes.Email);
 
         if (string.IsNullOrEmpty(userIdentifier))
             return Unauthorized(new { messaggio = "Impossibile identificare l'utente autenticato." });
@@ -265,7 +266,6 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
         return StatusCode(500, new { messaggio = "Errore interno durante il recupero dell'utente." });
     }
 
-    // Controlla disponibilità prodotti
     var checkResult = await _availabilityManager.PuoPiazzareOrdine(idUtente, request.ArticoliOrdine);
     if (!checkResult.successo)
         return BadRequest(new { checkResult.messaggio });
@@ -279,189 +279,86 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
             return StatusCode(500, new { messaggio = "Errore interno nella generazione dell'ordine." });
         }
 
-        // Raccoglie i dati per il PDF
-        var articoliOrdinePerPdf = new List<(string NomeProdotto, int Quantita, decimal PrezzoUnitario)>();
-        decimal totaleOrdine = 0;
+         nuovoOrdine = await _context.Ordini
+                                .Include(o => o.Cliente) // Carica l'oggetto Cliente correlato
+                                .FirstOrDefaultAsync(o => o.IdOrdine == nuovoOrdine.IdOrdine);
 
-        foreach (var articolo in request.ArticoliOrdine)
+        if (nuovoOrdine == null || nuovoOrdine.Cliente == null)
         {
-            var prodotto = await _context.Prodotti.AsNoTracking().FirstOrDefaultAsync(p => p.IdProdotto == articolo.ProdottoId);
-            if (prodotto != null)
+        _logger.LogWarning("Ordine {OrderId} o Cliente associato non trovato dopo il salvataggio.", nuovoOrdine?.IdOrdine);
+        // Puoi decidere se ritornare un errore o procedere con dati mancanti.
+        // Se il cliente è null qui, il PDF mostrerà "Non disponibile".
+        }
+
+        // Carica i dettagli ordine con prodotti per PDF
+        var dettagliOrdine = await _context.DettagliOrdini
+            .Include(d => d.Prodotto)
+            .Where(d => d.IdOrdine == nuovoOrdine.IdOrdine)
+            .ToListAsync();
+
+        // Aggiorna totale ordine se necessario
+        if (nuovoOrdine.TotaleOrdine == 0 && dettagliOrdine.Any())
+            nuovoOrdine.TotaleOrdine = dettagliOrdine.Sum(d => d.PrezzoUnitario * d.Quantita);
+
+
+        // --- INIZIO FIX: Creazione e mappatura dell'oggetto Cliente per il PDF ---
+        WebAppEF.Entities.Cliente clientePerPdf = nuovoOrdine?.Cliente; // Prendi il cliente direttamente dall'ordine caricato
+
+        if (utente != null)
+        {
+            clientePerPdf = new WebAppEF.Entities.Cliente
             {
-                articoliOrdinePerPdf.Add((prodotto.NomeProdotto, articolo.Quantita, prodotto.Prezzo));
-                totaleOrdine += prodotto.Prezzo * articolo.Quantita;
-            }
-        }
+                IdCliente = utente.Id, 
+                Nome = utente.Username,
+                Cognome = "", 
+                Email = utente.Email,
+                DataIscrizione = DateTime.Now, 
+                Attivo = true, 
+                Indirizzo = null,
+                Civico = null,
+                Citta = null,
+                Paese = null,
+                Cap = null
+            };
 
-        if (nuovoOrdine.TotaleOrdine == 0 && totaleOrdine > 0)
-        {
-            nuovoOrdine.TotaleOrdine = totaleOrdine;
         }
-        
+      
         byte[] pdfBytes = null;
         try
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
-            byte[] logoBytes = null;
-            string logoPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.jpeg");
-
-             if (System.IO.File.Exists(logoPath))
-            {
-            logoBytes = await System.IO.File.ReadAllBytesAsync(logoPath);
-            _logger.LogInformation("Logo caricato correttamente da: {LogoPath}", logoPath);
-            }
-            else
-            {
-            _logger.LogWarning("File del logo non trovato al percorso: {LogoPath}", logoPath);
-            }
-
-            using var stream = new MemoryStream();
-            var documento = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A4);
-                    page.Margin(36);
-
-                    // Linea verticale sul margine sinistro
-                    page.Background().Canvas((canvas, size) =>
-                    {
-                        float lineWidth = 6;
-                        var x = lineWidth / 2;
-                        canvas.DrawLine(x, 0, x, size.Height, Colors.Grey.Darken2, lineWidth);
-                    });
-
-                    // Intestazione con logo + nome azienda
-                    page.Header().Element(header =>
-                    {
-                        header.Height(60);
-                        header.Row(row =>
-                        {
-                            if(logoBytes != null)
-                            {
-                            row.ConstantItem(120)
-                               .AlignLeft()
-                               .Height(50)
-                               .Image(logoBytes, ImageScaling.FitArea);
-                            }
-                            else
-                            {
-                                row.ConstantItem(120)
-                                   .AlignLeft()
-                                   .Height(50)
-                                   .Text("Logo non disponibile")
-                                   .Style(TextStyle.Default.FontSize(12).Italic().FontColor(Colors.Grey.Darken1));
-                            }
-
-                            row.RelativeItem()
-                               .AlignCenter()
-                               .AlignMiddle()
-                               .Text("Gaming Store")
-                               .Style(TextStyle.Default.FontSize(24).Bold().FontColor(Colors.Blue.Medium));
-                        });
-
-                        header.LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
-                    });
-
-                    // Corpo documento: dati ordine e cliente
-                    page.Content().PaddingVertical(10).Column(column =>
-                    {
-                        column.Spacing(10);
-
-                        column.Item().Text("Dettagli Cliente").Style(TextStyle.Default.FontSize(14).Bold());
-                        column.Item().Text($"Username: {utente.Username}");
-                        column.Item().Text($"Email: {utente.Email}");
-
-                        column.Item().Text($"Ordine #{nuovoOrdine.IdOrdine}").Style(TextStyle.Default.FontSize(14).Bold());
-                        column.Item().Text($"Data: {nuovoOrdine.DataOrdine:dd/MM/yyyy HH:mm}");
-                        column.Item().Text($"Stato: {nuovoOrdine.Stato}");
-
-                        column.Item().Text("Articoli Ordinati").Style(TextStyle.Default.FontSize(14).Bold());
-
-                        if (articoliOrdinePerPdf.Any())
-                        {
-                            column.Item().Table(table =>
-                            {
-                                table.ColumnsDefinition(c =>
-                                {
-                                    c.RelativeColumn(3);
-                                    c.RelativeColumn();
-                                    c.RelativeColumn();
-                                });
-
-                                table.Header(header =>
-                                {
-                                    header.Cell().Text("Prodotto").Bold();
-                                    header.Cell().AlignRight().Text("Quantità").Bold();
-                                    header.Cell().AlignRight().Text("Prezzo").Bold();
-                                });
-
-                                foreach (var a in articoliOrdinePerPdf)
-                                {
-                                    table.Cell().Text(a.NomeProdotto);
-                                    table.Cell().AlignRight().Text(a.Quantita.ToString());
-                                    table.Cell().AlignRight().Text($"{a.PrezzoUnitario:C}");
-                                }
-                            });
-                        }
-                        else
-                        {
-                            column.Item().Text("Nessun articolo trovato.").Italic();
-                        }
-
-                        column.Item().AlignRight().Text($"Totale: {nuovoOrdine.TotaleOrdine:C}").Bold();
-                    });
-
-                    page.Footer().AlignCenter().Column(footer =>
-                    {
-                        footer.Spacing(5);
-
-                        footer.Item().Text(text =>
-                        {
-                            text.Span("Pagina ").FontSize(10);
-                            text.CurrentPageNumber().FontSize(10);
-                            text.Span(" di ").FontSize(10);
-                            text.TotalPages().FontSize(10);
-                        });
-
-                        footer.Item().Text("Gaming Store S.r.l. | P.IVA 12345678901")
-                                      .FontSize(10)
-                                      .Italic()
-                                      .FontColor(Colors.Grey.Darken1);
-                    });
-                });
-            });
-
-            documento.GeneratePdf(stream);
-            pdfBytes = stream.ToArray();
-
-            _logger.LogInformation("PDF generato per ordine {OrderId}", nuovoOrdine.IdOrdine);
+            pdfBytes = await _generatorePdfService.GeneraRicevutaOrdinePdfAsync(nuovoOrdine, dettagliOrdine, clientePerPdf);
+            _logger.LogInformation("PDF per ordine {OrderId} generato con successo.", nuovoOrdine.IdOrdine);
         }
         catch (Exception exPdf)
         {
-            _logger.LogError(exPdf, "Errore generazione PDF per ordine {OrderId}", nuovoOrdine.IdOrdine);
+            _logger.LogError(exPdf, "Errore durante la generazione del PDF per l'ordine {OrderId}. L'email verrà inviata senza allegato.", nuovoOrdine.IdOrdine);
         }
-
-        // Invio email con allegato PDF
-        string subject = $"Conferma Ordine #{nuovoOrdine.IdOrdine} - Gaming Store";
-        string baseUrl = _configuration["BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
-        string destinatario = utente.Email;
-        string saluto = string.IsNullOrEmpty(utente.Username) ? utente.Email : utente.Username;
-
-        string html = $@"
-            <p>Ciao {saluto},</p>
-            <p>Il tuo ordine <strong>#{nuovoOrdine.IdOrdine}</strong> è stato confermato.</p>
-            <p>In allegato trovi la ricevuta in PDF.</p>
-            <p><a href='{baseUrl}/Ordini/Dettagli/{nuovoOrdine.IdOrdine}'>Visualizza ordine</a></p>
-            <p>Grazie per aver scelto Gaming Store!</p>";
 
         try
         {
-            if (!string.IsNullOrEmpty(destinatario))
+            string subject = $"Conferma Ordine #{nuovoOrdine.IdOrdine} - Gaming Store";
+            string destinatario = utente.Email;
+            string saluto = string.IsNullOrEmpty(utente.Username) ? utente.Email : utente.Username;
+
+            // Crea il corpo dell'email (HTML)
+            string html = BuildConfirmationEmailBody(saluto, nuovoOrdine, pdfBytes); 
+
+            if (pdfBytes != null && pdfBytes.Length > 0)
             {
-                await _emailSender.SendEmailWithAttachmentAsync(destinatario, subject, html, pdfBytes, $"Ricevuta_Ordine_{nuovoOrdine.IdOrdine}.pdf", "application/pdf");
-                _logger.LogInformation("Email inviata a {email} per ordine {id}", destinatario, nuovoOrdine.IdOrdine);
+                await _emailSender.SendEmailWithAttachmentAsync(
+                    destinatario,
+                    subject,
+                    html,
+                    pdfBytes,
+                    $"Ricevuta_Ordine_{nuovoOrdine.IdOrdine}.pdf", // Nome del file
+                    "application/pdf"                               // MIME type
+                );
+                _logger.LogInformation("Email con allegato PDF inviata a {Email}", destinatario);
+            }
+            else
+            {
+                await _emailSender.SendEmailAsync(destinatario, subject, html);
+                _logger.LogWarning("Email inviata senza allegato PDF a {Email} per ordine {OrderId}", destinatario, nuovoOrdine.IdOrdine);
             }
         }
         catch (Exception exEmail)
@@ -469,19 +366,29 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
             _logger.LogError(exEmail, "Errore invio email per ordine {OrderId}", nuovoOrdine.IdOrdine);
         }
 
-        return Ok(new { messaggio = "Ordine confermato! Controlla la tua email per la ricevuta." });
+        return Ok(new
+        {
+            messaggio = "Ordine confermato con successo! Controlla la tua email per la ricevuta.",
+            ordineId = nuovoOrdine.IdOrdine,
+        });
     }
     catch (Exception ex)
     {
-        _logger.LogError(ex, "Errore durante la conferma ordine per utente {idUtente}", idUtente);
+        _logger.LogError(ex, "Errore critico durante la conferma ordine per utente {idUtente}", idUtente);
         return StatusCode(500, new { messaggio = "Errore interno nella conferma dell'ordine." });
     }
 }
 
+private string BuildConfirmationEmailBody(string saluto, Ordine ordine, byte[] pdfBytes)
+{
     
-
-
-
+    string body = $"<h1>Ciao {saluto},</h1>" +
+                  $"<p>Il tuo ordine #{ordine.IdOrdine} è stato confermato con successo!</p>" +
+                  $"<p>Totale: {ordine.TotaleOrdine:C}</p>" +
+                  (pdfBytes != null && pdfBytes.Length > 0 ? "<p>Trovi la ricevuta in allegato.</p>" : "<p>Non è stato possibile allegare la ricevuta PDF. Contattaci per richiederla.</p>") +
+                  "<p>Grazie per il tuo acquisto!</p>";
+    return body;
+}
         /// <summary>
         /// Aggiorna la quantità di un articolo nel carrello (utilizzando il GestoreDisponibilitaProdotto).
         /// </summary>

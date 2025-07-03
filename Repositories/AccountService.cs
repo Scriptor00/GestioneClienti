@@ -6,7 +6,7 @@ namespace GestioneClienti.Repositories
     {
         public bool RegisterUser(RegisterViewModel model)
         {
-         
+
             return true;
         }
     }

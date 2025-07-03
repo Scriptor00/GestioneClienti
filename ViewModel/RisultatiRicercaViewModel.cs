@@ -9,6 +9,6 @@ namespace WebAppEF.ViewModel
         public string? NomeCliente { get; set; }
         public int? IdOrdine { get; set; }
 
-       
+
     }
 }

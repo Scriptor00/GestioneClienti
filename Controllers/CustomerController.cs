@@ -100,74 +100,74 @@ namespace WebAppEF.Controllers
         }
 
 
-    [HttpGet]
-public async Task<IActionResult> AutocompleteIndirizzo(
-    string query,
-    [FromQuery] string countryCode = null,
-    [FromQuery] int limit = 10)
-{
-    try
-    {
-        if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
+        [HttpGet]
+        public async Task<IActionResult> AutocompleteIndirizzo(
+        string query,
+        [FromQuery] string countryCode = null,
+        [FromQuery] int limit = 10)
         {
-            _logger.LogWarning("Query troppo corta o vuota: {Query}", query);
-            return BadRequest(new { Message = "La query deve contenere almeno 3 caratteri" });
-        }
-
-        _logger.LogInformation("Autocomplete indirizzo avviato per: {Query}", query);
-
-        // Chiamata al servizio Google Maps per ottenere i suggerimenti
-        var suggestions = await _geocodingService.GetAddressSuggestionsAsync(query, countryCode);
-
-        if (suggestions == null || !suggestions.Any())
-        {
-            _logger.LogInformation("Nessun risultato trovato per: {Query}", query);
-            return Ok(new List<AddressAutocompleteViewModel>());
-        }
-
-        // Mappatura dei risultati in ViewModel
-        var results = new List<AddressAutocompleteViewModel>();
-
-        foreach (var suggestion in suggestions.Take(limit))
-        {
-            // Ottenere i dettagli del PlaceId
-            var details = await _geocodingService.GetPlaceDetailsAsync(suggestion.PlaceId);
-
-            if (details != null)
+            try
             {
-                var result = new AddressAutocompleteViewModel
+                if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
                 {
-                    PlaceId = suggestion.PlaceId,
-                    FormattedAddress = suggestion.Description,
-                    Street = details.Street,
-                    StreetNumber = details.StreetNumber,
-                    City = details.City,
-                    Country = details.Country,
-                    PostalCode = details.PostalCode
-                };
+                    _logger.LogWarning("Query troppo corta o vuota: {Query}", query);
+                    return BadRequest(new { Message = "La query deve contenere almeno 3 caratteri" });
+                }
 
-                results.Add(result);
+                _logger.LogInformation("Autocomplete indirizzo avviato per: {Query}", query);
+
+                // Chiamata al servizio Google Maps per ottenere i suggerimenti
+                var suggestions = await _geocodingService.GetAddressSuggestionsAsync(query, countryCode);
+
+                if (suggestions == null || !suggestions.Any())
+                {
+                    _logger.LogInformation("Nessun risultato trovato per: {Query}", query);
+                    return Ok(new List<AddressAutocompleteViewModel>());
+                }
+
+                // Mappatura dei risultati in ViewModel
+                var results = new List<AddressAutocompleteViewModel>();
+
+                foreach (var suggestion in suggestions.Take(limit))
+                {
+                    // Ottenere i dettagli del PlaceId
+                    var details = await _geocodingService.GetPlaceDetailsAsync(suggestion.PlaceId);
+
+                    if (details != null)
+                    {
+                        var result = new AddressAutocompleteViewModel
+                        {
+                            PlaceId = suggestion.PlaceId,
+                            FormattedAddress = suggestion.Description,
+                            Street = details.Street,
+                            StreetNumber = details.StreetNumber,
+                            City = details.City,
+                            Country = details.Country,
+                            PostalCode = details.PostalCode
+                        };
+
+                        results.Add(result);
+                    }
+                }
+
+                return Ok(results);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Errore di connessione al servizio Google Maps");
+                return StatusCode(502, new { Message = "Servizio di geocoding non disponibile" });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Errore parsing JSON dalla risposta Google");
+                return StatusCode(500, new { Message = "Errore nell'elaborazione della risposta" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Errore imprevisto durante l'autocomplete");
+                return StatusCode(500, new { Message = "Errore interno del server" });
             }
         }
-
-        return Ok(results);
-    }
-    catch (HttpRequestException ex)
-    {
-        _logger.LogError(ex, "Errore di connessione al servizio Google Maps");
-        return StatusCode(502, new { Message = "Servizio di geocoding non disponibile" });
-    }
-    catch (JsonException ex)
-    {
-        _logger.LogError(ex, "Errore parsing JSON dalla risposta Google");
-        return StatusCode(500, new { Message = "Errore nell'elaborazione della risposta" });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogCritical(ex, "Errore imprevisto durante l'autocomplete");
-        return StatusCode(500, new { Message = "Errore interno del server" });
-    }
-}
 
 
 
@@ -208,7 +208,7 @@ public async Task<IActionResult> AutocompleteIndirizzo(
                 return Json(new { valid = false, message = "Errore durante il controllo dell'email." });
             }
         }
-       
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -264,11 +264,11 @@ public async Task<IActionResult> AutocompleteIndirizzo(
                     Cognome = viewModel.Cognome,
                     Email = viewModel.Email,
                     Attivo = viewModel.Attivo,
-                    Indirizzo = viewModel.Indirizzo, 
-                    Civico = viewModel.Civico,      
-                    Citta = viewModel.Citta,         
-                    Cap = viewModel.Cap,             
-                    Paese = viewModel.Paese           
+                    Indirizzo = viewModel.Indirizzo,
+                    Civico = viewModel.Civico,
+                    Citta = viewModel.Citta,
+                    Cap = viewModel.Cap,
+                    Paese = viewModel.Paese
                 };
 
                 await _customerRepository.UpdateAsync(customer);

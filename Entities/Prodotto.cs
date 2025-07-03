@@ -26,8 +26,8 @@ namespace WebAppEF.Entities
         public string? ImmagineUrl { get; set; }
 
         public string? TrailerUrl { get; set; }
-        
-        [Timestamp] 
+
+        [Timestamp]
         public byte[] RowVersion { get; set; }
     }
 }
