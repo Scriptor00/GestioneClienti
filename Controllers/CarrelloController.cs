@@ -224,12 +224,12 @@ namespace ProgettoStage.Controllers
         }
 
     [HttpPost]
-[Route("Carrello/ConfermaOrdine")]
-[Authorize]
-public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto request)
-{
-    if (!ModelState.IsValid)
+    [Route("Carrello/ConfermaOrdine")]
+    [Authorize]
+    public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto request)
     {
+      if (!ModelState.IsValid)
+      {
         return BadRequest(new
         {
             messaggio = "Dati di richiesta non validi.",
@@ -286,8 +286,6 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
         if (nuovoOrdine == null || nuovoOrdine.Cliente == null)
         {
         _logger.LogWarning("Ordine {OrderId} o Cliente associato non trovato dopo il salvataggio.", nuovoOrdine?.IdOrdine);
-        // Puoi decidere se ritornare un errore o procedere con dati mancanti.
-        // Se il cliente è null qui, il PDF mostrerà "Non disponibile".
         }
 
         // Carica i dettagli ordine con prodotti per PDF
@@ -300,8 +298,7 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
         if (nuovoOrdine.TotaleOrdine == 0 && dettagliOrdine.Any())
             nuovoOrdine.TotaleOrdine = dettagliOrdine.Sum(d => d.PrezzoUnitario * d.Quantita);
 
-
-        // --- INIZIO FIX: Creazione e mappatura dell'oggetto Cliente per il PDF ---
+        //  Creazione e mappatura dell'oggetto Cliente per il PDF ---
         WebAppEF.Entities.Cliente clientePerPdf = nuovoOrdine?.Cliente; // Prendi il cliente direttamente dall'ordine caricato
 
         if (utente != null)
@@ -320,7 +317,6 @@ public async Task<IActionResult> ConfermaOrdine([FromBody] OrdineRequestDto requ
                 Paese = null,
                 Cap = null
             };
-
         }
       
         byte[] pdfBytes = null;
